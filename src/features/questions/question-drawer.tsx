@@ -66,7 +66,7 @@ export function QuestionDrawer({
           <motion.section className="flex flex-col gap-2">
             <Heading className="text-xs font-medium text-neutral-500">来源帖子</Heading>
             {question.sources.map((s) => (
-              <motion.div key={s.id} className="flex flex-col items-start gap-1">
+              <motion.div key={s.id} className="flex items-center justify-start gap-1">
                 <ButtonLink
                   href={s.url}
                   target="_blank"
