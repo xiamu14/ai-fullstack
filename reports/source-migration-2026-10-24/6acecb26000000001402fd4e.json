@@ -1,0 +1,35 @@
+{
+  "id": "6acecb26000000001402fd4e",
+  "fileHash": "2cba59685f094da29b10a094087f237f1775f38a3ff231ff097f0625f9ad82e5",
+  "bodyHash": "0d86950d3c5ff9617b0f3c288c9fcbe8fe49178684630696429473118c5fc7d9",
+  "decision": "include",
+  "reason": "正文可独立说明本地模型网关与订阅路由；未采用未披露的三个 loop 细节",
+  "label": "knowledge",
+  "confidence": 0.43,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.57,
+          "questions": 0,
+          "media": 0.05,
+          "off_topic": 0.38
+        },
+        "confidence": 0.43
+      }
+    },
+    "usage": {
+      "input_tokens": 1085,
+      "output_tokens": 46,
+      "cost": 4.557e-05
+    },
+    "id": "gen-dec-1792822631-9gZWSdiVYqf8sDPNt7l9",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

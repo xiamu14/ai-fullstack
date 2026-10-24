@@ -1,0 +1,35 @@
+{
+  "id": "6a057524000000003701f6aa",
+  "fileHash": "cf78b65a9613e7b2cb4b230e278c204bf57e671d8ff20e75113b40ff231b7851",
+  "bodyHash": "ed5c44168f71f6da66061763f160a0c645ee58da44dbe802edefc3ac9e8d1164",
+  "decision": "include",
+  "reason": "正文解释 Hook/Middleware 的观察、改写、阻断与组合边界；不补造后续内容",
+  "label": "knowledge",
+  "confidence": 0.65,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.74,
+          "questions": 0,
+          "media": 0.1,
+          "off_topic": 0.16
+        },
+        "confidence": 0.65
+      }
+    },
+    "usage": {
+      "input_tokens": 1222,
+      "output_tokens": 46,
+      "cost": 5.1324e-05
+    },
+    "id": "gen-dec-1792822599-dcH9yO5qNlYQ2CLbFcT8",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,4125 @@
+{
+  "snapshot": "typesafe/jev-1.14-20261014",
+  "calibration": {
+    "model": "typesafe/jev-1.14",
+    "policyVersion": "rubric-v1",
+    "confidence": 0.3,
+    "criticalLow": 0.05,
+    "criticalHigh": 0.6
+  },
+  "passed": true,
+  "requested": 160,
+  "approved": 32,
+  "combined": {
+    "count": 160,
+    "scored": 159,
+    "uncertain": 1,
+    "coverage": 0.99375,
+    "mae": 2.169811320754717,
+    "criticalMisses": 0,
+    "falseCritical": 0,
+    "injectionFailures": 0,
+    "passed": true,
+    "rows": [
+      {
+        "id": "agent-loop-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-loop-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-loop-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "agent-loop-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 93,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 7
+      },
+      {
+        "id": "agent-loop-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "planning-patterns-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "planning-patterns-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "planning-patterns-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "planning-patterns-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 90,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 10
+      },
+      {
+        "id": "planning-patterns-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "plan-granularity-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "plan-granularity-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "plan-granularity-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "plan-granularity-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "plan-granularity-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "worker-contract-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "worker-contract-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "worker-contract-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "worker-contract-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "worker-contract-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "concurrent-writes-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "concurrent-writes-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "concurrent-writes-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "concurrent-writes-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 95,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "concurrent-writes-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "structured-validation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "structured-validation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "structured-validation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "structured-validation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 88,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 12
+      },
+      {
+        "id": "structured-validation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "skill-ab-evaluation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "skill-ab-evaluation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "skill-ab-evaluation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "skill-ab-evaluation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "skill-ab-evaluation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "skill-routing-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "skill-routing-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "skill-routing-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "skill-routing-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 87,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 13
+      },
+      {
+        "id": "skill-routing-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "tool-selection-metrics-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "tool-selection-metrics-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "tool-selection-metrics-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "tool-selection-metrics-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 74,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 26
+      },
+      {
+        "id": "tool-selection-metrics-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "tool-discovery-contract-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "tool-discovery-contract-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "tool-discovery-contract-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 4,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 4
+      },
+      {
+        "id": "tool-discovery-contract-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 89,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "tool-discovery-contract-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "secret-injection-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "secret-injection-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "secret-injection-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "secret-injection-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "secret-injection-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "error-code-retrieval-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "error-code-retrieval-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "error-code-retrieval-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "error-code-retrieval-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "error-code-retrieval-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "graph-vector-retrieval-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "graph-vector-retrieval-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "graph-vector-retrieval-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "graph-vector-retrieval-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "graph-vector-retrieval-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "corpus-search-choice-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "corpus-search-choice-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 38,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "corpus-search-choice-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "corpus-search-choice-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "corpus-search-choice-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "semantic-cache-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "semantic-cache-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "semantic-cache-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "semantic-cache-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 95,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "semantic-cache-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-entity-merge-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-entity-merge-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": null,
+        "uncertain": true,
+        "critical": false,
+        "expectedCritical": false,
+        "error": null
+      },
+      {
+        "id": "memory-entity-merge-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "memory-entity-merge-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "memory-entity-merge-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "memory-causality-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "memory-causality-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-causality-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "memory-causality-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "memory-causality-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-drift-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-drift-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-drift-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "context-drift-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "context-drift-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "trajectory-normalization-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "trajectory-normalization-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "trajectory-normalization-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "trajectory-normalization-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "trajectory-normalization-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "evaluation-attribution-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "evaluation-attribution-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "evaluation-attribution-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "evaluation-attribution-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "evaluation-attribution-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "pass-at-k-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "pass-at-k-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "pass-at-k-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "pass-at-k-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "pass-at-k-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "judge-alignment-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "judge-alignment-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "judge-alignment-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 7,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 7
+      },
+      {
+        "id": "judge-alignment-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 86,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 14
+      },
+      {
+        "id": "judge-alignment-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "business-state-evaluation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "business-state-evaluation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 40,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 7
+      },
+      {
+        "id": "business-state-evaluation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "business-state-evaluation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "business-state-evaluation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "token-cost-accounting-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "token-cost-accounting-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "token-cost-accounting-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "token-cost-accounting-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "token-cost-accounting-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "durable-execution-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "durable-execution-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "durable-execution-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "durable-execution-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "durable-execution-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "queue-backpressure-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "queue-backpressure-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "queue-backpressure-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "queue-backpressure-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "queue-backpressure-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "runtime-sandbox-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "runtime-sandbox-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "runtime-sandbox-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "runtime-sandbox-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 83,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 17
+      },
+      {
+        "id": "runtime-sandbox-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "non-generative-decisions-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "non-generative-decisions-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 39,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "non-generative-decisions-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "non-generative-decisions-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "non-generative-decisions-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "refusal-boundary-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "refusal-boundary-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "refusal-boundary-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "refusal-boundary-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 89,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "refusal-boundary-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "harness-evolution-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "harness-evolution-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "harness-evolution-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "harness-evolution-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "harness-evolution-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "hook-middleware-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "hook-middleware-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "hook-middleware-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 4,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 4
+      },
+      {
+        "id": "hook-middleware-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 92,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "hook-middleware-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "trace-inspection-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "trace-inspection-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "trace-inspection-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "trace-inspection-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "trace-inspection-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "agent-loop",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "agent-loop-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-loop-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-loop-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "agent-loop-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 93,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 7
+          },
+          {
+            "id": "agent-loop-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "planning-patterns",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "planning-patterns-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "planning-patterns-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "planning-patterns-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "planning-patterns-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 90,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 10
+          },
+          {
+            "id": "planning-patterns-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-granularity",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "plan-granularity-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "plan-granularity-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "plan-granularity-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "plan-granularity-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "plan-granularity-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "worker-contract",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "worker-contract-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "worker-contract-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "worker-contract-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "worker-contract-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "worker-contract-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "concurrent-writes",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "concurrent-writes-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "concurrent-writes-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "concurrent-writes-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "concurrent-writes-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 95,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 5
+          },
+          {
+            "id": "concurrent-writes-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "structured-validation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "structured-validation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "structured-validation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "structured-validation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "structured-validation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 88,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 12
+          },
+          {
+            "id": "structured-validation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "skill-ab-evaluation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "skill-ab-evaluation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "skill-ab-evaluation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "skill-ab-evaluation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "skill-ab-evaluation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "skill-ab-evaluation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "skill-routing",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "skill-routing-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "skill-routing-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "skill-routing-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "skill-routing-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 87,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 13
+          },
+          {
+            "id": "skill-routing-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool-selection-metrics",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 6.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "tool-selection-metrics-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "tool-selection-metrics-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "tool-selection-metrics-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "tool-selection-metrics-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 74,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 26
+          },
+          {
+            "id": "tool-selection-metrics-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool-discovery-contract",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "tool-discovery-contract-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "tool-discovery-contract-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "tool-discovery-contract-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 4,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 4
+          },
+          {
+            "id": "tool-discovery-contract-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 89,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 11
+          },
+          {
+            "id": "tool-discovery-contract-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "secret-injection",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "secret-injection-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "secret-injection-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "secret-injection-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "secret-injection-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "secret-injection-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "error-code-retrieval",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "error-code-retrieval-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "error-code-retrieval-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "error-code-retrieval-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "error-code-retrieval-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "error-code-retrieval-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "graph-vector-retrieval",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "graph-vector-retrieval-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "graph-vector-retrieval-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "graph-vector-retrieval-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "graph-vector-retrieval-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "graph-vector-retrieval-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "corpus-search-choice",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "corpus-search-choice-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "corpus-search-choice-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 38,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 5
+          },
+          {
+            "id": "corpus-search-choice-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "corpus-search-choice-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "corpus-search-choice-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "semantic-cache",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "semantic-cache-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "semantic-cache-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "semantic-cache-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "semantic-cache-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 95,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 5
+          },
+          {
+            "id": "semantic-cache-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "memory-entity-merge",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 4,
+        "uncertain": 1,
+        "coverage": 0.8,
+        "mae": 1.5,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "memory-entity-merge-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "memory-entity-merge-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": null,
+            "uncertain": true,
+            "critical": false,
+            "expectedCritical": false,
+            "error": null
+          },
+          {
+            "id": "memory-entity-merge-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "memory-entity-merge-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "memory-entity-merge-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 3,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "memory-causality",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "memory-causality-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "memory-causality-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "memory-causality-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "memory-causality-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "memory-causality-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-drift",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "context-drift-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "context-drift-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "context-drift-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "context-drift-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "context-drift-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "trajectory-normalization",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "trajectory-normalization-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "trajectory-normalization-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "trajectory-normalization-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "trajectory-normalization-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "trajectory-normalization-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "evaluation-attribution",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "evaluation-attribution-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "evaluation-attribution-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "evaluation-attribution-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "evaluation-attribution-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "evaluation-attribution-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "pass-at-k",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "pass-at-k-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "pass-at-k-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "pass-at-k-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "pass-at-k-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "pass-at-k-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "judge-alignment",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 4.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "judge-alignment-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "judge-alignment-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "judge-alignment-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 7,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 7
+          },
+          {
+            "id": "judge-alignment-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 86,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 14
+          },
+          {
+            "id": "judge-alignment-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "business-state-evaluation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "business-state-evaluation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "business-state-evaluation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 40,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 7
+          },
+          {
+            "id": "business-state-evaluation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "business-state-evaluation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "business-state-evaluation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "token-cost-accounting",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "token-cost-accounting-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "token-cost-accounting-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "token-cost-accounting-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "token-cost-accounting-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "token-cost-accounting-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "durable-execution",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "durable-execution-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "durable-execution-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "durable-execution-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "durable-execution-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "durable-execution-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "queue-backpressure",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "queue-backpressure-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "queue-backpressure-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "queue-backpressure-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "queue-backpressure-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "queue-backpressure-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "runtime-sandbox",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 4.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "runtime-sandbox-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "runtime-sandbox-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "runtime-sandbox-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "runtime-sandbox-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 83,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 17
+          },
+          {
+            "id": "runtime-sandbox-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "non-generative-decisions",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "non-generative-decisions-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "non-generative-decisions-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 39,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "non-generative-decisions-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "non-generative-decisions-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "non-generative-decisions-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "refusal-boundary",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "refusal-boundary-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "refusal-boundary-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "refusal-boundary-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "refusal-boundary-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 89,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 11
+          },
+          {
+            "id": "refusal-boundary-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "harness-evolution",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "harness-evolution-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "harness-evolution-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "harness-evolution-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "harness-evolution-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "harness-evolution-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "hook-middleware",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "hook-middleware-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "hook-middleware-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "hook-middleware-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 4,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 4
+          },
+          {
+            "id": "hook-middleware-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 92,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 8
+          },
+          {
+            "id": "hook-middleware-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "trace-inspection",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "trace-inspection-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "trace-inspection-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "trace-inspection-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "trace-inspection-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "trace-inspection-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    }
+  ],
+  "note": "仅答题评分验证；正文判定未重跑。标签由整理者制定，待独立人工复核。固定既有阈值，不重试、不重新校准。"
+}

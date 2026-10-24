@@ -1,0 +1,3229 @@
+{
+  "snapshot": "typesafe/jev-1.14-20261014",
+  "calibration": {
+    "model": "typesafe/jev-1.14",
+    "policyVersion": "rubric-v1",
+    "confidence": 0.3,
+    "criticalLow": 0.05,
+    "criticalHigh": 0.6
+  },
+  "passed": true,
+  "requested": 125,
+  "approved": 25,
+  "combined": {
+    "count": 125,
+    "scored": 124,
+    "uncertain": 1,
+    "coverage": 0.992,
+    "mae": 1.5483870967741935,
+    "criticalMisses": 0,
+    "falseCritical": 0,
+    "injectionFailures": 0,
+    "passed": true,
+    "rows": [
+      {
+        "id": "task-progress-model-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "task-progress-model-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "task-progress-model-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "task-progress-model-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "task-progress-model-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "branching-conversation-context-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "branching-conversation-context-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "branching-conversation-context-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "branching-conversation-context-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "branching-conversation-context-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "companion-safety-evaluation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "companion-safety-evaluation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "companion-safety-evaluation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "companion-safety-evaluation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "companion-safety-evaluation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "delegated-purchase-scope-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "delegated-purchase-scope-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "delegated-purchase-scope-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "delegated-purchase-scope-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "delegated-purchase-scope-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "durable-release-workflow-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "durable-release-workflow-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "durable-release-workflow-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "durable-release-workflow-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "durable-release-workflow-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "persistent-agent-workspace-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "persistent-agent-workspace-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "persistent-agent-workspace-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "persistent-agent-workspace-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "persistent-agent-workspace-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "prediction-agent-validation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "prediction-agent-validation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "prediction-agent-validation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "prediction-agent-validation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "prediction-agent-validation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "loop-policy-separation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "loop-policy-separation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "loop-policy-separation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "loop-policy-separation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "loop-policy-separation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "task-cancellation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "task-cancellation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "task-cancellation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 4,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 4
+      },
+      {
+        "id": "task-cancellation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "task-cancellation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "information-sufficiency-gate-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "information-sufficiency-gate-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "information-sufficiency-gate-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "information-sufficiency-gate-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "information-sufficiency-gate-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-as-delegated-tool-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-as-delegated-tool-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-as-delegated-tool-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "agent-as-delegated-tool-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "agent-as-delegated-tool-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "credential-redaction-path-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "credential-redaction-path-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "credential-redaction-path-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "credential-redaction-path-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "credential-redaction-path-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "filesystem-checkpoints-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "filesystem-checkpoints-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "filesystem-checkpoints-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 4,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 4
+      },
+      {
+        "id": "filesystem-checkpoints-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "filesystem-checkpoints-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "intent-entity-distinction-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "intent-entity-distinction-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 37,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "intent-entity-distinction-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "intent-entity-distinction-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "intent-entity-distinction-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "intent-classifier-choice-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-classifier-choice-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-classifier-choice-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "intent-classifier-choice-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "intent-classifier-choice-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multi-intent-decomposition-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multi-intent-decomposition-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multi-intent-decomposition-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "multi-intent-decomposition-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 91,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 9
+      },
+      {
+        "id": "multi-intent-decomposition-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-transition-management-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-transition-management-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 37,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "intent-transition-management-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 3
+      },
+      {
+        "id": "intent-transition-management-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "intent-transition-management-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 4,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "intent-taxonomy-design-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-taxonomy-design-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-taxonomy-design-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "intent-taxonomy-design-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "intent-taxonomy-design-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-fewshot-design-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-fewshot-design-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-fewshot-design-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "intent-fewshot-design-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-fewshot-design-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-evaluation-metrics-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-evaluation-metrics-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-evaluation-metrics-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "intent-evaluation-metrics-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "intent-evaluation-metrics-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multilingual-intent-routing-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multilingual-intent-routing-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multilingual-intent-routing-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "multilingual-intent-routing-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 95,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "multilingual-intent-routing-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-routing-latency-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-routing-latency-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-routing-latency-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "intent-routing-latency-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "intent-routing-latency-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "ambiguous-intent-clarification-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "ambiguous-intent-clarification-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "ambiguous-intent-clarification-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "ambiguous-intent-clarification-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "ambiguous-intent-clarification-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "reasoning-prompt-evaluation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "reasoning-prompt-evaluation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "reasoning-prompt-evaluation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "reasoning-prompt-evaluation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "reasoning-prompt-evaluation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "intent-injection-resilience-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-injection-resilience-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "intent-injection-resilience-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "intent-injection-resilience-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 93,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 7
+      },
+      {
+        "id": "intent-injection-resilience-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": null,
+        "uncertain": true,
+        "critical": null,
+        "expectedCritical": false,
+        "error": null
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "task-progress-model",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "task-progress-model-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "task-progress-model-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "task-progress-model-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "task-progress-model-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "task-progress-model-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "branching-conversation-context",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "branching-conversation-context-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "branching-conversation-context-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "branching-conversation-context-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "branching-conversation-context-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "branching-conversation-context-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "companion-safety-evaluation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "companion-safety-evaluation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "companion-safety-evaluation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "companion-safety-evaluation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "companion-safety-evaluation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "companion-safety-evaluation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "delegated-purchase-scope",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "delegated-purchase-scope-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "delegated-purchase-scope-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "delegated-purchase-scope-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "delegated-purchase-scope-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "delegated-purchase-scope-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "durable-release-workflow",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "durable-release-workflow-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "durable-release-workflow-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "durable-release-workflow-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "durable-release-workflow-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "durable-release-workflow-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "persistent-agent-workspace",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "persistent-agent-workspace-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "persistent-agent-workspace-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "persistent-agent-workspace-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "persistent-agent-workspace-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "persistent-agent-workspace-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "prediction-agent-validation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "prediction-agent-validation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "prediction-agent-validation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "prediction-agent-validation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "prediction-agent-validation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "prediction-agent-validation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "loop-policy-separation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "loop-policy-separation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "loop-policy-separation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "loop-policy-separation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "loop-policy-separation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "loop-policy-separation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "task-cancellation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "task-cancellation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "task-cancellation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "task-cancellation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 4,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 4
+          },
+          {
+            "id": "task-cancellation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "task-cancellation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "information-sufficiency-gate",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "information-sufficiency-gate-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "information-sufficiency-gate-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "information-sufficiency-gate-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "information-sufficiency-gate-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "information-sufficiency-gate-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-as-delegated-tool",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "agent-as-delegated-tool-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-as-delegated-tool-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-as-delegated-tool-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "agent-as-delegated-tool-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "agent-as-delegated-tool-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "credential-redaction-path",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "credential-redaction-path-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "credential-redaction-path-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "credential-redaction-path-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "credential-redaction-path-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "credential-redaction-path-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "filesystem-checkpoints",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "filesystem-checkpoints-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "filesystem-checkpoints-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "filesystem-checkpoints-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 4,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 4
+          },
+          {
+            "id": "filesystem-checkpoints-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "filesystem-checkpoints-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-entity-distinction",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-entity-distinction-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "intent-entity-distinction-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 37,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "intent-entity-distinction-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "intent-entity-distinction-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "intent-entity-distinction-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-classifier-choice",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-classifier-choice-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-classifier-choice-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-classifier-choice-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "intent-classifier-choice-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "intent-classifier-choice-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi-intent-decomposition",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "multi-intent-decomposition-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "multi-intent-decomposition-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "multi-intent-decomposition-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "multi-intent-decomposition-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 91,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 9
+          },
+          {
+            "id": "multi-intent-decomposition-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-transition-management",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-transition-management-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-transition-management-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 37,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "intent-transition-management-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 3,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 3
+          },
+          {
+            "id": "intent-transition-management-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "intent-transition-management-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 4,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-taxonomy-design",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-taxonomy-design-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "intent-taxonomy-design-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-taxonomy-design-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "intent-taxonomy-design-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "intent-taxonomy-design-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-fewshot-design",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-fewshot-design-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "intent-fewshot-design-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "intent-fewshot-design-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "intent-fewshot-design-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-fewshot-design-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-evaluation-metrics",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-evaluation-metrics-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "intent-evaluation-metrics-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-evaluation-metrics-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "intent-evaluation-metrics-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "intent-evaluation-metrics-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "multilingual-intent-routing",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "multilingual-intent-routing-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "multilingual-intent-routing-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "multilingual-intent-routing-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "multilingual-intent-routing-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 95,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 5
+          },
+          {
+            "id": "multilingual-intent-routing-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-routing-latency",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-routing-latency-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "intent-routing-latency-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "intent-routing-latency-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "intent-routing-latency-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "intent-routing-latency-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ambiguous-intent-clarification",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "ambiguous-intent-clarification-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "ambiguous-intent-clarification-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "ambiguous-intent-clarification-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "ambiguous-intent-clarification-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "ambiguous-intent-clarification-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "reasoning-prompt-evaluation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "reasoning-prompt-evaluation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "reasoning-prompt-evaluation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "reasoning-prompt-evaluation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "reasoning-prompt-evaluation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "reasoning-prompt-evaluation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "intent-injection-resilience",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 4,
+        "uncertain": 1,
+        "coverage": 0.8,
+        "mae": 2.25,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "intent-injection-resilience-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "intent-injection-resilience-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "intent-injection-resilience-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "intent-injection-resilience-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 93,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 7
+          },
+          {
+            "id": "intent-injection-resilience-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": null,
+            "uncertain": true,
+            "critical": null,
+            "expectedCritical": false,
+            "error": null
+          }
+        ]
+      }
+    }
+  ],
+  "note": "仅答题评分验证；正文判定未重跑。标签由整理者制定，待独立人工复核。固定既有阈值，不重试、不重新校准。"
+}

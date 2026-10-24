@@ -1,0 +1,35 @@
+{
+  "id": "6a73152d000000003301b284",
+  "fileHash": "cc09e749f4da50833e575431d9110f2ea646f4a940e7326b45681fe00378a9e6",
+  "bodyHash": "d5835e11a7d60bc5d328743719ddfa04ba756fe91536dafde4e5f7737dc07d61",
+  "decision": "include",
+  "reason": "正文有邮件 Agent 部署入口、API/CLI 使用、人工批准与测试域名边界",
+  "label": "off_topic",
+  "confidence": 0.45,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.4,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.59
+        },
+        "confidence": 0.45
+      }
+    },
+    "usage": {
+      "input_tokens": 1213,
+      "output_tokens": 47,
+      "cost": 5.0946e-05
+    },
+    "id": "gen-dec-1792822618-3eAZ2guby5h1dcIVaayU",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

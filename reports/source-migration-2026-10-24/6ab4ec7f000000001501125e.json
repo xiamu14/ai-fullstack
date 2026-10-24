@@ -1,0 +1,35 @@
+{
+  "id": "6ab4ec7f000000001501125e",
+  "fileHash": "ca6767eaa5a3ee328c7a7f7b4a7dde3fcdf67da3aa31bc3bd881bce9f85d9210",
+  "bodyHash": "6628d79df9c7b105967cff14a6b4466f2fc3e3ac224612f7b6eb367d40be299d",
+  "decision": "include",
+  "reason": "正文独立分析线性会话污染及树形分支上下文的取舍",
+  "label": "knowledge",
+  "confidence": 0.59,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.69,
+          "questions": 0,
+          "media": 0,
+          "off_topic": 0.31
+        },
+        "confidence": 0.59
+      }
+    },
+    "usage": {
+      "input_tokens": 1697,
+      "output_tokens": 46,
+      "cost": 7.1274e-05
+    },
+    "id": "gen-dec-1792822627-OhIKY7PgjuGludt8dgqC",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a43b4740000000022018460",
+  "fileHash": "905c935bcf6eec0f5da7ce5cfeb25f531f28b067295760b669844d61b1fc2342",
+  "bodyHash": "e64ef537c200735fd2e11ac3beb16e4c82c7630cd52795636ca14dbe57942038",
+  "decision": "include",
+  "reason": "正文有 Agent 主循环、日志、测试与最小版本的独立建议；不补图中实现",
+  "label": "knowledge",
+  "confidence": 0.63,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.72,
+          "questions": 0,
+          "media": 0.15,
+          "off_topic": 0.13
+        },
+        "confidence": 0.63
+      }
+    },
+    "usage": {
+      "input_tokens": 1083,
+      "output_tokens": 46,
+      "cost": 4.5486e-05
+    },
+    "id": "gen-dec-1792822611-PPPyeL3aeE88tbJzQYV3",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

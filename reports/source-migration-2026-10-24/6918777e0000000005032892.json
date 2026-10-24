@@ -1,0 +1,8 @@
+{
+  "id": "6918777e0000000005032892",
+  "fileHash": "989dfeabbaecab467eef0fa9ffefdd0d70b516fb0c2d0177717ccd0178a4c9c9",
+  "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decision": "exclude",
+  "reason": "采集状态：outside-date",
+  "reviewer": "rules"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a5ca70000000000010029ee",
+  "fileHash": "2b83d15eaea67ed1ed7ea6190bbbe08bf1bc3e75a92b5f35067c68fc06af8eb2",
+  "bodyHash": "7655cd18c0313995a295942c9c231f15cf2e792ac917fb501a577f19bece58d3",
+  "decision": "include",
+  "reason": "正文通过具体例子说明 Skill 封装方法论与推理流程",
+  "label": "off_topic",
+  "confidence": 0.72,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.21,
+          "questions": 0,
+          "media": 0,
+          "off_topic": 0.79
+        },
+        "confidence": 0.72
+      }
+    },
+    "usage": {
+      "input_tokens": 1209,
+      "output_tokens": 47,
+      "cost": 5.0778e-05
+    },
+    "id": "gen-dec-1792822614-eTek8znJ3E7vYziRJQdR",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

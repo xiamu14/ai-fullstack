@@ -1,0 +1,35 @@
+{
+  "id": "6a5f2ee6000000000401f8ba",
+  "fileHash": "ce0f0d6e5ec2740e89a972e998140493277e695dd6fdfbdbd9e0851828464c60",
+  "bodyHash": "830762a74664332e32a744593b3017250941b6bc63765cc1488c8970272fb3a0",
+  "decision": "include",
+  "reason": "视频正文独立说明 Agent 身份与执行状态的视觉编码",
+  "label": "off_topic",
+  "confidence": 0.55,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.33,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.66
+        },
+        "confidence": 0.55
+      }
+    },
+    "usage": {
+      "input_tokens": 1352,
+      "output_tokens": 47,
+      "cost": 5.6784e-05
+    },
+    "id": "gen-dec-1792822615-Qd70Ifm46sPK5aTvtYI0",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -20,7 +20,15 @@
     "read:images": "/opt/homebrew/bin/python3 ../agent-knowledge/scripts/read-images.py",
     "start": "bun scripts/serve.ts",
     "library:add": "bun scripts/library.ts",
-    "export:md": "bun scripts/export-markdown.ts"
+    "export:md": "bun scripts/export-markdown.ts",
+    "sources:review": "bun scripts/source-migration/review.ts",
+    "sources:import": "bun scripts/source-migration/import.ts",
+    "sources:verify": "bun scripts/source-migration/verify.ts",
+    "sources:backup-check": "bun scripts/source-migration/backup-verification.ts",
+    "sources:cleanup": "bun scripts/source-migration/cleanup.ts",
+    "questions:evaluate": "bun scripts/question-expansion/evaluate.ts",
+    "questions:evaluate:batches": "bun scripts/question-expansion/evaluate-batches.ts",
+    "questions:verify:coverage": "bun scripts/question-expansion/verify-coverage.ts"
   },
   "dependencies": {
     "@remixicon/react": "latest",

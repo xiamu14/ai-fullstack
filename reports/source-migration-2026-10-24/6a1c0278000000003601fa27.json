@@ -1,0 +1,35 @@
+{
+  "id": "6a1c0278000000003601fa27",
+  "fileHash": "f81fad69341b00c302d89ef1eee98da7f66ae95f1c19b691948510c1db7c4907",
+  "bodyHash": "71019f8aa9edf776ae0b0bf7861e3f890580b5248346bb16855041f62c503877",
+  "decision": "include",
+  "reason": "正文完整说明显式偏好、硬约束与会话纠偏的设计视角",
+  "label": "knowledge",
+  "confidence": 0.77,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.83,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.16
+        },
+        "confidence": 0.77
+      }
+    },
+    "usage": {
+      "input_tokens": 1245,
+      "output_tokens": 46,
+      "cost": 5.229e-05
+    },
+    "id": "gen-dec-1792822606-KQIuriJpPUnpdV7vhLB0",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

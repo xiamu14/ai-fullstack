@@ -1,0 +1,30 @@
+{
+  "sources": 145,
+  "coveredSources": 145,
+  "newQuestions": 111,
+  "totalQuestions": 163,
+  "samples": 555,
+  "scored": 551,
+  "uncertain": 4,
+  "mae": 1.851179673321234,
+  "criticalMisses": 0,
+  "falseCritical": 0,
+  "injectionFailures": 0,
+  "requestErrors": 0,
+  "reportedCostUsd": 0.03999151800000001,
+  "uncertainSamples": [
+    "preference-dialogue-paraphrase",
+    "workspace-context-isolation-partial",
+    "engineering-tradeoff-evidence-complete",
+    "intent-injection-resilience-injection"
+  ],
+  "moduleCounts": {
+    "工程质量": 35,
+    "决策编排": 24,
+    "系统设计": 27,
+    "模型交互": 22,
+    "上下文记忆": 22,
+    "检索增强": 11,
+    "工具执行": 22
+  }
+}

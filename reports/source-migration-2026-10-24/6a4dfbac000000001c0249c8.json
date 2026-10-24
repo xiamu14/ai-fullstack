@@ -1,0 +1,35 @@
+{
+  "id": "6a4dfbac000000001c0249c8",
+  "fileHash": "8eae25e2f6966e9e1500b072dad410642a12c7e81dd64ba4496a4a28a733ab21",
+  "bodyHash": "04d0539148a0e8c3e8952782e021343d08736e41a3d5a427a7498f27602b3c11",
+  "decision": "include",
+  "reason": "视频正文独立说明参考素材、数据读取与重绘流程，不读取视频",
+  "label": "knowledge",
+  "confidence": 0.37,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.53,
+          "questions": 0,
+          "media": 0.07,
+          "off_topic": 0.4
+        },
+        "confidence": 0.37
+      }
+    },
+    "usage": {
+      "input_tokens": 1104,
+      "output_tokens": 46,
+      "cost": 4.6368e-05
+    },
+    "id": "gen-dec-1792822613-zB5vTtddkZa7jR0zEoJN",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

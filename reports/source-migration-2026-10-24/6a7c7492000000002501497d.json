@@ -1,0 +1,35 @@
+{
+  "id": "6a7c7492000000002501497d",
+  "fileHash": "b4deabc009adaaa52fb27ced689efbc9c7571ee8c998e8364abcf5b9f5e908df",
+  "bodyHash": "45804f1e40c0625ab47eccb9d4adff2f8d7d1a943659faeb56462cfb717d7235",
+  "decision": "include",
+  "reason": "正文有查询、抽取、清洗、聚类流程和结构化采集接口说明",
+  "label": "knowledge",
+  "confidence": 0.71,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.78,
+          "questions": 0,
+          "media": 0,
+          "off_topic": 0.22
+        },
+        "confidence": 0.71
+      }
+    },
+    "usage": {
+      "input_tokens": 1394,
+      "output_tokens": 46,
+      "cost": 5.8548e-05
+    },
+    "id": "gen-dec-1792822621-m7eYUd61IOT28otXPrfy",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

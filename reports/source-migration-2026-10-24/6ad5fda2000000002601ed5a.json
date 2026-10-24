@@ -1,0 +1,35 @@
+{
+  "id": "6ad5fda2000000002601ed5a",
+  "fileHash": "efd9ec373f3f4d11e71f9b801148bf9dbfaa0c6ca9541b196fd267ff2307b7c7",
+  "bodyHash": "78e91ad49ee422c26f83f76c4feb457faee0f31c8141fa0b8a8bdf885569483b",
+  "decision": "include",
+  "reason": "视频正文独立说明轨迹树、逐层展开与原始证据保留",
+  "label": "off_topic",
+  "confidence": 0.39,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.44,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.54
+        },
+        "confidence": 0.39
+      }
+    },
+    "usage": {
+      "input_tokens": 1385,
+      "output_tokens": 47,
+      "cost": 5.817e-05
+    },
+    "id": "gen-dec-1792822632-hz2ssB6zosaJYyJ3cdka",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

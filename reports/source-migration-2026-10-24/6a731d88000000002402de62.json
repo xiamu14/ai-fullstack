@@ -1,0 +1,35 @@
+{
+  "id": "6a731d88000000002402de62",
+  "fileHash": "5a1e1c3b2f44286c938f9ae5f8fe89de2475c5eecf7b40f70b41c332db43cbdb",
+  "bodyHash": "3c560838d21288e81992a6c46c74aabb67ff8cbfa4995d96f0623599a789b2f6",
+  "decision": "include",
+  "reason": "视频正文独立说明通过 MCP 检索并应用 React 动效组件的机制",
+  "label": "off_topic",
+  "confidence": 0.43,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.3,
+          "questions": 0,
+          "media": 0.13,
+          "off_topic": 0.57
+        },
+        "confidence": 0.43
+      }
+    },
+    "usage": {
+      "input_tokens": 1000,
+      "output_tokens": 47,
+      "cost": 4.2e-05
+    },
+    "id": "gen-dec-1792822618-9tbLLtbj5DASwFC77t2E",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

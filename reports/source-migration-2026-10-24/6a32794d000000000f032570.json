@@ -1,0 +1,35 @@
+{
+  "id": "6a32794d000000000f032570",
+  "fileHash": "e31c98b2357a3fd84fb61952a3f2a2ff85de77ed593e216d733677ec950ac973",
+  "bodyHash": "a7e4fb3746ae0c24508c6e5b0049ab088784167b8891c230e5971b57b170b571",
+  "decision": "include",
+  "reason": "正文完整列出 Agent 通信网络研究问题；仅保存问题来源",
+  "label": "off_topic",
+  "confidence": 0.55,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0,
+          "questions": 0.03,
+          "media": 0.31,
+          "off_topic": 0.66
+        },
+        "confidence": 0.55
+      }
+    },
+    "usage": {
+      "input_tokens": 1075,
+      "output_tokens": 47,
+      "cost": 4.515e-05
+    },
+    "id": "gen-dec-1792822609-n0L5lI3qMPHANH2OPBZ0",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

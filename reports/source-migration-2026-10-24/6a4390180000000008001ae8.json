@@ -1,0 +1,35 @@
+{
+  "id": "6a4390180000000008001ae8",
+  "fileHash": "3d0d5daf6f013b7d123032ed2a9248afb33bb66f7184c2a8cdfb9025924d125e",
+  "bodyHash": "f839118b3d3f43474f0e8181010aef3e67249f55c89be5a788914132b463848d",
+  "decision": "include",
+  "reason": "正文独立说明跨仓依赖图及会话状态捕获的设计思路",
+  "label": "knowledge",
+  "confidence": 0.4,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.55,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.44
+        },
+        "confidence": 0.4
+      }
+    },
+    "usage": {
+      "input_tokens": 1181,
+      "output_tokens": 46,
+      "cost": 4.9602e-05
+    },
+    "id": "gen-dec-1792822611-ZxqlAR4U1MUOLd10jIxw",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

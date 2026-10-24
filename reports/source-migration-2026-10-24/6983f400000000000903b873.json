@@ -1,0 +1,35 @@
+{
+  "id": "6983f400000000000903b873",
+  "fileHash": "bf036ac98b51c587f860e5bae973f55c9efa44f674b19b7aacced187a96fba7a",
+  "bodyHash": "f4a4d5c398b4e1b73a48277e33481e3b1b2b9d2789a2bea5ba2dab59786ef357",
+  "decision": "include",
+  "reason": "正文独立说明 AI 评估目标与方法，作为作者观点保存",
+  "label": "off_topic",
+  "confidence": 0.55,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.23,
+          "questions": 0,
+          "media": 0.11,
+          "off_topic": 0.66
+        },
+        "confidence": 0.55
+      }
+    },
+    "usage": {
+      "input_tokens": 876,
+      "output_tokens": 47,
+      "cost": 3.6792e-05
+    },
+    "id": "gen-dec-1792822596-Y9EP6NP6k67O9xDL51Cf",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

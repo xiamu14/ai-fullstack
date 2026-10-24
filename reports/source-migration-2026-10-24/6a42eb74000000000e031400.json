@@ -1,0 +1,35 @@
+{
+  "id": "6a42eb74000000000e031400",
+  "fileHash": "9960007e650e15066b771d7f2ef31f670c383cdb0f455028b0af28a52d17fd35",
+  "bodyHash": "4aa276825a766c9b318bcb0b148eb0b6887cc503694f5efb43106eb4748650b2",
+  "decision": "include",
+  "reason": "视频正文独立说明多 Agent 在独立 worktree 实现、比较与合并的流程",
+  "label": "knowledge",
+  "confidence": 0.71,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.78,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.19
+        },
+        "confidence": 0.71
+      }
+    },
+    "usage": {
+      "input_tokens": 1100,
+      "output_tokens": 46,
+      "cost": 4.62e-05
+    },
+    "id": "gen-dec-1792822611-ZbjGWRLKBlswyGzGvEJO",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

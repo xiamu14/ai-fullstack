@@ -1,0 +1,35 @@
+{
+  "id": "6a5ddecf000000000f01c426",
+  "fileHash": "f98abf52e58e99e0475bf066b0a1374e105705630c6a40a2a58b54e1c76808bc",
+  "bodyHash": "830293b5630178224d99ac1e9e6d25014909e9d4b9de748256603e163d7328e1",
+  "decision": "include",
+  "reason": "正文有截图分析到代码生成再迭代的完整使用流程，不依赖展示图",
+  "label": "off_topic",
+  "confidence": 0.61,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.28,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.71
+        },
+        "confidence": 0.61
+      }
+    },
+    "usage": {
+      "input_tokens": 1423,
+      "output_tokens": 47,
+      "cost": 5.9766e-05
+    },
+    "id": "gen-dec-1792822614-1e6U6JHhbKXICApT756u",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

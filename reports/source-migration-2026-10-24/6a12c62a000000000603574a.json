@@ -1,0 +1,35 @@
+{
+  "id": "6a12c62a000000000603574a",
+  "fileHash": "7931e03551829db96a1fd9cc4e456d85651214cee1bcea98db8c1a616df136d6",
+  "bodyHash": "35efa22fa7704e56abec45136c4d2d01285cb8a7a0a45b03faad42922db64ec4",
+  "decision": "include",
+  "reason": "正文独立说明动态评测和静态评测的适用边界；性能提升仅作作者主张",
+  "label": "knowledge",
+  "confidence": 0.6,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.7,
+          "questions": 0.07,
+          "media": 0,
+          "off_topic": 0.23
+        },
+        "confidence": 0.6
+      }
+    },
+    "usage": {
+      "input_tokens": 1267,
+      "output_tokens": 46,
+      "cost": 5.3214e-05
+    },
+    "id": "gen-dec-1792822604-3Bi1ZUcde2N7bvnkyWyt",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

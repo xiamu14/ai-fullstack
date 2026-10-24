@@ -1,0 +1,8 @@
+{
+  "id": "6a96ec05000000002802d7f2",
+  "fileHash": "513ac536703dd9af00763af3a9b7c331bc0c089514fc0b916555d1b2643a1f9a",
+  "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decision": "exclude",
+  "reason": "正文为空",
+  "reviewer": "rules"
+}

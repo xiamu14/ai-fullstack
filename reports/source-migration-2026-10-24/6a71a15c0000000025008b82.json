@@ -1,0 +1,35 @@
+{
+  "id": "6a71a15c0000000025008b82",
+  "fileHash": "c06202b6e91c44fff58b3a305ac51bc928d5737ddc005628bf6184366f73b058",
+  "bodyHash": "3db656ea455caa2fb1208ae07052800e02013021d2da9d8b56f4dc1212662b1b",
+  "decision": "include",
+  "reason": "正文独立说明 isolate/容器按任务重量分配及共享文件状态",
+  "label": "knowledge",
+  "confidence": 0.41,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.56,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.41
+        },
+        "confidence": 0.41
+      }
+    },
+    "usage": {
+      "input_tokens": 909,
+      "output_tokens": 46,
+      "cost": 3.8178e-05
+    },
+    "id": "gen-dec-1792822618-LylLt080kTA2tgcGjOCs",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

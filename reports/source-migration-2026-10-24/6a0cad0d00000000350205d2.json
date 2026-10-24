@@ -1,0 +1,35 @@
+{
+  "id": "6a0cad0d00000000350205d2",
+  "fileHash": "a939151f26eb73f276b2a6b80ab9848ec764e08af88c92e977a651700e8a6d5e",
+  "bodyHash": "9c9773ddd9f515fdf18096c9ffdd28fe681178dc1967ad41677076ce9c4b0c30",
+  "decision": "include",
+  "reason": "正文独立总结可验证任务、Agentic Engineering 和模型能力边界",
+  "label": "knowledge",
+  "confidence": 0.41,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.56,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.41
+        },
+        "confidence": 0.41
+      }
+    },
+    "usage": {
+      "input_tokens": 1203,
+      "output_tokens": 46,
+      "cost": 5.0526e-05
+    },
+    "id": "gen-dec-1792822602-EFiMkXn5LCHlKoRV9yLR",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -6,3 +6,4 @@ dist/
 .output/
 .tanstack/
 *.sql.gz
+backups/

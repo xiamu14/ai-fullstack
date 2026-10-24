@@ -1,0 +1,35 @@
+{
+  "id": "6a32267c000000002201adf3",
+  "fileHash": "9f655b42acb824b30e83698cb71cded33f0032fe438100b4f27d6860ce169121",
+  "bodyHash": "b67e3bf54be7f0b8a814361fac41267d7559461a3e03261a5825af31ceb7e0bc",
+  "decision": "include",
+  "reason": "正文独立描述图向量混合查询、类型推断及嵌入处理；产品能力为作者主张",
+  "label": "knowledge",
+  "confidence": 0.68,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.76,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.23
+        },
+        "confidence": 0.68
+      }
+    },
+    "usage": {
+      "input_tokens": 1233,
+      "output_tokens": 46,
+      "cost": 5.1786e-05
+    },
+    "id": "gen-dec-1792822609-QOT2qkmuMTJTGSTnsZ6t",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

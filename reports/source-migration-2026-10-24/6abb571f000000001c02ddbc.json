@@ -1,0 +1,35 @@
+{
+  "id": "6abb571f000000001c02ddbc",
+  "fileHash": "4cdf68ffce997eca35d7e74e0bccc09be59339864bf38d09ef6ca98eb4382112",
+  "bodyHash": "174b9309810b5f8f602fd91ad9526c0952d8e28795bc5efa44d43c5f0e2b78da",
+  "decision": "include",
+  "reason": "视频正文独立说明推荐理由、约束展示与授权的交互设计",
+  "label": "off_topic",
+  "confidence": 0.51,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.35,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.63
+        },
+        "confidence": 0.51
+      }
+    },
+    "usage": {
+      "input_tokens": 1439,
+      "output_tokens": 47,
+      "cost": 6.0438e-05
+    },
+    "id": "gen-dec-1792822627-7t9K5L8noJIKB6aJF2fS",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

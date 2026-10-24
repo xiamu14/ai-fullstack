@@ -1,0 +1,35 @@
+{
+  "id": "69fed9650000000036003a00",
+  "fileHash": "54e0b610a38d7d008292edcea2f6c0d587687ef65f8919e9a1df7f4d3aa713ee",
+  "bodyHash": "90977dd87b54c7faf68fa17c84f7a6f3dc2f0de990cbbb25d8d6e37747672528",
+  "decision": "include",
+  "reason": "正文解释 Skill 固化高频流程与推理成本的关系",
+  "label": "knowledge",
+  "confidence": 0.68,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.76,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.22
+        },
+        "confidence": 0.68
+      }
+    },
+    "usage": {
+      "input_tokens": 988,
+      "output_tokens": 46,
+      "cost": 4.1496e-05
+    },
+    "id": "gen-dec-1792822598-XlxfYJ8U3VUBiVE7ItB3",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

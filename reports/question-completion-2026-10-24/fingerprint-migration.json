@@ -1,0 +1,8 @@
+{
+  "verifiedAt": "2026-10-24T07:12:44.239Z",
+  "journals": 715,
+  "gradingInputsUnchanged": true,
+  "originalArtifactFingerprintsRetained": true,
+  "newApiCalls": 0,
+  "reason": "评分缓存只绑定实际评分输入及标签配置；来源和版本更正不改变 Jev 输入。逐份验证原指纹与当前评分内容一致后迁移。"
+}

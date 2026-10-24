@@ -1,0 +1,4637 @@
+{
+  "snapshot": "typesafe/jev-1.14-20261014",
+  "calibration": {
+    "model": "typesafe/jev-1.14",
+    "policyVersion": "rubric-v1",
+    "confidence": 0.3,
+    "criticalLow": 0.05,
+    "criticalHigh": 0.6
+  },
+  "passed": true,
+  "requested": 180,
+  "approved": 36,
+  "combined": {
+    "count": 180,
+    "scored": 178,
+    "uncertain": 2,
+    "coverage": 0.9888888888888889,
+    "mae": 1.904494382022472,
+    "criticalMisses": 0,
+    "falseCritical": 0,
+    "injectionFailures": 0,
+    "passed": true,
+    "rows": [
+      {
+        "id": "constrained-workflow-language-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "constrained-workflow-language-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "constrained-workflow-language-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "constrained-workflow-language-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 93,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 7
+      },
+      {
+        "id": "constrained-workflow-language-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "just-in-time-context-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "just-in-time-context-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 39,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "just-in-time-context-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 7,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 7
+      },
+      {
+        "id": "just-in-time-context-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "just-in-time-context-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "evaluation-suite-design-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "evaluation-suite-design-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "evaluation-suite-design-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "evaluation-suite-design-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "evaluation-suite-design-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "workflow-agent-boundary-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "workflow-agent-boundary-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "workflow-agent-boundary-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "workflow-agent-boundary-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 92,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "workflow-agent-boundary-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "single-multi-agent-choice-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "single-multi-agent-choice-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "single-multi-agent-choice-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "single-multi-agent-choice-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 91,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 9
+      },
+      {
+        "id": "single-multi-agent-choice-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-tool-distinction-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-tool-distinction-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "agent-tool-distinction-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "agent-tool-distinction-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 89,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "agent-tool-distinction-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "code-as-action-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "code-as-action-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "code-as-action-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "code-as-action-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "code-as-action-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "ui-delivery-evidence-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "ui-delivery-evidence-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "ui-delivery-evidence-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "ui-delivery-evidence-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 95,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "ui-delivery-evidence-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-network-efficiency-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-network-efficiency-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-network-efficiency-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "agent-network-efficiency-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "agent-network-efficiency-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "workspace-context-isolation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "workspace-context-isolation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": null,
+        "uncertain": true,
+        "critical": false,
+        "expectedCritical": false,
+        "error": null
+      },
+      {
+        "id": "workspace-context-isolation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "workspace-context-isolation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "workspace-context-isolation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "code-enforced-policy-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "code-enforced-policy-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 41,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "code-enforced-policy-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "code-enforced-policy-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "code-enforced-policy-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "lora-training-tradeoffs-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "lora-training-tradeoffs-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "lora-training-tradeoffs-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "lora-training-tradeoffs-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "lora-training-tradeoffs-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "skill-installation-scope-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "skill-installation-scope-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "skill-installation-scope-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "skill-installation-scope-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "skill-installation-scope-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "cross-repository-context-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "cross-repository-context-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "cross-repository-context-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "cross-repository-context-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "cross-repository-context-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "transcript-index-consistency-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "transcript-index-consistency-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "transcript-index-consistency-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "transcript-index-consistency-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "transcript-index-consistency-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "task-permission-profiles-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "task-permission-profiles-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "task-permission-profiles-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 3
+      },
+      {
+        "id": "task-permission-profiles-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "task-permission-profiles-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "visual-data-fidelity-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "visual-data-fidelity-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "visual-data-fidelity-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "visual-data-fidelity-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 91,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 9
+      },
+      {
+        "id": "visual-data-fidelity-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "animation-release-boundary-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "animation-release-boundary-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "animation-release-boundary-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "animation-release-boundary-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "animation-release-boundary-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "editable-memory-artifact-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "editable-memory-artifact-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "editable-memory-artifact-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "editable-memory-artifact-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "editable-memory-artifact-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-message-trust-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-message-trust-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-message-trust-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "agent-message-trust-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "agent-message-trust-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "cli-interface-adaptation-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "cli-interface-adaptation-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "cli-interface-adaptation-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 3
+      },
+      {
+        "id": "cli-interface-adaptation-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "cli-interface-adaptation-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "sse-event-framing-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "sse-event-framing-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "sse-event-framing-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "sse-event-framing-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "sse-event-framing-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "sse-resume-consistency-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "sse-resume-consistency-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "sse-resume-consistency-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "sse-resume-consistency-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 91,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 9
+      },
+      {
+        "id": "sse-resume-consistency-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-status-identity-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "agent-status-identity-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "agent-status-identity-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "agent-status-identity-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 90,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 10
+      },
+      {
+        "id": "agent-status-identity-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multimodal-workflow-reuse-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "multimodal-workflow-reuse-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "multimodal-workflow-reuse-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "multimodal-workflow-reuse-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "multimodal-workflow-reuse-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "typed-pipeline-editing-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "typed-pipeline-editing-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "typed-pipeline-editing-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 3
+      },
+      {
+        "id": "typed-pipeline-editing-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "typed-pipeline-editing-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-lifetimes-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-lifetimes-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-lifetimes-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "memory-lifetimes-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "memory-lifetimes-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "embedding-generation-boundary-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "embedding-generation-boundary-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 33,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "embedding-generation-boundary-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "embedding-generation-boundary-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "embedding-generation-boundary-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "retrieval-index-tradeoffs-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "retrieval-index-tradeoffs-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "retrieval-index-tradeoffs-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "retrieval-index-tradeoffs-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 92,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "retrieval-index-tradeoffs-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "tool-selection-precision-recall-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "tool-selection-precision-recall-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "tool-selection-precision-recall-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "tool-selection-precision-recall-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "tool-selection-precision-recall-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "engineering-tradeoff-evidence-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": null,
+        "uncertain": true,
+        "critical": false,
+        "expectedCritical": false,
+        "error": null
+      },
+      {
+        "id": "engineering-tradeoff-evidence-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 27,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "engineering-tradeoff-evidence-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "engineering-tradeoff-evidence-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 89,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "engineering-tradeoff-evidence-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "execution-environment-tiering-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "execution-environment-tiering-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 44,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "execution-environment-tiering-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "execution-environment-tiering-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "execution-environment-tiering-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-position-testing-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-position-testing-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 38,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "context-position-testing-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "context-position-testing-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "context-position-testing-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "jit-retrieval-boundary-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "jit-retrieval-boundary-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "jit-retrieval-boundary-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "jit-retrieval-boundary-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 92,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "jit-retrieval-boundary-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-prefix-cache-layout-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "context-prefix-cache-layout-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "context-prefix-cache-layout-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "context-prefix-cache-layout-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "context-prefix-cache-layout-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "evidence-coverage-localization-complete",
+        "kind": "complete",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "evidence-coverage-localization-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "evidence-coverage-localization-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "evidence-coverage-localization-paraphrase",
+        "kind": "paraphrase",
+        "split": "holdout",
+        "target": 100,
+        "score": 93,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 7
+      },
+      {
+        "id": "evidence-coverage-localization-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "constrained-workflow-language",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "constrained-workflow-language-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "constrained-workflow-language-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "constrained-workflow-language-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "constrained-workflow-language-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 93,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 7
+          },
+          {
+            "id": "constrained-workflow-language-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "just-in-time-context",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "just-in-time-context-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "just-in-time-context-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 39,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "just-in-time-context-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 7,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 7
+          },
+          {
+            "id": "just-in-time-context-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "just-in-time-context-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "evaluation-suite-design",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "evaluation-suite-design-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "evaluation-suite-design-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "evaluation-suite-design-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "evaluation-suite-design-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "evaluation-suite-design-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "workflow-agent-boundary",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "workflow-agent-boundary-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "workflow-agent-boundary-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "workflow-agent-boundary-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "workflow-agent-boundary-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 92,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 8
+          },
+          {
+            "id": "workflow-agent-boundary-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "single-multi-agent-choice",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "single-multi-agent-choice-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "single-multi-agent-choice-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "single-multi-agent-choice-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "single-multi-agent-choice-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 91,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 9
+          },
+          {
+            "id": "single-multi-agent-choice-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-tool-distinction",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "agent-tool-distinction-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "agent-tool-distinction-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "agent-tool-distinction-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "agent-tool-distinction-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 89,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 11
+          },
+          {
+            "id": "agent-tool-distinction-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "code-as-action",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "code-as-action-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "code-as-action-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "code-as-action-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "code-as-action-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "code-as-action-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ui-delivery-evidence",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "ui-delivery-evidence-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "ui-delivery-evidence-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "ui-delivery-evidence-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "ui-delivery-evidence-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 95,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 5
+          },
+          {
+            "id": "ui-delivery-evidence-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-network-efficiency",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "agent-network-efficiency-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "agent-network-efficiency-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-network-efficiency-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "agent-network-efficiency-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "agent-network-efficiency-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "workspace-context-isolation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 4,
+        "uncertain": 1,
+        "coverage": 0.8,
+        "mae": 1.5,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "workspace-context-isolation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "workspace-context-isolation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": null,
+            "uncertain": true,
+            "critical": false,
+            "expectedCritical": false,
+            "error": null
+          },
+          {
+            "id": "workspace-context-isolation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "workspace-context-isolation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "workspace-context-isolation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "code-enforced-policy",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "code-enforced-policy-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "code-enforced-policy-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 41,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 8
+          },
+          {
+            "id": "code-enforced-policy-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "code-enforced-policy-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "code-enforced-policy-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "lora-training-tradeoffs",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "lora-training-tradeoffs-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "lora-training-tradeoffs-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "lora-training-tradeoffs-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "lora-training-tradeoffs-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "lora-training-tradeoffs-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "skill-installation-scope",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "skill-installation-scope-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "skill-installation-scope-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "skill-installation-scope-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "skill-installation-scope-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "skill-installation-scope-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "cross-repository-context",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "cross-repository-context-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "cross-repository-context-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "cross-repository-context-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "cross-repository-context-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "cross-repository-context-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "transcript-index-consistency",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "transcript-index-consistency-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "transcript-index-consistency-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "transcript-index-consistency-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "transcript-index-consistency-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "transcript-index-consistency-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "task-permission-profiles",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "task-permission-profiles-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "task-permission-profiles-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "task-permission-profiles-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 3,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 3
+          },
+          {
+            "id": "task-permission-profiles-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "task-permission-profiles-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "visual-data-fidelity",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "visual-data-fidelity-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "visual-data-fidelity-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "visual-data-fidelity-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "visual-data-fidelity-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 91,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 9
+          },
+          {
+            "id": "visual-data-fidelity-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "animation-release-boundary",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "animation-release-boundary-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "animation-release-boundary-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "animation-release-boundary-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "animation-release-boundary-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "animation-release-boundary-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "editable-memory-artifact",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.4,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "editable-memory-artifact-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "editable-memory-artifact-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "editable-memory-artifact-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "editable-memory-artifact-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "editable-memory-artifact-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-message-trust",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.8,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "agent-message-trust-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-message-trust-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "agent-message-trust-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "agent-message-trust-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "agent-message-trust-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "cli-interface-adaptation",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "cli-interface-adaptation-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "cli-interface-adaptation-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "cli-interface-adaptation-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 3,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 3
+          },
+          {
+            "id": "cli-interface-adaptation-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 96,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 4
+          },
+          {
+            "id": "cli-interface-adaptation-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "sse-event-framing",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "sse-event-framing-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "sse-event-framing-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "sse-event-framing-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "sse-event-framing-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "sse-event-framing-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "sse-resume-consistency",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "sse-resume-consistency-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "sse-resume-consistency-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 36,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "sse-resume-consistency-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "sse-resume-consistency-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 91,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 9
+          },
+          {
+            "id": "sse-resume-consistency-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-status-identity",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "agent-status-identity-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "agent-status-identity-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "agent-status-identity-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "agent-status-identity-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 90,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 10
+          },
+          {
+            "id": "agent-status-identity-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "multimodal-workflow-reuse",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "multimodal-workflow-reuse-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "multimodal-workflow-reuse-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "multimodal-workflow-reuse-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "multimodal-workflow-reuse-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "multimodal-workflow-reuse-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "typed-pipeline-editing",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "typed-pipeline-editing-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "typed-pipeline-editing-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "typed-pipeline-editing-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 3,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 3
+          },
+          {
+            "id": "typed-pipeline-editing-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "typed-pipeline-editing-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "memory-lifetimes",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "memory-lifetimes-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "memory-lifetimes-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "memory-lifetimes-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "memory-lifetimes-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 94,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "memory-lifetimes-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "embedding-generation-boundary",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 0.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "embedding-generation-boundary-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "embedding-generation-boundary-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 33,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "embedding-generation-boundary-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "embedding-generation-boundary-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "embedding-generation-boundary-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "retrieval-index-tradeoffs",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "retrieval-index-tradeoffs-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "retrieval-index-tradeoffs-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "retrieval-index-tradeoffs-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "retrieval-index-tradeoffs-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 92,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 8
+          },
+          {
+            "id": "retrieval-index-tradeoffs-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "tool-selection-precision-recall",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "tool-selection-precision-recall-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "tool-selection-precision-recall-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 34,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "tool-selection-precision-recall-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "tool-selection-precision-recall-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "tool-selection-precision-recall-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "engineering-tradeoff-evidence",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 4,
+        "uncertain": 1,
+        "coverage": 0.8,
+        "mae": 4.5,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "engineering-tradeoff-evidence-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": null,
+            "uncertain": true,
+            "critical": false,
+            "expectedCritical": false,
+            "error": null
+          },
+          {
+            "id": "engineering-tradeoff-evidence-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 27,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 6
+          },
+          {
+            "id": "engineering-tradeoff-evidence-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "engineering-tradeoff-evidence-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 89,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 11
+          },
+          {
+            "id": "engineering-tradeoff-evidence-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "execution-environment-tiering",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 3.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "execution-environment-tiering-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "execution-environment-tiering-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 44,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 11
+          },
+          {
+            "id": "execution-environment-tiering-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "execution-environment-tiering-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "execution-environment-tiering-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-position-testing",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "context-position-testing-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 99,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          },
+          {
+            "id": "context-position-testing-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 38,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 5
+          },
+          {
+            "id": "context-position-testing-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 0,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 0
+          },
+          {
+            "id": "context-position-testing-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 97,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          },
+          {
+            "id": "context-position-testing-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "jit-retrieval-boundary",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "jit-retrieval-boundary-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "jit-retrieval-boundary-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "jit-retrieval-boundary-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 2,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 2
+          },
+          {
+            "id": "jit-retrieval-boundary-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 92,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 8
+          },
+          {
+            "id": "jit-retrieval-boundary-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "context-prefix-cache-layout",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 1.2,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "context-prefix-cache-layout-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "context-prefix-cache-layout-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "context-prefix-cache-layout-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "context-prefix-cache-layout-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 98,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "context-prefix-cache-layout-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "evidence-coverage-localization",
+      "passed": true,
+      "errors": [],
+      "result": {
+        "count": 5,
+        "scored": 5,
+        "uncertain": 0,
+        "coverage": 1,
+        "mae": 2.6,
+        "criticalMisses": 0,
+        "falseCritical": 0,
+        "injectionFailures": 0,
+        "passed": true,
+        "rows": [
+          {
+            "id": "evidence-coverage-localization-complete",
+            "kind": "complete",
+            "split": "holdout",
+            "target": 100,
+            "score": 100,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 0
+          },
+          {
+            "id": "evidence-coverage-localization-partial",
+            "kind": "partial",
+            "split": "holdout",
+            "target": 33,
+            "score": 35,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 2
+          },
+          {
+            "id": "evidence-coverage-localization-critical",
+            "kind": "critical",
+            "split": "holdout",
+            "target": 0,
+            "score": 1,
+            "uncertain": false,
+            "critical": true,
+            "expectedCritical": true,
+            "error": 1
+          },
+          {
+            "id": "evidence-coverage-localization-paraphrase",
+            "kind": "paraphrase",
+            "split": "holdout",
+            "target": 100,
+            "score": 93,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 7
+          },
+          {
+            "id": "evidence-coverage-localization-injection",
+            "kind": "injection",
+            "split": "holdout",
+            "target": 0,
+            "score": 3,
+            "uncertain": false,
+            "critical": false,
+            "expectedCritical": false,
+            "error": 3
+          }
+        ]
+      }
+    }
+  ],
+  "note": "仅答题评分验证；正文判定未重跑。标签由整理者制定，待独立人工复核。固定既有阈值，不重试、不重新校准。"
+}

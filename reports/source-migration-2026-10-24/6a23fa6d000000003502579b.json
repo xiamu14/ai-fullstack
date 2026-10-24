@@ -1,0 +1,35 @@
+{
+  "id": "6a23fa6d000000003502579b",
+  "fileHash": "12e1c36f2c461171ceac567a4af69c7acacf71125f87d5135cef5e95e6b15c33",
+  "bodyHash": "49e26139958e0a121b6ff1b5b91663f80781921b32d18a2bf393991d574959c1",
+  "decision": "include",
+  "reason": "正文完整列出上下文工程自测题；没有答案，不作为可评测题",
+  "label": "questions",
+  "confidence": 0.76,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "questions",
+        "probabilities": {
+          "knowledge": 0.01,
+          "questions": 0.82,
+          "media": 0.16,
+          "off_topic": 0.01
+        },
+        "confidence": 0.76
+      }
+    },
+    "usage": {
+      "input_tokens": 1368,
+      "output_tokens": 46,
+      "cost": 5.7456e-05
+    },
+    "id": "gen-dec-1792822607-caGJUXh6sZNNUcmZMbwl",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a7cba72000000002403f71d",
+  "fileHash": "d1d9f56ecd72e68ab8fe58ee35714a08337fea7cfe8f282976c338fbc6150b36",
+  "bodyHash": "d9d7f4121d1efbec0663310222cfed9e03b449dd4bf23c985bca3cc512d09298",
+  "decision": "include",
+  "reason": "正文有任务启动器与上下文冷启动的独立设计建议；不补图中案例",
+  "label": "knowledge",
+  "confidence": 0.52,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.64,
+          "questions": 0,
+          "media": 0.09,
+          "off_topic": 0.27
+        },
+        "confidence": 0.52
+      }
+    },
+    "usage": {
+      "input_tokens": 1333,
+      "output_tokens": 46,
+      "cost": 5.5986e-05
+    },
+    "id": "gen-dec-1792822621-2LDXb7vxQLY1seo5fH1j",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a64957d000000000f033116",
+  "fileHash": "01bf1d4c36364a99f28559776ab6531e68dc4d7dc388e905af36bc212bd197be",
+  "bodyHash": "e07e5c51daace2ec038c09abb6d6301e5c7fe26864609cf71214da7ee5c70033",
+  "decision": "include",
+  "reason": "正文说明按工具能力分工并把修改反馈沉淀为复用规则；未采集私信中的完整教程",
+  "label": "knowledge",
+  "confidence": 0.27,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.45,
+          "questions": 0,
+          "media": 0.29,
+          "off_topic": 0.26
+        },
+        "confidence": 0.27
+      }
+    },
+    "usage": {
+      "input_tokens": 1289,
+      "output_tokens": 46,
+      "cost": 5.4138e-05
+    },
+    "id": "gen-dec-1792822616-7APmGuCffy9RLc8YEZ7i",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

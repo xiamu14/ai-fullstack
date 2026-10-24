@@ -1,0 +1,35 @@
+{
+  "id": "6a96e77b00000000120242d8",
+  "fileHash": "7d662e8395fd69029b6d1d0e9259e5e776fc2af0648fb1dda7b3051acb411103",
+  "bodyHash": "88d0fe4652e4f950f80e9623e4b5f14e324234ef6790fc514c188a0f6b3f95b1",
+  "decision": "include",
+  "reason": "正文独立定义编排职责；外部 OpenAI 原文未额外读取",
+  "label": "media",
+  "confidence": 0.4,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "media",
+        "probabilities": {
+          "knowledge": 0.3,
+          "questions": 0,
+          "media": 0.55,
+          "off_topic": 0.15
+        },
+        "confidence": 0.4
+      }
+    },
+    "usage": {
+      "input_tokens": 887,
+      "output_tokens": 46,
+      "cost": 3.7254e-05
+    },
+    "id": "gen-dec-1792822624-qPOAZarWiXUsLtfI5f5g",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

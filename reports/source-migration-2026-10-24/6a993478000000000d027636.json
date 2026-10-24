@@ -1,0 +1,35 @@
+{
+  "id": "6a993478000000000d027636",
+  "fileHash": "b9f9e2362b887abc3e25d518f56246c14811216e53c9d34e7d1bb6f9b3552e35",
+  "bodyHash": "bc4ed1ef700de0a140da8f3e23debe59193bc48bfb29ea02b1c2c4840c99a5d9",
+  "decision": "include",
+  "reason": "正文说明需求结构化、目标导向与澄清缺口的流程",
+  "label": "off_topic",
+  "confidence": 0.31,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.47,
+          "questions": 0,
+          "media": 0.05,
+          "off_topic": 0.48
+        },
+        "confidence": 0.31
+      }
+    },
+    "usage": {
+      "input_tokens": 1155,
+      "output_tokens": 47,
+      "cost": 4.851e-05
+    },
+    "id": "gen-dec-1792822624-v21BMpUh8I9kbRYPIcwp",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

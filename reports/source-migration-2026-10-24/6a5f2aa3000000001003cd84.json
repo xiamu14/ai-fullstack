@@ -1,0 +1,35 @@
+{
+  "id": "6a5f2aa3000000001003cd84",
+  "fileHash": "33c766d42a84e560bb52b90c316ab6adfa901ba66ef2a22b921d0b80419c724b",
+  "bodyHash": "9bf2d52a16ba6d8c5787e41831799a4098945d76bf6439e06abe39f910f72842",
+  "decision": "include",
+  "reason": "正文独立解释 Agent 定义、工具与执行步骤；不据此授予自动支付权限",
+  "label": "knowledge",
+  "confidence": 0.61,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.71,
+          "questions": 0,
+          "media": 0,
+          "off_topic": 0.29
+        },
+        "confidence": 0.61
+      }
+    },
+    "usage": {
+      "input_tokens": 1402,
+      "output_tokens": 46,
+      "cost": 5.8884e-05
+    },
+    "id": "gen-dec-1792822615-nf6NaACi7ZTdlSp9OavZ",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

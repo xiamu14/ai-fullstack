@@ -55,30 +55,30 @@ Version: 2026-10-24.1
 [开源 Memory 项目评估，那个方案更适合你？](https://www.xiaohongshu.com/explore/6aa21c4a000000000b03645f)，老纪的技术唠嗑局，2026-09-10T10:56:10+08:00，仅正文。
 
 客户明明只说“考虑签约”，AI却记成“已经同意”，还把错误写进长期记忆——很多AI记忆系统解决了“记不住”，却没解决“记错了”怎么办。
-	
+
 最近我跑了PowerContext，也对比了mem0、LangMem、Letta和Holographic。它真正特别的不是更快，而是记忆治理。
-	
+
 1️⃣ AI只能提议 LLM只能生成待审核的Candidate，人工批准后才能成为长期记忆。Holographic允许LLM直接写入；mem0虽有类似机制，但PowerContext把“AI提议、人类批准”设成强制边界。
-	
+
 2️⃣ 每条记忆都有出处 Memory必须关联原始Source，召回时带citation，可以反查来自哪次对话、哪份文档。相比把记忆作为普通字符串保存的方案，它更重视证据链；LangMem集成方便，但来源引用并非同等强制。
-	
+
 3️⃣ 召回有字节预算 多数产品只限制top-k，不限制内容长度。PowerContext可以设置max_bytes，避免上下文膨胀和token超支。Letta擅长多Agent协作，但没有把字节预算作为核心能力。
-	
+
 4️⃣ 知识分四层 Source是原始证据，Memory是事实，Experience是经验，Skill是可执行流程。不同知识不会混在一起，Skill还必须显式导出，安全边界更清楚。
-	
+
 5️⃣ 跨会话能接着干 Handoff会保存目标、进展、阻塞、下一步和证据，像医院交接班。新session不必重新了解背景，适合持续数天的研究项目。
-	
+
 mem0：轻量、易用、生产友好
 LangMem：LangChain集成方便
 Letta：多Agent协作能力强
 Holographic：本地化、比较轻量
 PowerContext：更适合重视审核、溯源和跨会话工作的场景
-	
+
 如果你只是想让AI随手记点东西，mem0或Holographic可能更省事；
 如果每条长期事实都要能审核、能拒绝、能追溯，PowerContext会更合适。
-	
+
 AI记忆真正的竞争力，可能不是“记得更多”，而是“记得可信”。
-	
+
 你现在给Agent用的是哪套记忆方案？👇
-	
+
 #AI工具[话题]#  #AIAgent[话题]#  #AI记忆[话题]#  #开源项目[话题]#  #大模型[话题]#   #PowerContext[话题]#  #老纪的技术唠嗑局[话题]#

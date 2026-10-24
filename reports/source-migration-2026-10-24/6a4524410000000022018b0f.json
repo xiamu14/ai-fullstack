@@ -1,0 +1,35 @@
+{
+  "id": "6a4524410000000022018b0f",
+  "fileHash": "e9551a482e14bc233882c139f5cb091891318299a3759ce876a816fc209e8144",
+  "bodyHash": "21a4154eae4b599deceaa4c4fdea09c937a24573406a6832714a94684f4be8bf",
+  "decision": "include",
+  "reason": "正文独立说明文件、网络与权限策略的细粒度控制思路",
+  "label": "knowledge",
+  "confidence": 0.64,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.73,
+          "questions": 0.03,
+          "media": 0.01,
+          "off_topic": 0.23
+        },
+        "confidence": 0.64
+      }
+    },
+    "usage": {
+      "input_tokens": 1141,
+      "output_tokens": 46,
+      "cost": 4.7922e-05
+    },
+    "id": "gen-dec-1792822611-AtX9hHfxrpHZU8BcA53e",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

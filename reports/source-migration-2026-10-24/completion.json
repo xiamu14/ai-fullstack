@@ -1,0 +1,39 @@
+{
+  "completedAt": "2026-10-24T06:22:25.135Z",
+  "counts": {
+    "sources": 145,
+    "questions": 20,
+    "attempts": 0,
+    "drafts": 7,
+    "cleared": 145
+  },
+  "media": [
+    {
+      "type": null,
+      "count": 8
+    },
+    {
+      "type": "video",
+      "count": 11
+    },
+    {
+      "type": "normal",
+      "count": 126
+    }
+  ],
+  "originalNotes": 264,
+  "remainingNotes": 119,
+  "reviewedBodies": 254,
+  "jevCalls": 254,
+  "failed": 0,
+  "retries": 0,
+  "manualReviews": 117,
+  "costUsd": 0.012667535999999993,
+  "newSources": 137,
+  "unchangedSources": 8,
+  "approved": 145,
+  "excluded": 119,
+  "backups": "backups/source-migration-2026-10-24",
+  "preserved": "20题、7条草稿与原有8篇来源均已通过迁移前后恢复比较",
+  "knownSourceIdsFingerprint": "2388dbd441110b97825936b38a648380116a9de0cc48a22a854d91a6b1aed607"
+}

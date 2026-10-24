@@ -1,0 +1,16 @@
+{
+  "changedAt": "2026-10-24T07:13:10.691Z",
+  "questionId": "agent-loop",
+  "previousVersion": "2026-10-24.1",
+  "version": "2026-10-24.2",
+  "previousSources": [
+    "6a32267c000000002201adf3"
+  ],
+  "sources": [
+    "6a43b4740000000022018460",
+    "6a98aebc000000002b01c055"
+  ],
+  "gradingFieldsUnchanged": true,
+  "newApiCalls": 0,
+  "reason": "原先误关联图数据库正文；改为直接讲解 Agent Loop 的两篇正文，题干、答案、细则、标签和实际评分输入均未变。"
+}

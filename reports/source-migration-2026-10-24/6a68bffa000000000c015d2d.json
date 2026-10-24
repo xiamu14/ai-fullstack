@@ -1,0 +1,35 @@
+{
+  "id": "6a68bffa000000000c015d2d",
+  "fileHash": "623837e2a44fda44633c2f643562c2335c6d984efe6366de0a57cbca88f5b5ea",
+  "bodyHash": "da409dbefccec7210a30d8ac45aeb2cfe5181609642922b033c69dc0f57d93cc",
+  "decision": "include",
+  "reason": "正文独立定义会话内与跨会话记忆，并注明其定义口径",
+  "label": "knowledge",
+  "confidence": 0.44,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.58,
+          "questions": 0,
+          "media": 0.1,
+          "off_topic": 0.32
+        },
+        "confidence": 0.44
+      }
+    },
+    "usage": {
+      "input_tokens": 1096,
+      "output_tokens": 46,
+      "cost": 4.6032e-05
+    },
+    "id": "gen-dec-1792822616-eCcK4A1sU4RKAPeAphLD",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

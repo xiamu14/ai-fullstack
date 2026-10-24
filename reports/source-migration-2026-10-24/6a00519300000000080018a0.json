@@ -1,0 +1,35 @@
+{
+  "id": "6a00519300000000080018a0",
+  "fileHash": "49e5ae5fcac02d852326dbcb254bdaeab558ce6df2f20da42c40a825440e6ef7",
+  "bodyHash": "640218fcaf657a0e8c4db820f56f351d8fb7fbca28892fc671ab788690c9ca31",
+  "decision": "include",
+  "reason": "正文有按任务类别选择框架的独立说明；不采用图中 Top10 排名",
+  "label": "media",
+  "confidence": 0.61,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "media",
+        "probabilities": {
+          "knowledge": 0.08,
+          "questions": 0,
+          "media": 0.71,
+          "off_topic": 0.21
+        },
+        "confidence": 0.61
+      }
+    },
+    "usage": {
+      "input_tokens": 1125,
+      "output_tokens": 46,
+      "cost": 4.725e-05
+    },
+    "id": "gen-dec-1792822598-H5HkWZ2i9KpzKQ7SRbtq",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

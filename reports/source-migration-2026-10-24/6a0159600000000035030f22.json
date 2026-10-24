@@ -1,0 +1,35 @@
+{
+  "id": "6a0159600000000035030f22",
+  "fileHash": "bc6ad54883e5497f5b6c6e587bc7226267d392c94680eafce40107970ee57695",
+  "bodyHash": "c388826bd6bbebc8d78d209fced1cc28de7069f96f1c0b0881fda9eb6e1b8f13",
+  "decision": "include",
+  "reason": "正文说明同任务有无 Skill 的对照评测方法",
+  "label": "knowledge",
+  "confidence": 0.77,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.83,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.14
+        },
+        "confidence": 0.77
+      }
+    },
+    "usage": {
+      "input_tokens": 1073,
+      "output_tokens": 46,
+      "cost": 4.5066e-05
+    },
+    "id": "gen-dec-1792822598-Ayh0DVcoitRHK8EKNZ1a",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

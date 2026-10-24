@@ -1,0 +1,239 @@
+{
+  "sourceId": "6ad9ad51000000002b02b632",
+  "topics": [
+    {
+      "number": 1,
+      "prompt": "在 Agent 链路中，意图识别的核心价值是什么？",
+      "questionIds": [
+        "intent-route"
+      ]
+    },
+    {
+      "number": 2,
+      "prompt": "意图识别与实体抽取二者的关联和差异？",
+      "questionIds": [
+        "intent-entity-distinction"
+      ]
+    },
+    {
+      "number": 3,
+      "prompt": "单轮意图判定、多轮意图跟踪分别指什么？",
+      "questionIds": [
+        "agent-state-layers",
+        "intent-transition-management"
+      ]
+    },
+    {
+      "number": 4,
+      "prompt": "依托大模型做意图识别，对比传统 NLU 方案有哪些差异？",
+      "questionIds": [
+        "intent-classifier-choice"
+      ]
+    },
+    {
+      "number": 5,
+      "prompt": "工程上为什么不直接把所有用户输入交给大模型全权处理？",
+      "questionIds": [
+        "intent-route",
+        "code-enforced-policy"
+      ]
+    },
+    {
+      "number": 6,
+      "prompt": "在 Agent 规划、执行、反馈闭环里，意图识别承担什么角色？",
+      "questionIds": [
+        "intent-route",
+        "multi-intent-decomposition"
+      ]
+    },
+    {
+      "number": 7,
+      "prompt": "怎么借助 Few-shot 提示词，让大模型稳定完成意图分类？",
+      "questionIds": [
+        "intent-fewshot-design"
+      ]
+    },
+    {
+      "number": 8,
+      "prompt": "思维链 CoT 对复杂意图理解有没有增益？背后原因？",
+      "questionIds": [
+        "reasoning-prompt-evaluation"
+      ]
+    },
+    {
+      "number": 9,
+      "prompt": "如何通过系统提示词，限定 Agent 可识别的意图范围？",
+      "questionIds": [
+        "intent-taxonomy-design",
+        "refusal-boundary"
+      ]
+    },
+    {
+      "number": 10,
+      "prompt": "用户表达模糊时，提示词怎么内置主动澄清逻辑？",
+      "questionIds": [
+        "ambiguous-intent-clarification"
+      ]
+    },
+    {
+      "number": 11,
+      "prompt": "如果要求模型固定输出 JSON 识别结果，提示词怎么写更稳？",
+      "questionIds": [
+        "structured-validation"
+      ]
+    },
+    {
+      "number": 12,
+      "prompt": "怎么引导模型在信息不足时发起追问，而不是强行给出判断？",
+      "questionIds": [
+        "information-sufficiency-gate"
+      ]
+    },
+    {
+      "number": 13,
+      "prompt": "一句话承载多重意图，识别环节主要难点在哪？",
+      "questionIds": [
+        "multi-intent-decomposition"
+      ]
+    },
+    {
+      "number": 14,
+      "prompt": "什么是意图漂移？多轮对话场景如何降低该问题？",
+      "questionIds": [
+        "intent-transition-management",
+        "context-drift"
+      ]
+    },
+    {
+      "number": 15,
+      "prompt": "长对话上下文里，模型容易遗忘前期诉求，诱因是什么？",
+      "questionIds": [
+        "context-budget",
+        "context-position-testing"
+      ]
+    },
+    {
+      "number": 16,
+      "prompt": "意图识别输出结果，如何和工具调用链路串联？",
+      "questionIds": [
+        "intent-entity-distinction",
+        "tool-schema"
+      ]
+    },
+    {
+      "number": 17,
+      "prompt": "面对用户对抗输入，怎么提升意图识别的抗干扰能力？",
+      "questionIds": [
+        "intent-injection-resilience"
+      ]
+    },
+    {
+      "number": 18,
+      "prompt": "Agent 场景下，准确率和召回率优先保障哪一项？",
+      "questionIds": [
+        "intent-evaluation-metrics"
+      ]
+    },
+    {
+      "number": 19,
+      "prompt": "用户中途更换诉求，Agent 如何感知并切换业务流程？",
+      "questionIds": [
+        "intent-transition-management"
+      ]
+    },
+    {
+      "number": 20,
+      "prompt": "离线验证意图识别模块，重点观测哪些指标？",
+      "questionIds": [
+        "intent-evaluation-metrics"
+      ]
+    },
+    {
+      "number": 21,
+      "prompt": "如何从线上会话日志挖掘识别错误 Bad Case？",
+      "questionIds": [
+        "intent-evaluation-metrics"
+      ]
+    },
+    {
+      "number": 22,
+      "prompt": "意图类目划分粗细很难平衡，有哪些设计思路？",
+      "questionIds": [
+        "intent-taxonomy-design"
+      ]
+    },
+    {
+      "number": 23,
+      "prompt": "除提示词之外，还有哪些方案让模型存疑时主动反问？",
+      "questionIds": [
+        "information-sufficiency-gate",
+        "non-generative-decisions"
+      ]
+    },
+    {
+      "number": 24,
+      "prompt": "多语言业务下，意图识别提示词设计有哪些调整要点？",
+      "questionIds": [
+        "multilingual-intent-routing"
+      ]
+    },
+    {
+      "number": 25,
+      "prompt": "Few-shot 样本数量取多少，性价比最优？",
+      "questionIds": [
+        "intent-fewshot-design"
+      ]
+    },
+    {
+      "number": 26,
+      "prompt": "意图识别推理延迟偏高，有哪些优化路径？",
+      "questionIds": [
+        "intent-routing-latency"
+      ]
+    },
+    {
+      "number": 27,
+      "prompt": "客服 Agent：如何区分极易混淆的咨询和投诉诉求？",
+      "questionIds": [
+        "intent-taxonomy-design",
+        "ambiguous-intent-clarification"
+      ]
+    },
+    {
+      "number": 28,
+      "prompt": "个人助理 Agent：跨领域混合需求如何识别？",
+      "questionIds": [
+        "multi-intent-decomposition"
+      ]
+    },
+    {
+      "number": 29,
+      "prompt": "代码 Agent：区分用户需求是编写代码，还是解读已有代码？",
+      "questionIds": [
+        "intent-transition-management"
+      ]
+    },
+    {
+      "number": 30,
+      "prompt": "多轮对话中，怎么判断用户是开启新任务，还是延续上一轮需求？",
+      "questionIds": [
+        "intent-transition-management"
+      ]
+    },
+    {
+      "number": 31,
+      "prompt": "电商场景用户说 “太贵了”，如何判断是议价还是放弃下单？",
+      "questionIds": [
+        "ambiguous-intent-clarification"
+      ]
+    },
+    {
+      "number": 32,
+      "prompt": "金融 Agent：怎么把 “帮我看看基金” 这类模糊表述，拆解成可执行意图？",
+      "questionIds": [
+        "information-sufficiency-gate",
+        "ambiguous-intent-clarification"
+      ]
+    }
+  ]
+}
