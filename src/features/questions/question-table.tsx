@@ -59,7 +59,7 @@ export function QuestionTable({
           {(row) => (
             <TableRow id={row.id}>
               <TableCell>
-                {row.title}
+                <span className="font-semibold">{row.title}</span>
                 {row.archived && <Badge className="ml-2">已归档</Badge>}
               </TableCell>
               <TableCell className="whitespace-nowrap">
