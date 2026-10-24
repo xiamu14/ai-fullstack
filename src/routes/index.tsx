@@ -13,7 +13,7 @@ import { Chip } from '@/components/base/badges/chip'
 import { modules } from '@/domain/question'
 import { ModuleFilter } from '@/features/questions/module-filter'
 import { QuestionTable } from '@/features/questions/question-table'
-import { QuestionPagination } from '@/features/questions/question-pagination'
+import { Pagination } from '@/components/base/pagination/pagination'
 import { QuestionDrawer } from '@/features/questions/question-drawer'
 import { sortQuestions } from '@/features/questions/sort-questions'
 const searchSchema = z.object({
@@ -147,13 +147,18 @@ function LibraryPage() {
               void navigate({ search: (prev) => ({ ...prev, question }) })
             }}
           />
-          <QuestionPagination
-            page={page}
-            pages={pages}
-            onPageChange={(page) => {
-              void navigate({ search: (prev) => ({ ...prev, page }) })
-            }}
-          />
+          <motion.footer className="px-4 py-4">
+            <Pagination
+              page={page}
+              totalPages={pages}
+              previousLabel="上一页"
+              nextLabel="下一页"
+              aria-label="题目分页"
+              onChange={(page) => {
+                void navigate({ search: (prev) => ({ ...prev, page }) })
+              }}
+            />
+          </motion.footer>
         </motion.section>
       </motion.main>
       <AnimatePresence>
