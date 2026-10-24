@@ -3,17 +3,17 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { AnimatePresence, motion } from 'motion/react'
 import { Heading, Text } from 'react-aria-components'
-import { RiSearchLine, RiArrowLeftSLine, RiArrowRightSLine } from '@remixicon/react'
+import { RiSearchLine } from '@remixicon/react'
 import logo from '@/assets/logo.svg?url'
 import { loadCatalog, loadDetail } from '@/server/functions'
 import { Input } from '@/components/base/input/input'
 import { Select, SelectItem } from '@/components/base/select/select'
-import { Button } from '@/components/base/buttons/button'
 import { Badge } from '@/components/base/badges/badge'
 import { Chip } from '@/components/base/badges/chip'
 import { modules } from '@/domain/question'
 import { ModuleFilter } from '@/features/questions/module-filter'
 import { QuestionTable } from '@/features/questions/question-table'
+import { QuestionPagination } from '@/features/questions/question-pagination'
 import { QuestionDrawer } from '@/features/questions/question-drawer'
 import { sortQuestions } from '@/features/questions/sort-questions'
 const searchSchema = z.object({
@@ -147,35 +147,13 @@ function LibraryPage() {
               void navigate({ search: (prev) => ({ ...prev, question }) })
             }}
           />
-          <motion.footer className="flex items-center justify-between gap-3 px-4 py-4">
-            <Text className="text-xs text-neutral-500">
-              第 {page} / {pages} 页
-            </Text>
-            <motion.div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="small"
-                leadingIcon={RiArrowLeftSLine}
-                disabled={page <= 1}
-                onClick={() => {
-                  void navigate({ search: (prev) => ({ ...prev, page: page - 1 }) })
-                }}
-              >
-                上一页
-              </Button>
-              <Button
-                variant="secondary"
-                size="small"
-                trailingIcon={RiArrowRightSLine}
-                disabled={page >= pages}
-                onClick={() => {
-                  void navigate({ search: (prev) => ({ ...prev, page: page + 1 }) })
-                }}
-              >
-                下一页
-              </Button>
-            </motion.div>
-          </motion.footer>
+          <QuestionPagination
+            page={page}
+            pages={pages}
+            onPageChange={(page) => {
+              void navigate({ search: (prev) => ({ ...prev, page }) })
+            }}
+          />
         </motion.section>
       </motion.main>
       <AnimatePresence>
