@@ -1,0 +1,1119 @@
+{
+  "passed": true,
+  "config": {
+    "model": "typesafe/jev-1.14",
+    "policyVersion": "rubric-v1",
+    "confidence": 0.3,
+    "criticalLow": 0.05,
+    "criticalHigh": 0.6
+  },
+  "development": {
+    "count": 45,
+    "scored": 45,
+    "uncertain": 0,
+    "coverage": 1,
+    "mae": 3.6,
+    "criticalMisses": 0,
+    "falseCritical": 0,
+    "injectionFailures": 0,
+    "passed": true,
+    "rows": [
+      {
+        "id": "action-verification-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 76,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 24
+      },
+      {
+        "id": "action-verification-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 37,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "hook-quality-gate-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 91,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 9
+      },
+      {
+        "id": "action-verification-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "hook-quality-gate-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "memory-citation-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "rag-diagnosis-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "clarification-node-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "rag-diagnosis-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 44,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "approval-resume-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "mcp-context-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "rag-diagnosis-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 89,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 11
+      },
+      {
+        "id": "memory-summary-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "memory-summary-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "hook-quality-gate-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "mcp-context-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "action-verification-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "rag-diagnosis-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "intent-route-injection",
+        "kind": "injection",
+        "split": "development",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "approval-resume-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "approval-resume-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 3
+      },
+      {
+        "id": "memory-summary-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 91,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 9
+      },
+      {
+        "id": "mcp-context-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "mcp-context-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 94,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "memory-summary-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "approval-resume-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "intent-route-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 75,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 25
+      },
+      {
+        "id": "intent-route-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "prompt-evaluation-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "rag-diagnosis-injection",
+        "kind": "injection",
+        "split": "development",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "prompt-evaluation-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "memory-citation-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 92,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "clarification-node-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "clarification-node-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "memory-citation-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "intent-route-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "prompt-evaluation-injection",
+        "kind": "injection",
+        "split": "development",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "hook-quality-gate-critical",
+        "kind": "critical",
+        "split": "development",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "intent-route-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "prompt-evaluation-partial",
+        "kind": "partial",
+        "split": "development",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "clarification-node-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "memory-summary-injection",
+        "kind": "injection",
+        "split": "development",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "action-verification-injection",
+        "kind": "injection",
+        "split": "development",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "prompt-evaluation-concise",
+        "kind": "concise",
+        "split": "development",
+        "target": 100,
+        "score": 86,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 14
+      },
+      {
+        "id": "memory-citation-correct",
+        "kind": "correct",
+        "split": "development",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      }
+    ]
+  },
+  "holdout": {
+    "count": 45,
+    "scored": 42,
+    "uncertain": 3,
+    "coverage": 0.9333333333333333,
+    "mae": 1.9761904761904763,
+    "criticalMisses": 0,
+    "falseCritical": 0,
+    "injectionFailures": 0,
+    "passed": true,
+    "rows": [
+      {
+        "id": "clarification-idempotency-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "clarification-idempotency-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 97,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "rag-topk-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 96,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "context-budget-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 95,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      },
+      {
+        "id": "clarification-idempotency-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "context-budget-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "rag-topk-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "handoff-state-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "memory-governance-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 90,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 10
+      },
+      {
+        "id": "approval-boundary-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "memory-governance-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 35,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "tool-schema-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "state-precondition-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "rag-topk-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "context-budget-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "handoff-state-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "memory-governance-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "handoff-state-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 92,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 8
+      },
+      {
+        "id": "clarification-idempotency-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "rag-topk-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "context-budget-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "handoff-state-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 2,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 2
+      },
+      {
+        "id": "tool-schema-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "memory-governance-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "context-budget-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "approval-boundary-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": null,
+        "uncertain": true,
+        "critical": false,
+        "expectedCritical": false,
+        "error": null
+      },
+      {
+        "id": "mcp-intent-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 99,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "approval-boundary-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 36,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "state-precondition-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "mcp-intent-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 1,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 1
+      },
+      {
+        "id": "hook-prompt-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "tool-schema-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "state-precondition-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 39,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 6
+      },
+      {
+        "id": "state-precondition-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": null,
+        "uncertain": true,
+        "critical": false,
+        "expectedCritical": false,
+        "error": null
+      },
+      {
+        "id": "tool-schema-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 34,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 1
+      },
+      {
+        "id": "mcp-intent-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 37,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "mcp-intent-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 98,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 2
+      },
+      {
+        "id": "approval-boundary-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "tool-schema-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": null,
+        "uncertain": true,
+        "critical": false,
+        "expectedCritical": false,
+        "error": null
+      },
+      {
+        "id": "approval-boundary-injection",
+        "kind": "injection",
+        "split": "holdout",
+        "target": 0,
+        "score": 3,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 3
+      },
+      {
+        "id": "state-precondition-correct",
+        "kind": "correct",
+        "split": "holdout",
+        "target": 100,
+        "score": 100,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 0
+      },
+      {
+        "id": "hook-prompt-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "hook-prompt-partial",
+        "kind": "partial",
+        "split": "holdout",
+        "target": 33,
+        "score": 37,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 4
+      },
+      {
+        "id": "rag-topk-critical",
+        "kind": "critical",
+        "split": "holdout",
+        "target": 0,
+        "score": 0,
+        "uncertain": false,
+        "critical": true,
+        "expectedCritical": true,
+        "error": 0
+      },
+      {
+        "id": "hook-prompt-concise",
+        "kind": "concise",
+        "split": "holdout",
+        "target": 100,
+        "score": 95,
+        "uncertain": false,
+        "critical": false,
+        "expectedCritical": false,
+        "error": 5
+      }
+    ]
+  },
+  "repeats": [
+    {
+      "id": "action-verification-partial",
+      "values": [
+        37,
+        38,
+        37
+      ],
+      "range": 1
+    },
+    {
+      "id": "approval-resume-partial",
+      "values": [
+        34,
+        34,
+        34
+      ],
+      "range": 0
+    },
+    {
+      "id": "clarification-node-partial",
+      "values": [
+        34,
+        34,
+        35
+      ],
+      "range": 1
+    },
+    {
+      "id": "hook-quality-gate-partial",
+      "values": [
+        35,
+        35,
+        35
+      ],
+      "range": 0
+    },
+    {
+      "id": "intent-route-partial",
+      "values": [
+        34,
+        34,
+        34
+      ],
+      "range": 0
+    },
+    {
+      "id": "approval-boundary-partial",
+      "values": [
+        36,
+        37,
+        36
+      ],
+      "range": 1
+    },
+    {
+      "id": "clarification-idempotency-partial",
+      "values": [
+        34,
+        34,
+        34
+      ],
+      "range": 0
+    },
+    {
+      "id": "context-budget-partial",
+      "values": [
+        34,
+        34,
+        34
+      ],
+      "range": 0
+    },
+    {
+      "id": "handoff-state-partial",
+      "values": [
+        34,
+        34,
+        34
+      ],
+      "range": 0
+    },
+    {
+      "id": "hook-prompt-partial",
+      "values": [
+        37,
+        37,
+        36
+      ],
+      "range": 1
+    }
+  ],
+  "repeatPassed": true
+}

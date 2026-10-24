@@ -1,0 +1,10 @@
+{
+  "model": "typesafe/jev-1.14",
+  "policyVersion": "rubric-v1",
+  "confidence": 0.3,
+  "criticalLow": 0.05,
+  "criticalHigh": 0.6,
+  "validatedSnapshot": "typesafe/jev-1.14-20261014",
+  "validatedAt": "2026-10-24T01:16:20.777Z",
+  "report": "reports/2026-10-24T01-12-37.977Z"
+}

@@ -1,0 +1,151 @@
+{
+  "id": "hook-prompt-critical",
+  "kind": "critical",
+  "answer": "写了 Prompt 就能保证所有安全检查每次执行。这是我的方案。",
+  "expected": [
+    0,
+    0,
+    0
+  ],
+  "critical": true,
+  "question": {
+    "id": "hook-prompt",
+    "libraryId": "ai-agents",
+    "title": "必须每次执行的检查，为什么不应只写在 Prompt 中？",
+    "prompt": "必须每次执行的检查，为什么不应只写在 Prompt 中？",
+    "module": "工程质量",
+    "difficulty": "L1",
+    "version": "2026-10-24.1",
+    "review": "reviewed",
+    "reference": "概率性模型遵循指令不能替代确定性检查。\n\n职责划分：Prompt 引导方案与风格；必须执行的控制放程序生命周期；不能声称 Hook 使整个 Agent 确定。\n\n执行时机：工具调用前检查权限和保护路径；调用后运行校验并记录状态；完成前核验质量门。\n\n独立验证：Hook 失败须阻止受控动作；CI 保留独立验证；有判断归属的问题交人工审核。",
+    "supplement": "答案与细则由整理者依据正文补充；已核对正文证据，不代表原作者标准答案。",
+    "rubric": [
+      {
+        "id": "point_1",
+        "title": "职责划分",
+        "weight": 1,
+        "levels": [
+          "未涉及职责划分，或给出相反主张",
+          "只提到职责划分，未解释具体做法",
+          "Prompt 引导方案与风格",
+          "Prompt 引导方案与风格；必须执行的控制放程序生命周期",
+          "Prompt 引导方案与风格；必须执行的控制放程序生命周期；不能声称 Hook 使整个 Agent 确定"
+        ],
+        "missing": "需要说明：Prompt 引导方案与风格；必须执行的控制放程序生命周期；不能声称 Hook 使整个 Agent 确定"
+      },
+      {
+        "id": "point_2",
+        "title": "执行时机",
+        "weight": 1,
+        "levels": [
+          "未涉及执行时机，或给出相反主张",
+          "只提到执行时机，未解释具体做法",
+          "工具调用前检查权限和保护路径",
+          "工具调用前检查权限和保护路径；调用后运行校验并记录状态",
+          "工具调用前检查权限和保护路径；调用后运行校验并记录状态；完成前核验质量门"
+        ],
+        "missing": "需要说明：工具调用前检查权限和保护路径；调用后运行校验并记录状态；完成前核验质量门"
+      },
+      {
+        "id": "point_3",
+        "title": "独立验证",
+        "weight": 1,
+        "levels": [
+          "未涉及独立验证，或给出相反主张",
+          "只提到独立验证，未解释具体做法",
+          "Hook 失败须阻止受控动作",
+          "Hook 失败须阻止受控动作；CI 保留独立验证",
+          "Hook 失败须阻止受控动作；CI 保留独立验证；有判断归属的问题交人工审核"
+        ],
+        "missing": "需要说明：Hook 失败须阻止受控动作；CI 保留独立验证；有判断归属的问题交人工审核"
+      }
+    ],
+    "criticalError": "写了 Prompt 就能保证所有安全检查每次执行",
+    "sources": [
+      {
+        "id": "6a07b31a000000003700ed28",
+        "title": "Agent Hooks：给 agent 工作流加上确定控制",
+        "author": "奥森木",
+        "url": "https://www.xiaohongshu.com/explore/6a07b31a000000003700ed28",
+        "published": "2026-05-16T07:58:18+08:00",
+        "evidence": "什么时候用 hook。有个简单判断法：要求里出现 always / never / block / record / run / verify 这类词，就该放 hook 不是 prompt。\"不要编辑生成的文件\"、\"完成前跑测试\"、\"测试挂了不许说做完\"——这些都是 hook 该管的，模型有时候记得有时候忘。代码风格、命名约定这类灵活引导留 prompt 就够。\n\t\n6 个生命周期点够覆盖起步。按 agent 工作流时间线：\n- SessionStart 加载项目约定 / 活动约束\n- UserPromptSubmit 按主题给 prompt 加上下文 / 拦坏 prompt\n- PreToolUse 工具调用前拦截 / 批准 / 修改\n- PostToolUse 工具调用后跑测试 / 记日志 / 写状态\n- Stop 检查质量门，没过就阻止\"假完成\"\n- SessionEnd 写最终审计 / 清临时状态\n\t\n操作模型很干净：event → matcher → handler → outcome。匹配的事件触发时你的 handler 一定会跑，结果可以是上下文、决策、副作用或记录。handler 可以是 shell 命令、HTTP 请求、MCP 工具调用、子 agent，最便携的是 shell 调 Python 脚本。\n\t\n关键边界：hook 不让整个 agent 跑成确定性的。模型仍然自由决定方案、编辑、工具调用、恢复路径。hook 让确定的是窄但有用的那一块——一些必须每次都跑的检查和副作用。\n\t\n4 层职责要分清楚：项目指令（prompt）管风格架构 → hooks 管必跑控制 → CI 管独立验证 → 人审管判断归属。把所有东西塞 hook 会过度自动化，全塞 prompt 会依赖模型听话。\n\t\n采用路径就 3 步，别一上来想搭完整治理系统：\n1. 拦保护路径 · PreToolUse 拦编辑 generated/、.env、敏感 fixture\n2. 加质量门 · PostToolUse 跑最快有用的测试，结果写状态文件\n3. 加完成门 · Stop 读上一步状态，挂了就阻止 finish\n\t\n跑顺这 3 步再加 SessionStart 上下文、UserPromptSubmit 路由、SessionEnd 审计——锦上添花。\n\t\n最有用的一句收束：hook 把可重复的规则，从\"模型记忆\"搬进\"生命周期上有命名的代码点\"。 模型还能自由推理写代码，但测试、政策、日志、完成门——作为确定性的部分——在工作流里运行。\n\t\n如果你在用 Claude Code / Codex / Cursor / Devin，从拦保护路径这一条开始，今天就能配上。\n\t\n#ClaudeCode[话题]# #Codex[话题]# #Cursor[话题]# #agent[话题]# #程序员日常 #AI编程[话题]#  #开发者 #软件工程 #自动化 #技术分享",
+        "scope": "仅正文"
+      }
+    ],
+    "archived": false
+  },
+  "split": "holdout",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "point_1": {
+        "type": "score",
+        "score": 0.02,
+        "legend": {
+          "0": "未涉及职责划分，或给出相反主张",
+          "1": "只提到职责划分，未解释具体做法",
+          "2": "Prompt 引导方案与风格",
+          "3": "Prompt 引导方案与风格；必须执行的控制放程序生命周期",
+          "4": "Prompt 引导方案与风格；必须执行的控制放程序生命周期；不能声称 Hook 使整个 Agent 确定"
+        },
+        "probabilities": {
+          "0": 0.99,
+          "1": 0.01,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confidence": 0.99
+      },
+      "point_2": {
+        "type": "score",
+        "score": 0.02,
+        "legend": {
+          "0": "未涉及执行时机，或给出相反主张",
+          "1": "只提到执行时机，未解释具体做法",
+          "2": "工具调用前检查权限和保护路径",
+          "3": "工具调用前检查权限和保护路径；调用后运行校验并记录状态",
+          "4": "工具调用前检查权限和保护路径；调用后运行校验并记录状态；完成前核验质量门"
+        },
+        "probabilities": {
+          "0": 0.99,
+          "1": 0.01,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confidence": 0.99
+      },
+      "point_3": {
+        "type": "score",
+        "score": 0.01,
+        "legend": {
+          "0": "未涉及独立验证，或给出相反主张",
+          "1": "只提到独立验证，未解释具体做法",
+          "2": "Hook 失败须阻止受控动作",
+          "3": "Hook 失败须阻止受控动作；CI 保留独立验证",
+          "4": "Hook 失败须阻止受控动作；CI 保留独立验证；有判断归属的问题交人工审核"
+        },
+        "probabilities": {
+          "0": 1,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confidence": 1
+      },
+      "critical": {
+        "type": "noul",
+        "noul": 0.99
+      }
+    },
+    "usage": {
+      "input_tokens": 1326,
+      "output_tokens": 65,
+      "cost": 0.000055692
+    },
+    "id": "gen-dec-1792804362-6DOxGOESogOa3xJzUnh4",
+    "provider": "TypeSafe"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "questionId": "clarification-idempotency",
+  "split": "holdout",
+  "cases": [
+    {
+      "id": "clarification-idempotency-correct",
+      "kind": "correct",
+      "answer": "以请求状态的原子转换保证一次有效处理。\n\n标识关联：request ID 定位本次提问；run ID 定位执行；thread ID 定位会话。\n\n边界校验：检查提交者权限；检查回答格式；确认请求未过期且仍在等待。\n\n原子恢复：原子地把等待状态改为已回答；重复请求返回已有结果；根据已保存 checkpoint 幂等继续。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "clarification-idempotency-partial",
+      "kind": "partial",
+      "answer": "request ID 定位本次提问；run ID 定位执行；thread ID 定位会话。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "clarification-idempotency-critical",
+      "kind": "critical",
+      "answer": "仅禁用前端按钮就能阻止所有重复提交，无需服务端状态检查。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "clarification-idempotency-concise",
+      "kind": "concise",
+      "answer": "用 request 找提问、run 找执行、thread 找会话。服务端验权限、答案和待答有效期；原子认领一次，重复取已存结果，再从检查点幂等续跑。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

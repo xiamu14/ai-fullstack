@@ -1,0 +1,151 @@
+{
+  "id": "clarification-idempotency-critical",
+  "kind": "critical",
+  "answer": "仅禁用前端按钮就能阻止所有重复提交，无需服务端状态检查。这是我的方案。",
+  "expected": [
+    0,
+    0,
+    0
+  ],
+  "critical": true,
+  "question": {
+    "id": "clarification-idempotency",
+    "libraryId": "ai-agents",
+    "title": "用户重复提交澄清答案，服务端应怎样避免重复继续任务？",
+    "prompt": "用户重复提交澄清答案，服务端应怎样避免重复继续任务？",
+    "module": "工程质量",
+    "difficulty": "L3",
+    "version": "2026-10-24.1",
+    "review": "reviewed",
+    "reference": "以请求状态的原子转换保证一次有效处理。\n\n标识关联：request ID 定位本次提问；run ID 定位执行；thread ID 定位会话。\n\n边界校验：检查提交者权限；检查回答格式；确认请求未过期且仍在等待。\n\n原子恢复：原子地把等待状态改为已回答；重复请求返回已有结果；根据已保存 checkpoint 幂等继续。",
+    "supplement": "答案与细则由整理者依据正文补充；已核对正文证据，不代表原作者标准答案。",
+    "rubric": [
+      {
+        "id": "point_1",
+        "title": "标识关联",
+        "weight": 1,
+        "levels": [
+          "未涉及标识关联，或给出相反主张",
+          "只提到标识关联，未解释具体做法",
+          "request ID 定位本次提问",
+          "request ID 定位本次提问；run ID 定位执行",
+          "request ID 定位本次提问；run ID 定位执行；thread ID 定位会话"
+        ],
+        "missing": "需要说明：request ID 定位本次提问；run ID 定位执行；thread ID 定位会话"
+      },
+      {
+        "id": "point_2",
+        "title": "边界校验",
+        "weight": 1,
+        "levels": [
+          "未涉及边界校验，或给出相反主张",
+          "只提到边界校验，未解释具体做法",
+          "检查提交者权限",
+          "检查提交者权限；检查回答格式",
+          "检查提交者权限；检查回答格式；确认请求未过期且仍在等待"
+        ],
+        "missing": "需要说明：检查提交者权限；检查回答格式；确认请求未过期且仍在等待"
+      },
+      {
+        "id": "point_3",
+        "title": "原子恢复",
+        "weight": 1,
+        "levels": [
+          "未涉及原子恢复，或给出相反主张",
+          "只提到原子恢复，未解释具体做法",
+          "原子地把等待状态改为已回答",
+          "原子地把等待状态改为已回答；重复请求返回已有结果",
+          "原子地把等待状态改为已回答；重复请求返回已有结果；根据已保存 checkpoint 幂等继续"
+        ],
+        "missing": "需要说明：原子地把等待状态改为已回答；重复请求返回已有结果；根据已保存 checkpoint 幂等继续"
+      }
+    ],
+    "criticalError": "仅禁用前端按钮就能阻止所有重复提交，无需服务端状态检查",
+    "sources": [
+      {
+        "id": "6ac0b0a3000000001a02521c",
+        "title": "Agent执行任务前的AskUserQuestion",
+        "author": "婼小可怜的大魔王",
+        "url": "https://www.xiaohongshu.com/explore/6ac0b0a3000000001a02521c",
+        "published": "2026-10-03T15:37:07+08:00",
+        "evidence": "在CC 中，这项工具名为 AskUserQuestion。它允许 Agent 提出问题，并提供单选、多选或自由补充入口；用户回答后，结果会写回当前任务上下文，Agent 再继续规划或执行。\n\t\n因此，AskUser 不只是一个问答组件，而是一套发现信息缺口—暂停任务—获得回答—继续执行的交互机制。界面上的候选项只是呈现方式，不应被当成能力本身。\n\t\n1️⃣CC：AskUserQuestion\n1. Agent 判断自己缺少信息；\n2. 调用 AskUserQuestion，输出一组结构化问题；\n3. 前端渲染成单选、多选或文本输入；\n4. 用户作答后，答案被回传给 Agent；\n5. Agent 带着补充后的上下文继续执行。\n工具调用 + 权限拦截 + UI 渲染的人机协作节点。每个问题通常包含问题正文、短标签、选项、是否多选、是否允许自由输入等字段。\n\t\n2️⃣Cursor：ACP结构化提问\nCursor 的 Ask 不是工具，而是一个 交互模式。\nAsk 模式通常是只读的：它会读取你提供的代码或上下文来回答问题，但不会像 Agent 模式那样自动改文件、跑命令、执行多步操作。\n\t\n3️⃣Gemini CLI：Ask User tool\n它常见于 Gemini CLI 的计划模式或复杂任务流程中。比如 Agent 正在分析代码库、规划改动，但发现目标不够明确，就会通过 ask_user 暂停，向用户提出更具体的问题，收集偏好或确认目标后再继续。支持把问题组织成结构化列表，通常包括单选、多选或文本输入等形式。\n\t\n[立马暴富]执行流程\n用户提交选项时，客户端会把答案和 request ID 一起发回服务端。服务端检查答案格式、请求是否仍在等待、是否超时，以及提交者是否有权限。校验通过后，这次提问会被标记为已回答，避免重复提交。\n\t\n系统根据 request ID 找到对应的 run ID，再根据 thread ID 找回原会话和保存的 checkpoint。用户答案被写入原任务上下文，成为 Agent 下一步推理可以读取的新信息。三个 ID 的作用很简单：thread ID 找会话，run ID 找本次执行，request ID 找这次提问。\n#ai产品经理[话题]# #互联网大厂[话题]# #howto入门codex[话题]# #产品经理[话题]# #agent[话题]# #ai[话题]#",
+        "scope": "仅正文"
+      }
+    ],
+    "archived": false
+  },
+  "split": "holdout",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "point_1": {
+        "type": "score",
+        "score": 0.01,
+        "legend": {
+          "0": "未涉及标识关联，或给出相反主张",
+          "1": "只提到标识关联，未解释具体做法",
+          "2": "request ID 定位本次提问",
+          "3": "request ID 定位本次提问；run ID 定位执行",
+          "4": "request ID 定位本次提问；run ID 定位执行；thread ID 定位会话"
+        },
+        "probabilities": {
+          "0": 1,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confidence": 1
+      },
+      "point_2": {
+        "type": "score",
+        "score": 0.01,
+        "legend": {
+          "0": "未涉及边界校验，或给出相反主张",
+          "1": "只提到边界校验，未解释具体做法",
+          "2": "检查提交者权限",
+          "3": "检查提交者权限；检查回答格式",
+          "4": "检查提交者权限；检查回答格式；确认请求未过期且仍在等待"
+        },
+        "probabilities": {
+          "0": 1,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confidence": 1
+      },
+      "point_3": {
+        "type": "score",
+        "score": 0.01,
+        "legend": {
+          "0": "未涉及原子恢复，或给出相反主张",
+          "1": "只提到原子恢复，未解释具体做法",
+          "2": "原子地把等待状态改为已回答",
+          "3": "原子地把等待状态改为已回答；重复请求返回已有结果",
+          "4": "原子地把等待状态改为已回答；重复请求返回已有结果；根据已保存 checkpoint 幂等继续"
+        },
+        "probabilities": {
+          "0": 1,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "confidence": 1
+      },
+      "critical": {
+        "type": "noul",
+        "noul": 0.99
+      }
+    },
+    "usage": {
+      "input_tokens": 1292,
+      "output_tokens": 65,
+      "cost": 0.000054264
+    },
+    "id": "gen-dec-1792804360-0EKx44w2GTGHozbgJ8Sg",
+    "provider": "TypeSafe"
+  }
+}

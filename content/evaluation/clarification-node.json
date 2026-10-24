@@ -1,0 +1,50 @@
+{
+  "questionId": "clarification-node",
+  "split": "development",
+  "cases": [
+    {
+      "id": "clarification-node-correct",
+      "kind": "correct",
+      "answer": "澄清是暂停并补充原任务上下文的执行节点。\n\n缺口判断：识别影响执行的缺失信息；提出具体问题；选项之外允许自由补充。\n\n暂停绑定：保存原任务上下文和 checkpoint；关联会话执行和请求标识；等待回答期间不猜测执行。\n\n回答恢复：检查回答格式与请求状态；一次请求只接受有效提交；把回答写回原上下文再继续。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "clarification-node-partial",
+      "kind": "partial",
+      "answer": "识别影响执行的缺失信息；提出具体问题；选项之外允许自由补充。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "clarification-node-critical",
+      "kind": "critical",
+      "answer": "缺少关键需求时无需等待回答，直接猜测后执行。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "clarification-node-concise",
+      "kind": "concise",
+      "answer": "先找影响执行的信息缺口，具体发问并允许自由填。原上下文和检查点落盘，thread/run/request 绑定，等待不猜；回答验格式、状态并去重，补回上下文再跑。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

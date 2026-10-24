@@ -1,0 +1,51 @@
+{
+  "name": "interview-library",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 3006",
+    "build": "vite build",
+    "check": "tsc --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:migrate": "bun scripts/migrate.ts",
+    "import": "bun scripts/import.ts",
+    "evaluate": "bun scripts/evaluate.ts",
+    "backup": "docker compose exec -T postgres pg_dump -U interview -d interview --clean --if-exists",
+    "restore": "docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U interview -d interview",
+    "collect": "bun ../agent-knowledge/scripts/collect.mjs",
+    "read:notes": "bun ../agent-knowledge/scripts/read-notes.mjs",
+    "read:images": "/opt/homebrew/bin/python3 ../agent-knowledge/scripts/read-images.py",
+    "start": "bun scripts/serve.ts",
+    "library:add": "bun scripts/library.ts",
+    "export:md": "bun scripts/export-markdown.ts"
+  },
+  "dependencies": {
+    "@remixicon/react": "latest",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-start": "latest",
+    "motion": "latest",
+    "postgres": "latest",
+    "react": "^19.2.0",
+    "react-aria-components": "latest",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.2",
+    "@tailwindcss/vite": "latest",
+    "@types/bun": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "packageManager": "bun@1.3.14"
+}

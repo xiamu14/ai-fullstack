@@ -1,0 +1,50 @@
+{
+  "questionId": "mcp-intent",
+  "split": "holdout",
+  "cases": [
+    {
+      "id": "mcp-intent-correct",
+      "kind": "correct",
+      "answer": "围绕模型要完成的任务暴露清晰工具。\n\n任务建模：先明确用户目标；确定完成任务必需的输入；返回能直接支持下一步的结果。\n\n接口设计：工具名称说明意图；描述精炼且不重复名称；参数尽量简单扁平并明确约束。\n\n验证边界：用真实任务验证选工具准确性；保留权限与参数校验；高风险副作用不因合并工具而绕过审批。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "mcp-intent-partial",
+      "kind": "partial",
+      "answer": "先明确用户目标；确定完成任务必需的输入；返回能直接支持下一步的结果。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "mcp-intent-critical",
+      "kind": "critical",
+      "answer": "把多个 API 合并后就不必做权限或参数校验。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "mcp-intent-concise",
+      "kind": "concise",
+      "answer": "先看用户要办什么，列必要入参和下一步所需结果。名字表达任务，说明别重复，参数扁平且有约束；真实任务测选中率，合并也不能省权限、校验和审批。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

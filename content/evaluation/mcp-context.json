@@ -1,0 +1,50 @@
+{
+  "questionId": "mcp-context",
+  "split": "development",
+  "cases": [
+    {
+      "id": "mcp-context-correct",
+      "kind": "correct",
+      "answer": "优化工具数量、描述和结果，不丢失必要约束。\n\n测量开销：分别统计工具描述与返回结果的 Token；识别重复和不用的工具；用真实任务建立效果基线。\n\n输入精简：合并职责相近且边界一致的工具；精简重复描述；保持必需参数和安全约束清晰。\n\n输出精简：仅返回当前任务必要字段；保留错误与可操作信息；改动后比较准确率延迟与成本。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "mcp-context-partial",
+      "kind": "partial",
+      "answer": "分别统计工具描述与返回结果的 Token；识别重复和不用的工具；用真实任务建立效果基线。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "mcp-context-critical",
+      "kind": "critical",
+      "answer": "为节省 Token 可以删去所有参数约束和错误信息。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "mcp-context-concise",
+      "kind": "concise",
+      "answer": "先分开量工具 schema 和结果，找冗余并建真实任务基线。同边界功能可合并，描述去重复但保约束；结果只留所需字段与错误，再测准确率、时延和费用。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

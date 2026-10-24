@@ -1,0 +1,28 @@
+{
+  "model": "typesafe/jev-1.14",
+  "policy": "rubric-v1",
+  "questionVersions": {
+    "action-verification": "2026-10-24.1",
+    "approval-boundary": "2026-10-24.1",
+    "approval-resume": "2026-10-24.1",
+    "clarification-idempotency": "2026-10-24.1",
+    "clarification-node": "2026-10-24.1",
+    "context-budget": "2026-10-24.1",
+    "handoff-state": "2026-10-24.1",
+    "hook-prompt": "2026-10-24.1",
+    "hook-quality-gate": "2026-10-24.1",
+    "intent-route": "2026-10-24.1",
+    "mcp-context": "2026-10-24.1",
+    "mcp-intent": "2026-10-24.1",
+    "memory-citation": "2026-10-24.1",
+    "memory-governance": "2026-10-24.1",
+    "memory-summary": "2026-10-24.1",
+    "prompt-evaluation": "2026-10-24.1",
+    "rag-diagnosis": "2026-10-24.1",
+    "rag-topk": "2026-10-24.1",
+    "state-precondition": "2026-10-24.1",
+    "tool-schema": "2026-10-24.1"
+  },
+  "fingerprint": "ffc24d7d1cd7a2b1db8f42d8eb1b694943ee04ddf06c967c76e281c0fca7d539",
+  "note": "初始标签由整理者制定，尚待用户独立复核；同题不跨集合。"
+}
