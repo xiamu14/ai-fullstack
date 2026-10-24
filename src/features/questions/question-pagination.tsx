@@ -1,5 +1,4 @@
 import { motion } from 'motion/react'
-import { Text } from 'react-aria-components'
 import { RiArrowLeftSLine, RiArrowRightSLine } from '@remixicon/react'
 import { Button } from '@/components/base/buttons/button'
 
@@ -20,10 +19,7 @@ export function QuestionPagination({
   onPageChange: (page: number) => void
 }) {
   return (
-    <motion.footer className="flex flex-wrap items-center justify-between gap-3 px-4 py-4">
-      <Text className="text-xs text-neutral-500">
-        第 {page} / {pages} 页
-      </Text>
+    <motion.footer className="flex flex-wrap items-center justify-end gap-3 px-4 py-4">
       <nav aria-label="题目分页" className="flex flex-wrap items-center gap-2">
         <Button
           variant="secondary"
