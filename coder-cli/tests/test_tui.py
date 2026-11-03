@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, patch
 
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import ModelRequestRejectedError
-from pydantic_ai.messages import ToolCallPart, ToolReturnPart, UserPromptPart
+from pydantic_ai.messages import ModelRequest, ModelResponse, TextPart, ToolCallPart, ToolReturnPart, UserPromptPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai.usage import RunUsage
 
@@ -16,6 +16,7 @@ from tui.shell import ChatShell
 from tui.messages import MessageHistory
 from tui.prompt import PromptTextArea as Prompt, PromptContainer
 from tui.tools import ToolCall, ToolCallHeader
+from tui.turn import TurnView
 
 
 def result(text):
@@ -23,6 +24,32 @@ def result(text):
 
 
 class TuiTests(unittest.IsolatedAsyncioTestCase):
+    async def test_restored_reply_wraps_at_margin_boundary_without_clipping(self):
+        text = "中" * 57 + " END"
+        messages = [ModelResponse(parts=[TextPart(text)]), ModelRequest(parts=[UserPromptPart("下一轮")])]
+        app = ChatShell(SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=messages))
+        async with app.run_test(size=(122, 34)) as pilot:
+            await pilot.pause()
+            self.assertIn("END", app.export_screenshot())
+            for width in (80, 122):
+                await pilot.resize_terminal(width, 34)
+                await pilot.pause()
+                self.assertIn("END", app.export_screenshot())
+
+    async def test_streamed_reply_wraps_at_margin_boundary_without_clipping(self):
+        app = ChatShell(SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[]))
+        async with app.run_test(size=(122, 34)) as pilot:
+            history = app.query_one(MessageHistory)
+            view = TurnView(history)
+            text = "中" * 57 + " END"
+            await view.write(text[:-3])
+            await pilot.pause()
+            await view.write("END")
+            await view.finish(text)
+            await history.add("user", "下一轮")
+            await pilot.pause()
+            self.assertIn("END", app.export_screenshot())
+
     async def test_multiline_paste_streaming_and_input_history(self):
         started, release = asyncio.Event(), asyncio.Event()
 

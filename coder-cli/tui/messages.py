@@ -33,6 +33,19 @@ class MarkdownNote(Markdown):
 
 class Contents(VerticalGroup):
     def process_layout(self, placements):
+        offset = 0
+        for index, placement in enumerate(placements):
+            widget = placement.widget
+            region = placement.region
+            gutter = widget.styles.gutter
+            # StreamLayout measures before subtracting margins, clipping wrapped messages.
+            height = widget.get_content_height(
+                region.size, self.app.viewport_size, max(0, region.width - gutter.width)
+            ) + gutter.height
+            placements[index] = placement._replace(
+                region=region._replace(y=region.y + offset, height=height)
+            )
+            offset += height - region.height
         if placements:
             last_placement = placements[-1]
             top, right, _bottom, left = last_placement.margin

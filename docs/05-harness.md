@@ -219,7 +219,7 @@ System Prompt 分成两层：固定的角色与通用规则，以及会随项目
 
 没有文档依据时，只报告配置与目录事实，不把目录名推断成架构结论。函数实现、调用链、接口参数等细节在具体任务中通过文件工具加载。
 
-#### 持久化缓存与增量更新
+**持久化缓存与增量更新**
 
 缓存以规范化的工作目录为键，而不是按 session 存储。因此，同一项目的多个会话能够共享已经提取的概览。缓存保存来源指纹、内容摘要、提取片段和浅层目录项，不复制整个项目文件。
 
@@ -255,12 +255,87 @@ Git 命令设置超时和输出上限。采集失败时标记信息不可用，�
 
 验证时应检查实际文件打开与目录遍历，而不只检查摘要文字：重复启动应复用正文缓存，修改一个清单只读取该来源，新增模块只更新对应结构，依赖目录始终不被进入；再验证同轮复用、跨轮刷新与不同工作目录隔离。
 
-### 1.5 Tools Seach
-### 1.6 MCP
-### 1.7 Skills
+### 1.5 Tools
+
+工具定义通过模型 API 的 `tools` 字段发送，包含 `name`、`description` 和参数 JSON Schema；它们不是 Python 实现，也不等同于 Agent 的 `instructions`。默认发送当前可用工具的完整定义，普通工具与本地连接的 MCP 工具均如此。
+
+#### 渐进披露
+
+工具多时，先发现相关工具，再加载其定义。工具路由从“在全部工具中选择”变为“搜索候选工具 → 选择工具与参数”。
+
+```mermaid
+flowchart LR
+    A[用户任务] --> B[search_tools]
+    B --> C[匹配 name 和 description]
+    C --> D[披露候选工具的完整 Schema]
+    D --> E[模型选择并调用工具]
+```
+
+Pydantic AI 2.64.0 中，普通工具设置 `defer_loading=True`；框架自动提供 ToolSearch，无需单独注册。以下沿用已配置的 `model` 和已有工具函数：
+
+```python
+from pydantic_ai import Agent, Tool
+
+agent = Agent(model, tools=[
+    Tool(get_weather, defer_loading=True),
+    Tool(send_email, defer_loading=True),
+])
+```
+
+MCP 工具集可逐个按需发现；这与加载整组 capability 是两个粒度：
+
+```python
+from pydantic_ai.mcp import MCPToolset
+
+mcp = MCPToolset("http://127.0.0.1:8000/mcp")
+agent = Agent(model, toolsets=[mcp.defer_loading()])
+```
+
+#### 打印模型请求
+
+[可运行示例](../coder-cli/examples/tool_disclosure.py) 用模拟 HTTP 响应捕获 OpenAI Chat 请求，不调用在线模型。分别打印启用前、发现前、发现后的 `tools` 与 `messages`：
+
+```bash
+# 在 coder-cli 目录运行
+uv run python examples/tool_disclosure.py
+```
+
+请求变化如下（仅摘录名称；脚本打印完整描述与参数）：
+
+```text
+启用前       tools: get_weather, send_email
+启用后
+  发现前     tools: search_tools
+  模型调用   search_tools(queries=["weather"])
+  搜索结果   {"discovered_tools": [{"name": "get_weather"}]}
+  发现后     tools: get_weather, search_tools
+```
+
+| 影响 | 全量定义 | 渐进披露 |
+|---|---|---|
+| 工具定义的输入 token | 全部工具的描述与 Schema | 发现入口 + 已披露工具；另有搜索交互开销 |
+| 工具路由 | 每步面对全部工具 | 先缩小候选集，减少无关工具干扰；检索遗漏也会导致选不到工具 |
+
+工具越多、Schema 越长、单项任务需要的工具越少，节省空间越大。少量工具不一定节省 token；发现通常增加一次模型请求。名称与描述需明确用途和边界；减少候选不保证路由正确，应验证检索召回和调用成功率。
+
+上述请求形状对应 OpenAI Chat 的本地搜索路径。支持原生 tool search 的接口可能仍接收带延迟标记的完整定义，由服务端控制模型可见性；不能把 HTTP 请求大小直接当作模型上下文 token。Prompt cache 也不等同于渐进披露。
+
+来源：[Pydantic AI Tool Search](https://pydantic.dev/docs/ai/api/pydantic-ai/capabilities/#pydantic_ai.capabilities.ToolSearch)、[Toolset Deferred Loading](https://pydantic.dev/docs/ai/tools-toolsets/toolsets/#deferred-loading)。
+
+<!--TODO-->
+**MCP**
+MCP 是连接外部工具的协议，和内置 Tools 的差异在于：
+1. 需要 register 才能被发现
+2. 需要 下轮对话才能载入到 context
+3. 对于外部工具，需要做安全防护，避免 SSRF 工具
+4. 网络请求需要有 retries 和 timeout
+
+### 1.6 Skills
 --------
 ## 2. 护栏
 ### 2.1 权限
+
+Human-in-the-loop
 
 ### 2.2 Token 预算
 
@@ -268,17 +343,11 @@ Git 命令设置超时和输出上限。采集失败时标记信息不可用，�
 sessions 并行
 ## 3. 决策模式
 Planning 模式
-
 Reflection 模式
-
-Human-in-the-loop
-
 Chain-of-Thought
 
 ## 4. Multi-Agent
 
-
-
-## 5. Dsh Super Agent
-
+## 5. Long-term Agent
+Dsh Super Agent
 > [dsh-superagent-prototype](https://github.com/deepseek-ai/dsh-superagent-prototype/tree/main)
