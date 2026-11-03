@@ -1,0 +1,36 @@
+# Local environment and credentials; keep configuration templates.
+.env
+.env.*
+!.env.example
+.venv/
+
+# Python bytecode, build output, and tool caches.
+__pycache__/
+*.py[cod]
+build/
+dist/
+wheels/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.tox/
+.nox/
+.uv-cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local traces and runtime output (workspace is also ignored by coder-cli).
+.logfire/
+*.log
+
+# OS metadata and editor temporary files.
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

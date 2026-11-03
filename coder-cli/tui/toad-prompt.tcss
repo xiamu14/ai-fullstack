@@ -1,0 +1,101 @@
+# Toad 原始 TUI 样式摘录；仅删除未使用组件的规则，声明值保持原样。
+# 来源与许可证见 TOAD-NOTICE.md。
+Prompt {            
+    padding: 0 0 0 0;    
+    height: auto;  
+    dock: bottom;  
+
+    PromptContainer {       
+        &:dark {
+            background: black 10%;
+        }
+        &:light {
+            background: white 40%;
+        }
+        height: auto;
+        margin: 0 0 1 0;
+        border: tall transparent;
+        border-subtitle-align: left;
+        border-subtitle-style: reverse;
+        
+        &:focus-within {
+            border: tall $secondary;            
+            #prompt {
+                text-opacity: 100%;
+            }
+        }
+        
+        #prompt {
+            padding: 0 1;
+            text-opacity: 30%;
+        }
+        
+        PromptTextArea {
+            padding: 0 1 0 0;
+            background: transparent;
+            border: none;
+            height: auto;
+            max-height: 50vh;
+
+            &:blur {
+                text-opacity: 0.5;
+            }
+        }
+    }
+
+    #info-container {                
+        
+        height: 1;
+        margin: 1 1;
+        # padding: 1 0;
+        
+        AgentInfo {
+            padding: 0 1;
+            margin: 0 1 0 0;
+            color: $text-primary;
+            background: $primary 10%;
+            width: auto;           
+        }
+
+        CondensedPath { 
+            &:first-of-type {
+                margin: 0 1 0 0;
+            }
+            margin: 0 1;
+            width: 1fr;            
+            height: 1;
+            text-wrap: nowrap;
+            color: $text-secondary;            
+        }
+
+        StatusLine {            
+            color: $secondary 70%;    
+            margin: 0 1;
+            width: auto;
+            height: 1;    
+            text-align: right;            
+            text-wrap: nowrap;
+            text-overflow: ellipsis;                           
+        }
+        
+        ModeInfo {
+            padding: 0 1;
+            margin: 0 0;
+            color: $text-secondary;
+            background: $secondary 10%;
+            dock: right; 
+            display: none;
+        }        
+    }
+
+    &.-has-mode #info-container ModeInfo {
+        display: block;
+    }
+
+}
+
+MainScreen {    
+    background: $background;
+    layers: sidebar screen base;    
+
+}
