@@ -133,10 +133,23 @@ persistence = StepPersistence(
 
 #### 会话如何组织
 
-当前没有独立的 `sessions` 表。一个 session 由相同 `conversation_id` 的运行记录组成，每次 `agent.run()` 产生一个 `run_id`。
+会话和运行需要分开保存：一个会话可以暂时没有运行，而每次 `agent.run()` 才产生一个 `run_id`。仅从 `runs` 聚合会话，会遗漏尚未发送消息的空会话。
+
+因此，应用层增加 `sessions` 登记表，保存会话身份、工作目录和创建时间。ID 使用 Pydantic AI 的公开 `Conversation` 类型生成，随后交给各次运行沿用：
+
+```python
+from pydantic_ai.conversation import Conversation
+
+conversation = Conversation()
+conversation_id = conversation.conversation_id
+# 将 conversation_id、工作目录和创建时间保存到会话登记表。
+# 后续运行使用 agent.run(..., conversation_id=conversation_id)。
+```
+
+保存空会话不需要调用模型，也不应插入一条虚假的运行记录。运行过程与快照仍由框架的 `StepPersistence` 保存。
 
 ```text
-conversation_id：同一会话
+sessions.conversation_id：同一会话，可以有零到多次运行
 ├── run_id：第一次运行
 │   ├── metadata：工作目录等附加信息
 │   ├── events：运行、模型请求、工具调用的过程事件
@@ -148,13 +161,13 @@ conversation_id：同一会话
 
 | 会话信息 | 当前存放或获取方式 |
 | --- | --- |
-| 会话 ID | `runs.conversation_id`；应用中的 `session_id` 对应该字段 |
+| 会话 ID | `sessions.conversation_id`；运行通过 `runs.conversation_id` 关联，应用中的 `session_id` 对应该值 |
 | 标题 | 优先读取运行的 `metadata.title`，否则从首条用户消息提取；没有独立标题列 |
-| 工作目录 | 顶层运行的 `metadata.workspace`，值为绝对路径 |
+| 工作目录 | 会话登记表的 `workspace`；运行的 `metadata.workspace` 同时记录执行目录 |
 | 消息历史 | 最近成功的顶层运行所保存的完整消息快照 |
 | 运行结果状态 | 从 `events.kind` 判断，例如 `run_completed`、`run_failed`；没有独立 session 状态列 |
 
-会话列表中的 `session_id` 和 `title` 是聚合得到的视图，不是完整的持久化记录。工作目录也没有单独的数据库列，而是 metadata JSON 中的一个键：
+会话列表合并会话登记与运行记录，按最近活动排序；还没有消息时使用默认标题，出现消息后再提取标题。旧的运行记录即使没有会话登记，也可以继续按 `conversation_id` 聚合。运行 metadata 中仍保留工作目录：
 
 ```json
 {"workspace": "/absolute/path/to/project"}
@@ -162,10 +175,11 @@ conversation_id：同一会话
 
 #### SQLite 表结构
 
-下表列出当前存储使用的表与字段。`TEXT` 用于标识、时间和序列化 JSON，`INTEGER` 用于序号与步骤编号。
+下表列出当前存储使用的表与字段。`sessions` 是应用层登记表，其余表沿用框架的运行持久化结构。`TEXT` 用于标识、时间和序列化 JSON，`INTEGER` 用于序号与步骤编号。
 
 | 表 | 主键 | 其他字段 | 保存什么 |
 | --- | --- | --- | --- |
+| `sessions` | `conversation_id` | `workspace`、`created_at` | 独立于模型运行的会话身份与工作目录 |
 | `runs` | `run_id` | `conversation_id`、`parent_run_id`、`agent_name`、`metadata`、`started_at`、`registration_id` | 一次运行的身份、归属与附加信息 |
 | `events` | `seq`，自增 | `run_id`、`kind`、`step_index`、`timestamp`、`conversation_id`、`parent_run_id`、`agent_name`、`tool_call_id`、`tool_name`、`error`、`metadata`、`idempotency_key` | 按顺序追加的过程事件 |
 | `snapshots` | `seq`，自增 | `run_id`、`step_index`、`conversation_id`、`parent_run_id`、`agent_name`、`timestamp`、`state`、`messages`、`idempotency_key` | 可恢复的消息历史快照 |
@@ -200,7 +214,7 @@ System Prompt 分成两层：固定的角色与通用规则，以及会随项目
 | 项目名称、语言和框架 | 项目根目录及可见一级模块中的项目清单 | 如名称、简述、运行时、脚本名称和已声明的框架；不读取依赖安装目录 |
 | 模块分布 | 浅层目录项 | 最多两层、100 条可见目录项；不递归生成完整文件树 |
 | 架构与职责 | README、ARCHITECTURE 文档 | 简介和明确的架构、结构、模块说明，保留来源路径 |
-| 项目规则 | Git 根目录到工作目录之间适用的 AGENTS.md；非 Git 项目使用工作目录中的规则 | 按祖先到当前目录组织，越接近当前目录的规则越具体 |
+| 项目规则 | 所选工作目录中的 AGENTS.md | 以工作目录为边界，避免把宿主仓库的规则混入嵌套的独立练习项目 |
 | 当前工作状态 | Git 分支、HEAD 和已跟踪文件的状态 | 不读取 diff 正文，不递归枚举未跟踪文件或子模块内容 |
 
 没有文档依据时，只报告配置与目录事实，不把目录名推断成架构结论。函数实现、调用链、接口参数等细节在具体任务中通过文件工具加载。
@@ -229,7 +243,7 @@ System Prompt 分成两层：固定的角色与通用规则，以及会随项目
 
 每个来源最多读取 32 KiB，每轮更新总计最多读取 128 KiB；尚未处理的来源保留待更新标记，下一轮可以继续处理。动态层最多注入 8,000 个字符，超限的片段标记省略，任务需要时再读取原文件。
 
-遍历前排除依赖、环境、构建产物和缓存目录，例如 `node_modules`、`.venv`、`vendor`、`dist`、`target`；不跟随符号链接。Git 项目同时遵守 `.gitignore`，适用的 AGENTS.md 仍作为项目规则读取。锁文件、数据库、二进制和密钥文件不作为自动正文来源。
+遍历前排除依赖、环境、构建产物和缓存目录，例如 `node_modules`、`.venv`、`vendor`、`dist`、`target`；不跟随符号链接。Git 项目同时遵守 `.gitignore`，工作目录中的 AGENTS.md 仍作为项目规则读取。锁文件、数据库、二进制和密钥文件不作为自动正文来源。
 
 Git 命令设置超时和输出上限。采集失败时标记信息不可用，不把失败解释为工作区干净，也不通过全量读取来补偿。单个来源超过读取上限时只提供有界信息，不能把截断内容当作完整事实。
 

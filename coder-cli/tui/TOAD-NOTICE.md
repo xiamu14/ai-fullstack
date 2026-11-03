@@ -5,7 +5,7 @@
 
 - toad-global.tcss：src/toad/toad.tcss 中的消息块、Markdown、Throbber 和 Footer。
 - toad-conversation.tcss、toad-prompt.tcss：src/toad/screens/main.tcss 中的对话、输入、信息栏、工具结果和主屏幕规则。
-- toad-sessions.tcss：screens/session_resume_modal.tcss，移除未使用的 ACP 警告规则；tui/sessions.py 复用表格结构，使用本项目数据，仅支持复制与退出。
+- toad-sessions.tcss：screens/session_resume_modal.tcss，移除未使用的 ACP 警告规则；tui/sessions.py 复用表格结构，使用本项目数据，支持复制、删除会话与退出。
 - throbber.py：src/toad/widgets/throbber.py，仅补充 Python 3.13 所需的 Callable 导入。
 - highlighted_textarea.py：上游同名文件中的 Markdown 输入配色与缓存，只保留 Markdown 展示，移除 shell、路径和 slash 命令相关代码。
 - messages.py、prompt.py、tools.py 中的界面结构及工具标题呈现，依据对应的上游 widgets 组件裁剪适配；执行和消息事件由本项目实现。

@@ -49,7 +49,7 @@ class ChatShell(App):
         with ConversationView():
             yield Throbber()
             yield MessageHistory()
-            yield Prompt(self.conversation.session_id)
+            yield Prompt(self.conversation.session_id, self.conversation.workspace)
         yield Footer()
 
     async def on_mount(self) -> None:

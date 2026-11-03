@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, patch
@@ -32,7 +33,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             await release.wait()
             return result("**完整回复**")
 
-        conversation = SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send))
+        conversation = SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[], send=AsyncMock(side_effect=send))
         app = ChatShell(conversation)
         async with app.run_test(size=(90, 28)) as pilot:
             prompt = app.query_one(Prompt)
@@ -75,7 +76,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 raise ModelRequestRejectedError("test", "HTTP 400 secret-key")
             return result("恢复成功")
 
-        conversation = SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send))
+        conversation = SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[], send=AsyncMock(side_effect=send))
         app = ChatShell(conversation)
         with patch.dict("os.environ", {"OPENAI_API_KEY": "secret-key"}):
             async with app.run_test() as pilot:
@@ -107,7 +108,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 await asyncio.Event().wait()
             return result("继续成功")
 
-        app = ChatShell(SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send)))
+        app = ChatShell(SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[], send=AsyncMock(side_effect=send)))
         async with app.run_test() as pilot:
             prompt = app.query_one(Prompt)
             prompt.insert("耗时请求")
@@ -123,7 +124,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(list(app.query(".message"))[-1].content, "继续成功")
 
     async def test_scroll_back_is_preserved_and_small_terminal_keeps_input_visible(self):
-        app = ChatShell(SimpleNamespace(session_id="demo", history=[]))
+        app = ChatShell(SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[]))
         async with app.run_test(size=(48, 16)) as pilot:
             history = app.query_one(MessageHistory)
             for i in range(12):
@@ -171,7 +172,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 stopped.set()
 
-        app = ChatShell(SimpleNamespace(session_id="demo", history=[], send=send))
+        app = ChatShell(SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[], send=send))
         async with app.run_test() as pilot:
             app.query_one(Prompt).insert("耗时请求")
             await pilot.press("enter")
@@ -220,7 +221,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(tool.expanded)
 
     async def test_invalid_tool_args_and_failed_results_do_not_break_display(self):
-        app = ChatShell(SimpleNamespace(session_id="demo", history=[]))
+        app = ChatShell(SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[]))
         async with app.run_test() as pilot:
             tool = ToolCall(ToolCallPart("shell", "{invalid-json"))
             await app.query_one("#contents").mount(tool)

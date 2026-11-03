@@ -17,7 +17,7 @@ MAX_ENTRIES = 100
 MAX_FILE_BYTES = 32 * 1024
 MAX_READ_BYTES = 128 * 1024
 MAX_CONTEXT_CHARS = 8000
-CACHE_VERSION = 1
+CACHE_VERSION = 2
 
 
 class ProjectContext:
@@ -142,14 +142,8 @@ class ProjectContext:
                 break
         return directories, entries, omitted
 
-    def _candidates(self, entries: list, git_root: Path | None) -> list[Path]:
-        rules = []
-        if git_root:
-            chain = [self.workspace, *self.workspace.parents]
-            chain = chain[:chain.index(git_root) + 1]
-            rules = [path / "AGENTS.md" for path in reversed(chain)]
-        else:
-            rules = [self.workspace / "AGENTS.md"]
+    def _candidates(self, entries: list) -> list[Path]:
+        rules = [self.workspace / "AGENTS.md"]
         candidates = rules + [self.workspace / name for name in sorted(MANIFESTS)]
         candidates += [self.workspace / name for name in ("ARCHITECTURE.md", "architecture.md", "README.md", "README.rst", "README")]
         candidates += [self.workspace / "docs" / name for name in ("architecture.md", "ARCHITECTURE.md")]
@@ -210,7 +204,7 @@ class ProjectContext:
         if git_root and not self.workspace.is_relative_to(git_root):
             git_root = None
         directories, entries, omitted = self._directories(previous.get("directories", {}), git_root)
-        sources, sources_unavailable = self._sources(previous.get("sources", {}), self._candidates(entries, git_root), git_root)
+        sources, sources_unavailable = self._sources(previous.get("sources", {}), self._candidates(entries), git_root)
         state = {"version": CACHE_VERSION, "workspace": str(self.workspace), "directories": directories, "sources": sources}
         if state != previous:
             self._save(state)

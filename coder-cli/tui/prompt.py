@@ -81,9 +81,10 @@ class ModeInfo(Label):
 
 
 class Prompt(VerticalGroup):
-    def __init__(self, session_id: str | None) -> None:
+    def __init__(self, session_id: str | None, workspace: Path) -> None:
         super().__init__(classes="-has-mode")
         self.session_id = session_id
+        self.workspace = workspace
 
     def compose(self):
         with PromptContainer(id="prompt-container"):
@@ -92,6 +93,8 @@ class Prompt(VerticalGroup):
                 yield PromptTextArea()
         with HorizontalGroup(id="info-container"):
             yield AgentInfo("coder-cli", markup=False)
-            yield CondensedPath(str(Path("workspace").resolve()).replace(str(Path.home()), "~", 1), markup=False)
+            home = Path.home()
+            display_path = "~" if self.workspace == home else f"~/{self.workspace.relative_to(home)}" if self.workspace.is_relative_to(home) else str(self.workspace)
+            yield CondensedPath(display_path, markup=False)
             yield StatusLine(self.session_id or "新会话", id="session", markup=False)
             yield ModeInfo("Default")

@@ -20,8 +20,8 @@
 
 - TUI 必须沿用 Toad 的原始样式、默认 Dracula 主题和对应组件结构，不自定义配色、间距、边框或布局样式。仅摘录本项目使用的 TUI 规则，并在 coder-cli/tui/TOAD-NOTICE.md 记录来源、保留上游许可证。
 - 不引入 Toad 的 ACP、Agent 管理、多会话并行、侧栏、商店、权限系统或其他无关代码；`--sessions` 仅复用会话表格的 TUI 样式，不接入 Toad 会话存储或恢复逻辑；Agent 执行继续使用现有 Pydantic AI Harness。
-- CLI 默认直接进入对话 TUI；`--sessions` 查看本项目已保存会话并支持复制 ID，`--help` 显示参数说明。这些均为 CLI 功能，不给 Agent 增加 slash 指令系统。不提供位置参数 prompt 或单次命令模式。
-- 会话参数为可选的 `--sessionId`：不传时由 Agent 在首轮运行生成会话 ID，成功后从 `result.conversation_id` 获取并沿用，传入时使用指定 ID。不添加 `--session`、`--sesionId` 等别名。
+- CLI 默认直接进入对话 TUI；`--sessions` 查看本项目已保存会话，支持复制 ID 和按 D 删除选中会话，`--help` 显示参数说明。这些均为 CLI 功能，不给 Agent 增加 slash 指令系统。不提供位置参数 prompt 或单次命令模式。
+- 会话参数为可选的 `--sessionId`：不传时由 `create_agent` 使用 Pydantic AI 的 `Conversation` 生成会话 ID，并立即保存空会话及工作目录；不需要发送消息。后续运行沿用同一个 `conversation_id`，传入时使用指定 ID。不添加 `--session`、`--sesionId` 等别名。
 - 传入已有 `--sessionId` 时，必须加载该会话最近一次成功轮次的完整消息快照（包括工具调用和结果），传给 Agent 的 `message_history` 并还原界面；不能只传 ID。历史读取失败时明确报错，不静默改用空历史。
 
 - Agent 构建、工作目录绑定与 `message_history` 恢复统一由 `create_agent(session_id, path)` 负责，返回准备好的会话运行对象。TUI 层命名为 `ChatShell`，只展示消息和处理交互，不读取或恢复会话数据；`main.py` 只解析参数、调用工厂并启动外壳。
@@ -30,6 +30,6 @@
 
 # 项目上下文
 
-- 固定规则与动态项目概览分层；项目概览只提供整体、架构和来源导航，具体代码在任务中按需读取。
+- 固定规则与动态项目概览分层；项目概览只提供整体、架构和来源导航，具体代码在任务中按需读取。应用以所选工作目录为规则边界，只自动加载该目录的 AGENTS.md，不继承上层仓库的规则。
 - 项目概览按规范化工作目录持久化缓存，只增量检查和更新变化来源，不在启动或每次模型请求时全量读取项目；依赖目录、构建产物和缓存目录在遍历前排除。
 - 保持目录、单文件、每轮读取量和动态上下文的预算上限；超限或不可用时明确标记，不能退回全项目扫描。

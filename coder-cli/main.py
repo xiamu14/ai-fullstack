@@ -16,7 +16,7 @@ def main() -> int | None:
     parser = argparse.ArgumentParser(description="Coding Agent 多轮对话", allow_abbrev=False)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--sessionId", help="恢复指定会话的消息历史；省略时由 Agent 新建")
-    mode.add_argument("--sessions", action="store_true", help="列出 sessionId 和 title；选择一行按 C 复制 ID")
+    mode.add_argument("--sessions", action="store_true", help="列出 sessionId、title 和 workspace；选择一行按 C 复制 ID、D 删除会话")
     parser.add_argument("--path", help="工作目录，支持绝对或相对路径；默认当前目录；传 --sessionId 时忽略")
     args = parser.parse_args()
     if args.sessionId is not None and (not args.sessionId.strip() or args.sessionId == "new"):
@@ -31,9 +31,9 @@ def main() -> int | None:
         elif sys.stdin.isatty() and sys.stdout.isatty():
             SessionsApp(sessions).run()
         else:
-            print("sessionId\ttitle")
+            print("sessionId\ttitle\tworkspace")
             for session in sessions:
-                print(f"{session.session_id}\t{session.title}")
+                print(f"{session.session_id}\t{session.title}\t{session.workspace}")
         return
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         parser.error("TUI 需要交互终端，请直接在终端运行 uv run python main.py")

@@ -101,7 +101,7 @@ class ProjectContextTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotIn('OTHER_PROJECT', await context.refresh())
             self.assertNotEqual(context.cache_file, other_context.cache_file)
 
-    async def test_git_ignores_dependencies_symlinks_and_loads_ancestor_rules(self):
+    async def test_git_ignores_dependencies_symlinks_and_uses_only_workspace_rules(self):
         with TemporaryDirectory() as directory:
             repo, cache = Path(directory).resolve() / 'repo', Path(directory).resolve() / 'cache'
             repo.mkdir()
@@ -126,12 +126,40 @@ class ProjectContextTests(unittest.IsolatedAsyncioTestCase):
             with source_reads(root) as opened, patch('context.project.os.scandir', side_effect=scan):
                 text = await ProjectContext(root, cache).refresh()
             self.assertEqual(opened, ['AGENTS.md'])
-            self.assertIn('ANCESTOR_RULE', text)
+            self.assertNotIn('ANCESTOR_RULE', text)
             self.assertIn('LOCAL_RULE', text)
             self.assertNotIn('IGNORED_CONTENT', text)
             self.assertNotIn('NEVER_READ', text)
             self.assertNotIn('ignored/', text)
             self.assertNotIn('node_modules', text)
+
+    async def test_old_cache_drops_ancestor_rules_and_only_reads_selected_workspace(self):
+        with TemporaryDirectory() as directory:
+            repo, cache = Path(directory).resolve() / 'repo', Path(directory).resolve() / 'cache'
+            repo.mkdir()
+            subprocess.run(['git', 'init', '-q', str(repo)], check=True)
+            ancestor = repo / 'AGENTS.md'
+            ancestor.write_text('HOST_PROJECT_RULES')
+            root = repo / 'example'
+            root.mkdir()
+            context = ProjectContext(root, cache)
+            cache.mkdir()
+            context.cache_file.write_text(json.dumps({
+                'version': 1, 'workspace': str(root), 'directories': {},
+                'sources': {str(ancestor): {'summary': 'HOST_PROJECT_RULES'}},
+            }))
+            original = Path.open
+
+            def guarded_open(path, *args, **kwargs):
+                self.assertNotEqual(path, ancestor, '不能读取工作目录外的规则')
+                return original(path, *args, **kwargs)
+
+            with patch.object(Path, 'open', guarded_open):
+                text = await context.refresh()
+            self.assertNotIn('HOST_PROJECT_RULES', text)
+            self.assertEqual(json.loads(context.cache_file.read_text())['sources'], {})
+            (root / 'AGENTS.md').write_text('EXAMPLE_PROJECT_RULES')
+            self.assertIn('EXAMPLE_PROJECT_RULES', await context.refresh())
 
     async def test_limits_and_invalid_cache_rebuild(self):
         with TemporaryDirectory() as directory:

@@ -18,3 +18,8 @@ dependencies = [
     "python-dotenv",
     "textual>=8.2.8",
 ]
+
+[tool.uv.workspace]
+members = [
+    "example/hello",
+]

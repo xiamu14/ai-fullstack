@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from collections.abc import Awaitable, Callable
 from copy import deepcopy
 
@@ -18,9 +19,11 @@ from pydantic_ai.messages import (
 class Conversation:
     def __init__(
         self, agent: Agent, session_id: str | None = None, *, history: list[ModelMessage] | None = None,
+        workspace: Path | None = None,
     ) -> None:
         self.agent = agent
         self.session_id = session_id
+        self.workspace = (workspace if workspace is not None else Path.cwd()).resolve()
         self.history: list[ModelMessage] = history if history is not None else []
 
     async def send(

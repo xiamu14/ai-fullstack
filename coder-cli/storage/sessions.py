@@ -1,6 +1,7 @@
 import asyncio
 from contextlib import closing
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 import sqlite3
 
@@ -20,8 +21,14 @@ async def session_workspace(database: Path, session_id: str | None, path: str | 
         path = None
     saved = None
     if session_id and database.exists():
+        registered = await asyncio.to_thread(_session_rows, database, session_id)
+        if registered:
+            value = registered[0][1]
+            if not value or not Path(value).is_absolute():
+                raise ValueError(f"会话 {session_id} 的工作目录记录无效")
+            saved = Path(value).resolve()
         store = SqliteStepStore(database=str(database))
-        runs = [run for run in await store.list_runs(conversation_id=session_id) if run.parent_run_id is None]
+        runs = [] if saved is not None else [run for run in await store.list_runs(conversation_id=session_id) if run.parent_run_id is None]
         for run in reversed(runs):
             if "workspace" in run.metadata:
                 value = run.metadata["workspace"]
@@ -45,6 +52,34 @@ async def session_workspace(database: Path, session_id: str | None, path: str | 
 class SessionInfo:
     session_id: str
     title: str
+    workspace: str = ""
+
+
+async def save_session(database: Path, session_id: str, workspace: Path) -> None:
+    await asyncio.to_thread(_save_session, database, session_id, workspace)
+
+
+def _save_session(database: Path, session_id: str, workspace: Path) -> None:
+    database.parent.mkdir(parents=True, exist_ok=True)
+    with closing(sqlite3.connect(database)) as connection:
+        with connection:
+            connection.execute("""CREATE TABLE IF NOT EXISTS sessions (
+                conversation_id TEXT PRIMARY KEY, workspace TEXT NOT NULL, created_at TEXT NOT NULL
+            )""")
+            connection.execute(
+                "INSERT OR IGNORE INTO sessions (conversation_id, workspace, created_at) VALUES (?, ?, ?)",
+                (session_id, str(workspace), datetime.now(UTC).isoformat()),
+            )
+
+
+def _session_rows(database: Path, session_id: str | None = None) -> list[tuple[str, str, str]]:
+    with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True)) as connection:
+        if not connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='sessions'").fetchone():
+            return []
+        sql = "SELECT conversation_id, workspace, created_at FROM sessions"
+        if session_id is None:
+            return connection.execute(sql).fetchall()
+        return connection.execute(sql + " WHERE conversation_id = ?", (session_id,)).fetchall()
 
 
 def session_title(text: str) -> str:
@@ -56,13 +91,19 @@ async def list_sessions(database: Path) -> list[SessionInfo]:
         return []
     store = SqliteStepStore(database=str(database))
     source = SnapshotHistorySource(store)
-    sessions: dict[str, SessionInfo] = {}
+    registered = await asyncio.to_thread(_session_rows, database)
+    registered_workspaces = {session_id: workspace for session_id, workspace, _ in registered}
+    sessions = {session_id: SessionInfo(session_id, "", workspace) for session_id, workspace in registered_workspaces.items()}
+    activity = {session_id: datetime.fromisoformat(created_at) for session_id, _, created_at in registered}
     for run in await store.list_runs():
         session_id = run.conversation_id
         if not session_id or run.parent_run_id is not None:
             continue
         title = session_title(run.metadata.get("title", ""))
-        previous = sessions.pop(session_id, None)
+        previous = sessions.get(session_id)
+        workspace = registered_workspaces.get(
+            session_id, run.metadata.get("workspace", previous.workspace if previous else str(database.parent.resolve()))
+        )
         if not title and previous is not None:
             title = previous.title
         if not title:
@@ -78,8 +119,10 @@ async def list_sessions(database: Path) -> list[SessionInfo]:
                             break
                 if title:
                     break
-        sessions[session_id] = SessionInfo(session_id, title)
-    return [SessionInfo(s.session_id, s.title or "Untitled session") for s in reversed(sessions.values())]
+        sessions[session_id] = SessionInfo(session_id, title, workspace)
+        activity[session_id] = max(activity.get(session_id, run.started_at), run.started_at)
+    ordered = sorted(sessions.values(), key=lambda session: activity[session.session_id], reverse=True)
+    return [SessionInfo(s.session_id, s.title or "Untitled session", s.workspace) for s in ordered]
 
 
 async def load_session_history(database: Path, session_id: str) -> list[ModelMessage]:
@@ -97,6 +140,8 @@ async def load_session_history(database: Path, session_id: str) -> list[ModelMes
 
 def _latest_successful_run(database: Path, session_id: str) -> str | None:
     with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=rw", uri=True)) as connection:
+        if not connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='runs'").fetchone():
+            return None
         connection.execute(
             """
             CREATE INDEX IF NOT EXISTS idx_runs_top_conversation_started
@@ -118,3 +163,34 @@ def _latest_successful_run(database: Path, session_id: str) -> str | None:
             (session_id,),
         ).fetchone()
     return row[0] if row is not None else None
+
+
+async def delete_session(database: Path, session_id: str) -> None:
+    if not database.exists():
+        return
+    await asyncio.to_thread(_delete_session, database, session_id)
+
+
+def _delete_session(database: Path, session_id: str) -> None:
+    with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=rw", uri=True)) as connection:
+        with connection:
+            connection.execute("BEGIN IMMEDIATE")
+            tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if "runs" in tables:
+                connection.execute(
+                    """
+                    CREATE TEMP TABLE deleting_runs AS
+                    WITH RECURSIVE selected(run_id) AS (
+                        SELECT run_id FROM runs WHERE conversation_id = ?
+                        UNION
+                        SELECT r.run_id FROM runs AS r JOIN selected AS s ON r.parent_run_id = s.run_id
+                    )
+                    SELECT run_id FROM selected
+                    """,
+                    (session_id,),
+                )
+                # Snapshot deletion triggers release message references and unshared message bodies.
+                for table in ("events", "snapshots", "snapshot_idempotency_keys", "tool_effects", "runs"):
+                    connection.execute(f"DELETE FROM {table} WHERE run_id IN (SELECT run_id FROM deleting_runs)")
+            if "sessions" in tables:
+                connection.execute("DELETE FROM sessions WHERE conversation_id = ?", (session_id,))

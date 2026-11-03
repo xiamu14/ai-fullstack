@@ -1,6 +1,7 @@
 from contextlib import redirect_stderr
 from io import StringIO
 import sqlite3
+from pathlib import Path
 from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, patch
@@ -30,7 +31,7 @@ class EntryErrorTests(unittest.TestCase):
 
 class ShellErrorTests(unittest.IsolatedAsyncioTestCase):
     async def test_programming_error_propagates_after_cleanup(self):
-        conversation = SimpleNamespace(session_id=None, history=[], send=AsyncMock(side_effect=TypeError("bug")))
+        conversation = SimpleNamespace(workspace=Path.cwd(), session_id=None, history=[], send=AsyncMock(side_effect=TypeError("bug")))
         shell = ChatShell(conversation)
         async with shell.run_test():
             with self.assertRaisesRegex(TypeError, "bug"):
@@ -43,7 +44,7 @@ class ShellErrorTests(unittest.IsolatedAsyncioTestCase):
             ExceptionGroup("storage", [OSError("disk failure secret-key")]),
             TypeError("programming bug"),
         ])
-        conversation = SimpleNamespace(session_id=None, history=[], send=AsyncMock(side_effect=error))
+        conversation = SimpleNamespace(workspace=Path.cwd(), session_id=None, history=[], send=AsyncMock(side_effect=error))
         shell = ChatShell(conversation)
         with patch.dict("os.environ", {"OPENAI_API_KEY": "secret-key"}):
             async with shell.run_test():

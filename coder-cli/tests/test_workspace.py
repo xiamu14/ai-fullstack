@@ -14,6 +14,8 @@ from pydantic_ai_harness.step_persistence import RunRecord, SqliteStepStore
 from agent.runtime import create_agent
 from main import main
 from storage.sessions import session_workspace
+from tui.prompt import CondensedPath
+from tui.shell import ChatShell
 
 
 class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
@@ -65,8 +67,12 @@ class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
                  patch('agent.runtime.logfire.configure'), patch('agent.runtime.logfire.instrument_pydantic_ai'), \
                  patch('storage.sessions.SESSION_DATABASE', database):
                 with chdir(root):
-                    first = await create_agent(path='project')
-                    self.assertIsNone(first.session_id)
+                    first = await create_agent(path='./project')
+                    self.assertEqual(first.workspace, project)
+                    shell = ChatShell(first)
+                    async with shell.run_test():
+                        self.assertEqual(shell.query_one(CondensedPath).content, str(project))
+                    self.assertIsNotNone(first.session_id)
                     await first.send('写入证据')
                 self.assertEqual((project / 'proof.txt').read_text(), 'workspace proof')
                 self.assertFalse((root / 'proof.txt').exists())
@@ -77,6 +83,10 @@ class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
                 with chdir(elsewhere):
                     resumed = await create_agent(first.session_id)
                     self.assertTrue(resumed.history)
+                    self.assertEqual(resumed.workspace, project)
+                    shell = ChatShell(resumed)
+                    async with shell.run_test():
+                        self.assertEqual(shell.query_one(CondensedPath).content, str(project))
                     await resumed.send('读取证据并确认目录')
                     await create_agent(first.session_id, str(elsewhere))
                     await create_agent(first.session_id, 'missing')

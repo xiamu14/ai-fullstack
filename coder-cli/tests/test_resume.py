@@ -20,9 +20,9 @@ from pydantic_ai_harness.step_persistence import ContinuableSnapshot, RunRecord,
 
 from agent.runtime import create_agent
 from main import main
-from storage.sessions import load_session_history
+from storage.sessions import load_session_history, list_sessions
 from tui.shell import ChatShell
-from tui.prompt import PromptTextArea
+from tui.prompt import PromptTextArea, StatusLine
 from tui.tools import ToolCall
 
 
@@ -100,7 +100,7 @@ from pathlib import Path
 from storage import sessions
 from agent.runtime import create_agent
 from tui.shell import ChatShell
-from tui.prompt import PromptTextArea
+from tui.prompt import PromptTextArea, StatusLine
 
 def model(messages, info):
     prompts = [p.content for m in messages for p in m.parts if isinstance(p, UserPromptPart) and isinstance(p.content, str)]
@@ -140,6 +140,41 @@ asyncio.run(run())
 
 
 class ResumeFactoryTests(unittest.IsolatedAsyncioTestCase):
+    async def test_empty_session_is_listed_in_another_process_and_resumes_without_a_model_call(self):
+        root = Path(__file__).resolve().parents[1]
+        with TemporaryDirectory() as directory, chdir(directory):
+            project = Path.cwd() / "example"
+            project.mkdir()
+            with runtime_model(FunctionModel(lambda m, i: self.fail("空会话不能调用模型"))):
+                conversation = await create_agent(path="./example")
+                shell = ChatShell(conversation)
+                async with shell.run_test():
+                    self.assertEqual(shell.query_one(StatusLine).content, conversation.session_id)
+            database = Path("workspace/sessions.db").resolve()
+            probe = """
+from pathlib import Path
+import sys
+from storage import sessions
+sessions.SESSION_DATABASE = Path(sys.argv[1])
+from main import main
+sys.argv = ["main.py", "--sessions"]
+main()
+"""
+            process = subprocess.run(
+                [sys.executable, "-c", probe, str(database)],
+                env={**os.environ, "PYTHONPATH": str(root)},
+                cwd=project, capture_output=True, text=True, timeout=15,
+            )
+            self.assertEqual(process.returncode, 0, process.stderr)
+            self.assertIn(conversation.session_id, process.stdout)
+            self.assertIn(str(project), process.stdout)
+            self.assertIn("Untitled session", process.stdout)
+            with runtime_model(FunctionModel(lambda m, i: self.fail("恢复空会话不能调用模型"))):
+                resumed = await create_agent(conversation.session_id)
+            self.assertEqual(resumed.workspace, project)
+            self.assertEqual(resumed.history, [])
+            self.assertEqual(resumed.session_id, conversation.session_id)
+
     async def test_factory_restores_context_before_shell_and_shell_only_renders(self):
         with TemporaryDirectory() as directory, chdir(directory):
             await save_first_turn(Path("workspace/sessions.db"))
@@ -170,13 +205,16 @@ class ResumeFactoryTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaisesRegex(ValueError, "损坏的快照"):
                 await create_agent("saved-session")
 
-    async def test_new_session_is_left_to_agent_and_does_not_read_history(self):
+    async def test_new_session_is_created_by_framework_and_saved_before_first_message(self):
         with TemporaryDirectory() as directory, chdir(directory), \
              runtime_model(FunctionModel(lambda m, i: ModelResponse(parts=[TextPart("回复")]))), \
              patch("agent.runtime.load_session_history") as load:
             conversation = await create_agent()
-            self.assertIsNone(conversation.session_id)
+            self.assertIsNotNone(conversation.session_id)
             self.assertEqual(conversation.history, [])
+            rows = await list_sessions(Path("workspace/sessions.db"))
+            self.assertEqual([row.session_id for row in rows], [conversation.session_id])
+            self.assertEqual(rows[0].workspace, str(Path.cwd()))
             load.assert_not_awaited()
 
     async def test_factory_waits_for_history_before_returning_runtime(self):

@@ -5,6 +5,7 @@ import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
 from pydantic_ai.capabilities import MCP, LocalWorkspace
+from pydantic_ai.conversation import Conversation as NativeConversation
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai_harness import (
@@ -21,7 +22,12 @@ from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 from agent.conversation import Conversation
 from context.project import ProjectContext
-from storage.sessions import load_session_history, session_database, session_workspace
+from storage.sessions import (
+    load_session_history,
+    save_session,
+    session_database,
+    session_workspace,
+)
 from tools.web_tools import web_fetch
 
 
@@ -62,4 +68,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8"),
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)
-    return Conversation(agent, session_id, history=history)
+    if session_id is None:
+        session_id = NativeConversation().conversation_id
+    await save_session(database, session_id, workspace)
+    return Conversation(agent, session_id, history=history, workspace=workspace)
