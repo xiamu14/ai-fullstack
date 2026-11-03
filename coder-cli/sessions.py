@@ -5,7 +5,6 @@ from pydantic_ai.messages import ModelMessage, UserPromptPart
 from pydantic_ai_harness.conversation_search import SnapshotHistorySource
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
-
 SESSION_DATABASE = Path(__file__).resolve().parent / "workspace" / "sessions.db"
 
 

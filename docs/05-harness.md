@@ -1,4 +1,4 @@
-## 1. Harness 
+## 1. Harness 基础
 Agent 所有核心已经单独讲解完。在核心之上再补充工程化代码，以及权限、安全护栏，可观测性与评测就是一套 Harness。Pydantic AI 是 Agent Framework，再补充实际 Agent 场景（比如 coding，客户系统）工程系统，就是 Agent Harness（智能运行层），如 Claude Code，DeepSeek Harness(dsh)，OpenClaw 等。
 
 > Agent = Model + Harness
@@ -111,19 +111,20 @@ persistence = StepPersistence(
 --------
 
 <!--后续-->
-多 session 并行
+### 1.3 system prompt
+### 1.4 session schema
+### 1.5 tool seach
+### 1.6 mcp & skill
+**mcp registor** **mcp refresh** **mcp 去重** **mcp 无效**
 
-tool seach、渐进披露
-几十个工具加一堆 MCP server，上下文撑不住，于是有了 tool search 和渐进披露。
+## 2. 护栏
+### 2.1 权限
 
-护栏
+### 2.2 Token 预算
 
-权限
-
-Token 预算控制
-
-多 Agent
-
+### 2.3 上下文隔离
+sessions 并行
+## 3. 决策模式
 Planning 模式
 
 Reflection 模式
@@ -132,4 +133,10 @@ Human-in-the-loop
 
 Chain-of-Thought
 
-Super Agent
+## 4. Multi-Agent
+
+
+
+## 5. Dsh Super Agent
+
+> [dsh-superagent-prototype](https://github.com/deepseek-ai/dsh-superagent-prototype/tree/main)
