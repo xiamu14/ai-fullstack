@@ -20,20 +20,21 @@ from pydantic_ai_harness.memory import FileStore
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 from conversation import Conversation
-from sessions import load_session_history
+from sessions import load_session_history, session_database, session_workspace
 from tools.web_tools import web_fetch
 
 
-async def create_agent(session_id: str | None = None) -> Conversation:
+async def create_agent(session_id: str | None = None, path: str | None = None) -> Conversation:
     load_dotenv()
     if not all((os.getenv("MODEL_NAME"), os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))):
         raise ValueError("请在 .env 配置 OPENAI_BASE_URL、OPENAI_API_KEY 和 MODEL_NAME。")
     logfire.configure(service_name="coder-cli", send_to_logfire="if-token-present", console=False)
     logfire.instrument_pydantic_ai()
-    workspace = Path("workspace").resolve()
-    workspace.mkdir(exist_ok=True)
-    store = SqliteStepStore(database=str(workspace / "sessions.db"))
-    history = await load_session_history(workspace / "sessions.db", session_id) if session_id else []
+    database = session_database()
+    workspace = await session_workspace(database, session_id, path)
+    database.parent.mkdir(parents=True, exist_ok=True)
+    store = SqliteStepStore(database=str(database))
+    history = await load_session_history(database, session_id) if session_id else []
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
         provider=OpenAIProvider(
@@ -46,7 +47,7 @@ async def create_agent(session_id: str | None = None) -> Conversation:
         capabilities=[
             LocalWorkspace(workspace), Coder(),
             Skills(str(Path(__file__).resolve().parent / "skills")), weather,
-            StepPersistence(store=store),
+            StepPersistence(store=store, metadata={"workspace": str(workspace)}),
             ConversationSearch(SnapshotHistorySource(store), scope="conversation", max_matches=3),
             SummarizingCompaction(max_messages=60, keep_messages=20),
             Memory(

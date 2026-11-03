@@ -26,6 +26,7 @@ htmlcov/
 
 # Local traces and runtime output (workspace is also ignored by coder-cli).
 .logfire/
+.agent-memory/
 *.log
 
 # OS metadata and editor temporary files.

@@ -34,7 +34,8 @@ def runtime_model(model):
     with patch.dict(os.environ, env), patch("agent_runtime.load_dotenv"), \
          patch("agent_runtime.OpenAIChatModel", return_value=model), \
          patch("agent_runtime.MCP", return_value=Capability()), \
-         patch("agent_runtime.logfire.configure"), patch("agent_runtime.logfire.instrument_pydantic_ai"):
+         patch("agent_runtime.logfire.configure"), patch("agent_runtime.logfire.instrument_pydantic_ai"), \
+         patch("sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()):
         yield
 
 
@@ -64,7 +65,7 @@ class ResumeEntryTests(unittest.TestCase):
              patch("main.create_agent") as create, patch("main.ChatShell") as shell:
             shell.return_value.return_code = 0
             self.assertEqual(main(), 0)
-        create.assert_awaited_once_with("saved-session")
+        create.assert_awaited_once_with("saved-session", None)
         shell.assert_called_once_with(create.return_value)
         shell.return_value.run.assert_called_once_with()
 
@@ -93,6 +94,8 @@ from unittest.mock import patch
 from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import TextPart, ToolReturnPart, UserPromptPart, ModelResponse
 from pydantic_ai.models.function import FunctionModel
+from pathlib import Path
+import sessions
 from agent_runtime import create_agent
 from tui.shell import ChatShell
 from tui.prompt import PromptTextArea
@@ -107,6 +110,7 @@ async def stream_model(messages, info):
     yield model(messages, info).parts[0].content
 
 async def run():
+    sessions.SESSION_DATABASE = Path("workspace/sessions.db").resolve()
     with patch("agent_runtime.load_dotenv"), patch("agent_runtime.MCP", return_value=Capability()), \\
          patch("agent_runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \\
          patch("agent_runtime.logfire.configure"), patch("agent_runtime.logfire.instrument_pydantic_ai"):

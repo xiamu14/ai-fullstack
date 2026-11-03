@@ -16,7 +16,7 @@ class EntryTests(unittest.TestCase):
              patch("main.create_agent") as create, patch("main.ChatShell") as app:
             app.return_value.return_code = 0
             self.assertEqual(main(), 0)
-        create.assert_awaited_once_with("demo")
+        create.assert_awaited_once_with("demo", None)
         app.assert_called_once_with(create.return_value)
         create.return_value.send.assert_not_called()
         app.return_value.run.assert_called_once_with()
@@ -28,7 +28,7 @@ class EntryTests(unittest.TestCase):
              patch("main.create_agent") as create, patch("main.ChatShell") as app:
             main()
             main()
-        self.assertEqual([call.args for call in create.await_args_list], [(None,), (None,)])
+        self.assertEqual([call.args for call in create.await_args_list], [(None, None), (None, None)])
 
     def test_removed_arguments_and_invalid_ids_are_rejected_before_creating_files(self):
         with TemporaryDirectory() as directory, chdir(directory):

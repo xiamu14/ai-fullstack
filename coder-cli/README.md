@@ -20,6 +20,9 @@ uv run python weather.py
 
 ```bash
 uv run python main.py
+# 指定已存在的目录，支持绝对或相对路径：
+uv run python main.py --path ../my-project
+uv run python main.py --path /absolute/path/to/project
 # 可选：恢复已保存会话；未知 ID 开始空会话：
 uv run python main.py --sessionId demo
 ```
@@ -34,6 +37,8 @@ uv run python main.py --sessions
 会话列表显示完整 `sessionId` 和 `title`，按 ↑ / ↓ 选行，C 或 Copy sessionId 按钮复制 ID，Esc / Q 退出。macOS 使用系统剪贴板，其他终端通过 OSC 52 发送复制请求。非交互终端输出制表符分隔文本。标题优先使用已有 metadata.title，否则取首条用户消息的前 80 个字符；无消息时显示 Untitled session。同一会话合并为一行，最近活动的排在前面。
 
 `--sessions` 和 `--sessionId` 不能同时传入。这些是 CLI 参数，不给 Agent 添加 `/help` 或其他 slash 指令。
+
+新会话默认以执行命令时的当前目录作为工作目录；相对 `--path` 也基于该目录解析，支持 `~`。只要传入 `--sessionId`，就忽略 `--path`：已有会话沿用保存的目录，未知 ID 使用当前目录。目录不存在或不是目录时明确报错。`--sessions` 始终查看固定数据库中的所有会话。
 
 不接受位置参数 prompt、`--session` 或 `--sesionId`。需要交互终端，不能通过管道输入。模型名使用 `MODEL_NAME`。模型须支持工具调用和流式响应。
 
@@ -56,7 +61,7 @@ main.py 运行时只输出 hello world。读取 main.py，再运行它确认结�
 
 ## 记忆与历史
 
-笔记保存在 `workspace/.agent-memory/main/`，运行历史保存在 `workspace/sessions.db`。同一 workspace 的任务共享笔记，历史按会话 ID 分开检索。
+笔记保存在实际工作目录的 `.agent-memory/main/`，运行历史固定保存在本程序目录下的 `workspace/sessions.db`，不随启动目录或 `--path` 改变。已有旧会话没有目录记录时，沿用原来的 `coder-cli/workspace/`。同一 workspace 的任务共享笔记，历史按会话 ID 分开检索。
 
 在同一个 TUI 中依次发送：
 
@@ -65,7 +70,7 @@ main.py 运行时只输出 hello world。读取 main.py，再运行它确认结�
 搜索记忆和之前的对话，告诉我本项目的回答语言。
 ```
 
-同一进程内，下一轮自动传入上一轮完整模型消息，包括工具调用与结果。不传 `--sessionId` 时，CLI 不生成 ID；首轮运行由 Agent 创建会话，成功后获取 `result.conversation_id` 并在底部信息栏显示、在后续轮次沿用。首轮成功前显示“新会话”。传入已有 `--sessionId` 时，由 `create_agent(session_id)` 从 SQLite 异步加载最近一次成功轮次的完整消息快照（包含工具调用与结果），工厂返回准备好的会话运行对象；`ChatShell` 只展示已有消息和工具结果、处理输入交互，不加载数据库。未知 ID 按指定 ID 开始空会话。历史读取失败时明确退出，不静默使用空历史。
+同一进程内，下一轮自动传入上一轮完整模型消息，包括工具调用与结果。不传 `--sessionId` 时，CLI 不生成 ID；首轮运行由 Agent 创建会话，成功后获取 `result.conversation_id` 并在底部信息栏显示、在后续轮次沿用。首轮成功前显示“新会话”。传入已有 `--sessionId` 时，由 `create_agent(session_id, path)` 从 SQLite 异步加载最近一次成功轮次的完整消息快照（包含工具调用与结果），工厂返回准备好的会话运行对象；`ChatShell` 只展示已有消息和工具结果、处理输入交互，不加载数据库。未知 ID 按指定 ID 开始空会话。历史读取失败时明确退出，不静默使用空历史。
 
 笔记由模型调用工具写入，指令不能保证每次都写；请检查笔记文件或工具结果。超过 60 条模型消息时尝试摘要旧历史，保留近期约 20 条；摘要不会自动成为长期笔记。上下文压缩不删除界面中已展示的消息。失败或取消的轮次不提交到内存模型历史，但框架可能已持久化本轮的执行步骤；恢复时跳过这些未成功的轮次，避免自动重跑未完成工具。重启后界面展示恢复快照中仍保留的消息，压缩前原文仍可通过历史检索回查。
 

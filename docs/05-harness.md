@@ -38,19 +38,30 @@ second = agent.run_sync(
 
 一次 `agent.run()` 可以包含多次模型请求和工具调用，运行标识从 `result.run_id` 获取。同一会话中的多次运行沿用 `conversation_id`，每次运行各有自己的 `run_id`。
 
-当前项目的 `UsageLimits(request_limit=10)` 限制一次运行中的模型请求次数。
+`UsageLimits(request_limit=10)` 限制一次运行中的模型请求次数。
 
 新对话不传 `conversation_id`，由框架生成，成功后从 `result.conversation_id` 获取。已有会话沿用它的 ID，但 ID 本身不会把磁盘中的历史加载到模型上下文。
 
 #### 保存与恢复
 
-本项目使用 `StepPersistence` 将原生消息快照保存到 SQLite。应用重启后，先根据会话 ID 找到最近一次成功运行，再加载它的完整快照，并显式传给下一轮：
+`StepPersistence` 可以将原生消息快照保存到 SQLite。重启后，先根据会话 ID 找到最近一次成功运行，再加载完整快照。下面用已有的 `store` 演示恢复步骤：
 
 ```python
-from pathlib import Path
-from sessions import load_session_history
+async def restore_history(store, conversation_id):
+    runs = await store.list_runs(conversation_id=conversation_id)
+    for run in reversed(runs):
+        if run.parent_run_id is not None:
+            continue
+        events = await store.list_events(run_id=run.run_id)
+        if not any(event.kind == "run_completed" for event in events):
+            continue
+        snapshot = await store.latest_snapshot(run_id=run.run_id)
+        if snapshot is None:
+            raise ValueError("成功运行缺少消息快照")
+        return snapshot.messages
+    return []
 
-history = await load_session_history(Path("workspace/sessions.db"), saved_id)
+history = await restore_history(store, saved_id)
 result = await agent.run(
     "继续完成上次的任务。",
     conversation_id=saved_id,
@@ -58,13 +69,44 @@ result = await agent.run(
 )
 ```
 
-`load_session_history()` 是本项目的恢复代码：只选择顶层运行中标记为 `run_completed` 的轮次，保留完整工具调用、工具结果和压缩摘要。失败、取消、未完成和子 Agent 轮次不能覆盖最近成功的上下文。历史读取失败时应明确报错，不能静默改用空历史。
+这里选择顶层运行中标记为 `run_completed` 的记录，保留完整工具调用、工具结果和压缩摘要。失败、取消、未完成和子 Agent 运行不能覆盖最近成功的上下文。历史读取失败时应明确报错，不能静默改用空历史。
 
 恢复消息历史不会重新执行其中已完成的工具。继续运行后，框架保存新一轮快照，供之后恢复。已执行的文件写入或外部操作不会因为运行失败而自动回滚。
 
 消息恢复和历史检索是两件事：前者把当前上下文重新交给模型，后者按需找回旧原文。摘要压缩后，当前上下文不再保留的细节仍可通过历史检索回查；笔记、检索和摘要机制见[第四章](./04-memory.md)。
 
 ### 1.2 workspace
+
+Workspace 决定文件工具的相对路径从哪里解析，以及 shell 命令从哪个目录开始执行。本节沿用 [Pydantic AI 的 Workspace 与 LocalWorkspace](https://pydantic.dev/docs/ai/core-concepts/workspace/)：
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import LocalWorkspace
+from pydantic_ai_harness.coder import Coder
+
+agent = Agent(model, capabilities=[LocalWorkspace(project_dir), Coder()])
+```
+
+会话历史和工作目录需要一起恢复。同样的 `read_file("src/main.py")`，在不同目录下会读取不同文件；只恢复消息历史而切换目录，可能把之前的工具结果用于另一个项目。
+
+绑定会话时，先把工作目录转换为绝对路径，再与运行记录一起持久化。例如，在前文的 `StepPersistence` 配置中附加 metadata：
+
+```python
+workspace = project_dir.expanduser().resolve()
+if not workspace.is_dir():
+    raise ValueError("工作目录不存在或不是目录")
+
+persistence = StepPersistence(
+    store=store,
+    metadata={"workspace": str(workspace)},
+)
+```
+
+恢复时，先读取该会话顶层运行记录中的目录，再构建 `LocalWorkspace` 并加载消息历史。目录已删除或无法访问时，应明确报错，不能静默换成另一个目录。
+
+会话存储的位置应独立于命令启动目录，否则换一个目录启动后可能找不到旧会话。笔记可以按工作目录组织，让同一项目的多个会话共享约定；消息历史仍按会话 ID 隔离。
+
+`LocalWorkspace` 提供执行目录，不提供进程或文件访问隔离。工作目录绑定也不会阻止工具访问目录之外的本机资源。
 
 --------
 

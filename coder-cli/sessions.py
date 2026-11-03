@@ -6,6 +6,39 @@ from pydantic_ai_harness.conversation_search import SnapshotHistorySource
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 
+SESSION_DATABASE = Path(__file__).resolve().parent / "workspace" / "sessions.db"
+
+
+def session_database() -> Path:
+    return SESSION_DATABASE
+
+
+async def session_workspace(database: Path, session_id: str | None, path: str | None) -> Path:
+    if session_id is not None:
+        path = None
+    saved = None
+    if session_id and database.exists():
+        store = SqliteStepStore(database=str(database))
+        runs = [run for run in await store.list_runs(conversation_id=session_id) if run.parent_run_id is None]
+        for run in reversed(runs):
+            if "workspace" in run.metadata:
+                value = run.metadata["workspace"]
+                if not isinstance(value, str) or not value or not Path(value).is_absolute():
+                    raise ValueError(f"会话 {session_id} 的工作目录记录无效")
+                saved = Path(value).resolve()
+                break
+        if runs and saved is None:
+            # 旧会话的工具一直在数据库所在的 workspace 目录执行。
+            saved = database.parent.resolve()
+    if path is not None and not path.strip():
+        raise ValueError("--path 不能为空")
+    requested = Path(path).expanduser().resolve() if path is not None else None
+    workspace = saved or requested or Path.cwd().resolve()
+    if not workspace.is_dir():
+        raise ValueError(f"工作目录不存在或不是目录：{workspace}")
+    return workspace
+
+
 @dataclass(frozen=True)
 class SessionInfo:
     session_id: str

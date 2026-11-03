@@ -72,7 +72,9 @@ class SessionsCliTests(unittest.TestCase):
                 self.assertIn("--sessions", output.getvalue())
                 self.assertIn("复制", output.getvalue())
             with TemporaryDirectory() as directory, chdir(directory), \
-                 patch("sys.argv", ["main.py", "--sessions"]), redirect_stdout(StringIO()) as output:
+                 patch("sys.argv", ["main.py", "--sessions"]), \
+                 patch("sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()), \
+                 redirect_stdout(StringIO()) as output:
                 main()
                 self.assertIn("暂无", output.getvalue())
                 self.assertFalse(Path("workspace").exists())

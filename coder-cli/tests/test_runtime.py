@@ -67,6 +67,9 @@ class CoderTests(unittest.TestCase):
 
     def setUp(self):
         self.exporter = InMemorySpanExporter()
+        database = patch("agent_runtime.session_database", side_effect=lambda: Path("workspace/sessions.db").resolve())
+        database.start()
+        self.addCleanup(database.stop)
         configure = patch(
             "agent_runtime.logfire.configure",
             side_effect=lambda **kwargs: configure_logfire(
@@ -98,7 +101,7 @@ class CoderTests(unittest.TestCase):
             self.assertIn("weather_get_forecast", {t.name for t in info.function_tools})
             part = next(responses)
             if isinstance(part, list):
-                self.assertTrue(Path("workspace/hello").is_dir())
+                self.assertTrue(Path("hello").is_dir())
                 return ModelResponse(parts=part)
             if isinstance(part, TextPart):
                 outputs = [p.content for m in messages for p in m.parts
@@ -124,9 +127,9 @@ class CoderTests(unittest.TestCase):
             self.assertEqual(calls, 5)
             self.assertTrue(self.exporter.get_finished_spans(), "应记录 Agent 执行追踪")
             self.assertIn("hello world 验证通过", output.getvalue())
-            self.assertEqual(Path("workspace/hello/main.py").read_text(), 'print("hello world")\n')
-            self.assertTrue(Path("workspace/hello/pyproject.toml").is_file())
-            self.assertTrue(Path("workspace/hello/README.md").is_file())
+            self.assertEqual(Path("hello/main.py").read_text(), 'print("hello world")\n')
+            self.assertTrue(Path("hello/pyproject.toml").is_file())
+            self.assertTrue(Path("hello/README.md").is_file())
 
     def test_cache_statistics_report_reads_separately_from_writes(self):
         result = SimpleNamespace(
@@ -171,7 +174,7 @@ class CoderTests(unittest.TestCase):
                 ToolCallPart("write_memory", {"content": "PORT_PROBE=8001"}),
                 TextPart("saved"),
             ])
-            note = Path("workspace/.agent-memory/main/MEMORY.md")
+            note = Path(".agent-memory/main/MEMORY.md")
             self.assertIn("PORT_PROBE=8001", note.read_text())
 
             # 新进程重建整个 CLI；不传旧历史也应读到磁盘里的笔记。
@@ -183,8 +186,11 @@ from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolRetu
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from agent_runtime import create_agent
 from conversation import cache_statistics
+from pathlib import Path
+import sessions
 import asyncio
 
+sessions.SESSION_DATABASE = Path("workspace/sessions.db").resolve()
 calls = 0
 def model(messages, info):
     global calls
