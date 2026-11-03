@@ -23,14 +23,18 @@ from pydantic_ai.capabilities import MCP
 from pydantic_ai.usage import RequestUsage, RunUsage
 
 from agent_runtime import create_agent
-from conversation import Conversation, cache_statistics
+from conversation import cache_statistics
 import asyncio
 
 configure_logfire = logfire.configure
 
 
 def run_agent(prompt, session="test"):
-    result = asyncio.run(Conversation(create_agent(), session).send(prompt))
+    async def run():
+        conversation = await create_agent(session)
+        return await conversation.send(prompt)
+
+    result = asyncio.run(run())
     print(result.output)
     return result
 
@@ -178,7 +182,7 @@ from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from agent_runtime import create_agent
-from conversation import Conversation, cache_statistics
+from conversation import cache_statistics
 import asyncio
 
 calls = 0
@@ -204,7 +208,10 @@ configure = logfire.configure
 with patch("agent_runtime.load_dotenv"), patch("agent_runtime.MCP", return_value=Capability()), \\
      patch("agent_runtime.logfire.configure", side_effect=lambda **kwargs: configure(send_to_logfire=False, console=False)), \\
      patch("agent_runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)):
-    result = asyncio.run(Conversation(create_agent(), "second").send("读取端口约定"))
+    async def run():
+        conversation = await create_agent("second")
+        return await conversation.send("读取端口约定")
+    result = asyncio.run(run())
     print(result.output)
 '''
             result = subprocess.run(

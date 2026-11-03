@@ -120,7 +120,7 @@ AGENT_MODEL=你的模型名称
 
 #### 第二步：接入 Coder
 
-把下面代码放到 `main.py`。这是第一章的单次执行教学版本；当前仓库已在[第五章](./05-harness.md)演进为 TUI，Agent 装配位于 `agent_runtime.py`，入口不再接收 prompt 参数。
+把下面代码放到 `main.py`。这是第一章的最小教学版本，展示模型、工具与 Agent Loop 的组合；完整示例的运行方法见项目 [README](../coder-cli/README.md)。
 
 ```python
 import argparse
@@ -128,8 +128,10 @@ import os
 from pathlib import Path
 
 import logfire
+import httpx
 from dotenv import load_dotenv
 from pydantic_ai import Agent, UsageLimits
+from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.capabilities import LocalWorkspace
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -170,7 +172,7 @@ def main() -> None:
             usage_limits=UsageLimits(request_limit=10),
             model_settings={"timeout": 30},
         )
-    except Exception as exc:
+    except (AgentRunError, httpx.HTTPError, OSError) as exc:
         message = str(exc)
         for name in ("OPENAI_API_KEY", "LOGFIRE_TOKEN"):
             if token := os.getenv(name):
@@ -201,7 +203,7 @@ if __name__ == "__main__":
 
 ```bash
 uv run python main.py
-# 在 TUI 输入区发送：
+# 示例任务：
 # 在 hello 目录初始化一个无第三方依赖的 Python 项目，创建 pyproject.toml、README.md 和 main.py。main.py 运行时只输出 hello world。读取 main.py，再运行它确认结果。
 ```
 

@@ -1,5 +1,10 @@
 import asyncio
+import sqlite3
 
+import httpx
+from anyio import BrokenResourceError, ClosedResourceError, EndOfStream
+from pydantic_ai.exceptions import AgentRunError
+from pydantic_ai.mcp import MCPError
 from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -8,7 +13,8 @@ from textual.widgets import Footer
 from textual.worker import WorkerCancelled
 
 from conversation import Conversation, cache_statistics, error_message
-from tui.messages import Conversation as ConversationView, MessageHistory
+from tui.messages import Conversation as ConversationView
+from tui.messages import MessageHistory
 from tui.prompt import Prompt, PromptTextArea, StatusLine
 from tui.throbber import Throbber
 from tui.turn import TurnView, restore_messages
@@ -18,7 +24,7 @@ class MainScreen(Screen):
     pass
 
 
-class ChatApp(App):
+class ChatShell(App):
     CSS_PATH = ["toad-global.tcss", "toad-conversation.tcss", "toad-prompt.tcss"]
     AUTO_FOCUS = "PromptTextArea"
     BINDINGS = [
@@ -33,7 +39,7 @@ class ChatApp(App):
         super().__init__()
         self.theme = "dracula"
         self.conversation = conversation
-        self.busy = False
+        self.busy = True
         self.turn_worker = None
 
     def get_default_screen(self) -> Screen:
@@ -47,7 +53,12 @@ class ChatApp(App):
         yield Footer()
 
     async def on_mount(self) -> None:
+        prompt = self.query_one(PromptTextArea)
+        prompt.disabled = True
         await restore_messages(self.query_one(MessageHistory), self.conversation.history)
+        self.busy = False
+        prompt.disabled = False
+        prompt.focus()
 
     @on(PromptTextArea.Submitted)
     async def submitted(self, event: PromptTextArea.Submitted) -> None:
@@ -64,15 +75,19 @@ class ChatApp(App):
         history = self.query_one(MessageHistory)
         view = TurnView(history)
         try:
-            result = await self.conversation.send(prompt, view.write, on_tool=view.tool_event)
-            await view.finish(str(result.output))
-            self.query_one(StatusLine).tooltip = "\n".join(cache_statistics(result))
+            try:
+                result = await self.conversation.send(prompt, view.write, on_tool=view.tool_event)
+                await view.finish(str(result.output))
+                self.query_one(StatusLine).tooltip = "\n".join(cache_statistics(result))
+            except* (
+                AgentRunError, MCPError, httpx.HTTPError, OSError, sqlite3.Error,
+                BrokenResourceError, ClosedResourceError, EndOfStream,
+            ) as errors:
+                await history.add("error", error_message(errors))
         except asyncio.CancelledError:
             if self.is_running:
                 await history.add("error", "本轮已停止。已执行的工具操作不会回滚。")
             raise
-        except Exception as exc:
-            await history.add("error", error_message(exc))
         finally:
             await view.close()
             if self.is_running:

@@ -129,7 +129,7 @@ agent = Agent(
 
 ```bash
 uv run python main.py
-# 在 TUI 输入区发送：
+# 示例任务：
 # 下载 https://unsplash.com/photos/yellow-vintage-car-on-asphalt-FX8m9zcJjL8 中 img[alt="A yellow vintage car parked on asphalt with trees in the background"] 的图片，保存到 outputs
 ```
 
@@ -234,7 +234,7 @@ agent = Agent(
 
 ```bash
 uv run python main.py
-# 在 TUI 输入区发送：
+# 示例任务：
 # 下载 https://unsplash.com/photos/yellow-vintage-car-on-asphalt-FX8m9zcJjL8 中 img[alt="A yellow vintage car parked on asphalt with trees in the background"] 的图片，保存到 outputs。
 ```
 
@@ -312,7 +312,7 @@ weather = MCP("http://127.0.0.1:8000/mcp", id="weather", tool_prefix=True)
 
 ```bash
 uv run python main.py
-# 在 TUI 输入区发送：
+# 示例任务：
 # 查询波士顿的天气预报，用中文回答。
 ```
 
@@ -412,7 +412,7 @@ agent = Agent(
 
 ```bash
 uv run python main.py
-# 在 TUI 输入区发送：
+# 示例任务：
 # 使用 web-download 下载 https://unsplash.com/photos/yellow-vintage-car-on-asphalt-FX8m9zcJjL8 中 img[alt="A yellow vintage car parked on asphalt with trees in the background"] 的图片，保存到 outputs。
 ```
 下载是一套可复用的操作流程，说明按需加载，执行步骤由脚本固定，通用 Agent 不必常驻专用工具。代价是增加一次技能加载；它改善复用和上下文组织，不保证比内置工具少调用。
@@ -421,18 +421,8 @@ uv run python main.py
 
 ### 3.5 工程优化
 
-后续可在 `coder-cli` 中展示技能名称和描述，并支持在 query 中用 `/技能名` 显式调用：
+除模型按需加载外，应用也可以根据明确的任务约束直接选择技能，再把技能内容与用户任务一起交给 Agent。
 
-```bash
-uv run python main.py
-# TUI 没有 slash 命令解析，直接发送自然语言：
-# 使用 web-download 下载指定网页图片到 outputs
-```
-
-Pydantic AI 提供 `skills.load(...)` 获取技能目录，以及 `skill.render(arguments)` 生成技能输入；命令解析和目录展示由 CLI 实现。
-
-- 普通 query 原样交给模型。
-- `/技能名 参数` 由 CLI 查找技能，检查 `user_invocable`，将 `render(参数)` 的结果交给 Agent。
-- 未知技能直接报错并列出可用技能。
+Pydantic AI 提供 `skills.load(...)` 获取技能目录，以及 `skill.render(arguments)` 生成技能输入。应用负责检查技能是否存在、是否允许用户调用，以及参数是否符合要求；校验失败时明确报错。
 
 这样由程序确定加载技能，省去模型调用 `load_capability` 的一步；脚本仍由模型通过 Coder 执行，工具权限仍需单独控制。本节仅记录方案，尚未实现。

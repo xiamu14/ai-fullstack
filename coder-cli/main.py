@@ -1,16 +1,19 @@
 import argparse
 import asyncio
+import sqlite3
 import sys
 from pathlib import Path
 
+import httpx
+
 from agent_runtime import create_agent
-from conversation import Conversation, error_message
-from sessions import list_sessions, load_session_history
-from tui.app import ChatApp
+from conversation import error_message
+from sessions import list_sessions
 from tui.sessions import SessionsApp
+from tui.shell import ChatShell
 
 
-def main() -> None:
+def main() -> int | None:
     parser = argparse.ArgumentParser(description="Coding Agent 多轮对话", allow_abbrev=False)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--sessionId", help="恢复指定会话的消息历史；省略时由 Agent 新建")
@@ -21,7 +24,7 @@ def main() -> None:
     if args.sessions:
         try:
             sessions = asyncio.run(list_sessions(Path("workspace/sessions.db")))
-        except Exception as exc:
+        except (OSError, sqlite3.Error, ValueError) as exc:
             parser.exit(1, f"读取会话失败：{error_message(exc)}\n")
         if not sessions:
             print("暂无已保存会话。")
@@ -35,15 +38,13 @@ def main() -> None:
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         parser.error("TUI 需要交互终端，请直接在终端运行 uv run python main.py")
     try:
-        history = asyncio.run(load_session_history(Path("workspace/sessions.db"), args.sessionId)) if args.sessionId else []
-    except Exception as exc:
-        parser.exit(1, f"恢复会话失败：{error_message(exc)}\n")
-    try:
-        agent = create_agent()
-    except ValueError as exc:
-        parser.error(str(exc))
-    ChatApp(Conversation(agent, args.sessionId, history=history)).run()
+        conversation = asyncio.run(create_agent(args.sessionId))
+    except (OSError, sqlite3.Error, ValueError, httpx.InvalidURL) as exc:
+        parser.exit(1, f"初始化失败：{error_message(exc)}\n")
+    shell = ChatShell(conversation)
+    shell.run()
+    return shell.return_code
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -291,17 +291,15 @@ print(usage.input_tokens, usage.cache_read_tokens, usage.cache_write_tokens)
 
 参考：[Pydantic AI Caching](https://pydantic.dev/docs/ai/capabilities/caching/)、[Coder 缓存配置](https://pydantic.dev/docs/ai/harness/coder/#prompt-caching)。
 
-**本项目实测（2026-11-03）**：使用 `GLM-5.3-Flash-Event`，连续两次运行相同 query，保持配置一致且不调用工具。当时的单次 CLI 输出了逐请求和累计缓存统计。当前 TUI 在状态行展示累计值，悬停查看逐请求值。
+**本项目实测（2026-11-03）**：使用 `GLM-5.3-Flash-Event`，连续两次运行相同 query，保持配置一致且不调用工具。本次记录了逐请求和累计缓存统计。
 
-在 `coder-cli` 目录中，加载已有 `.env` 配置，确认天气 MCP 服务 `http://127.0.0.1:8000/mcp` 可用后，启动 TUI，发送以下请求，等待完成后退出，再启动一次并发送同一请求：
+两次请求使用相同的配置、指令与任务文本，均不传入上一轮的 `message_history`：
 
-```bash
-.venv/bin/python main.py
-# 在 TUI 中发送；完成后 Ctrl+Q 退出，再启动一次重复发送：
-# 这是缓存验证请求。不要调用任何工具，不要创建、读取或修改任何文件。只回复：缓存验证完成。
+```text
+这是缓存验证请求。不要调用任何工具，不要创建、读取或修改任何文件。只回复：缓存验证完成。
 ```
 
-本次记录使用两个独立的单次 CLI 进程，未传递 `message_history`；当前 TUI 重启后发送第一条消息可保持同样的上下文隔离。两次都只请求模型一次，并回复“缓存验证完成。”；框架启动时会发现 MCP 工具，但模型未调用业务工具。缓存由服务商跨请求复用，不依赖同一个 Python 进程。
+本次记录使用两个独立进程。两次都只请求模型一次，并回复“缓存验证完成。”；框架启动时会发现 MCP 工具，但模型未调用业务工具。缓存由服务商跨请求复用，不依赖同一个 Python 进程。
 
 | 运行 | 输入 token | 缓存读取 token | 缓存输入占比 |
 | --- | ---: | ---: | ---: |

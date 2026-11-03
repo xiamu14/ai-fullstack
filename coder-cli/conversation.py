@@ -57,6 +57,8 @@ class Conversation:
 
 
 def error_message(exc: Exception) -> str:
+    if isinstance(exc, ExceptionGroup):
+        return "\n".join(error_message(error) for error in exc.exceptions)
     message = f"任务未完成（{type(exc).__name__}）：{exc}"
     for name in ("OPENAI_API_KEY", "LOGFIRE_TOKEN"):
         if token := os.getenv(name):

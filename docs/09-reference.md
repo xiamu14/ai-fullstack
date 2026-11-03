@@ -22,9 +22,6 @@
 [AI 工程面试题(按公司分类)](https://github.com/ninetyhe-90/ai-engineering-interview-questions-company-wise-zh-cn)
 ![intro](./images/008.png?sw=1054&sh=628)
 
-[Toad](https://github.com/batrachianai/toad)
-![intro](./images/009.png?sw=1586&sh=620)
-
 [Full-Stack AI Engineering - Complete Beginner Course](https://www.youtube.com/watch?v=XzjSx7u9mGw)
 [Customer support automation](https://learn.datalumina.com/docs/customer-support-automation)
 ![intro](./images/010.png?sw=966&sh=784)

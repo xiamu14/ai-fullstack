@@ -19,10 +19,12 @@ from pydantic_ai_harness.conversation_search import SnapshotHistorySource
 from pydantic_ai_harness.memory import FileStore
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
+from conversation import Conversation
+from sessions import load_session_history
 from tools.web_tools import web_fetch
 
 
-def create_agent() -> Agent:
+async def create_agent(session_id: str | None = None) -> Conversation:
     load_dotenv()
     if not all((os.getenv("MODEL_NAME"), os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))):
         raise ValueError("请在 .env 配置 OPENAI_BASE_URL、OPENAI_API_KEY 和 MODEL_NAME。")
@@ -31,6 +33,7 @@ def create_agent() -> Agent:
     workspace = Path("workspace").resolve()
     workspace.mkdir(exist_ok=True)
     store = SqliteStepStore(database=str(workspace / "sessions.db"))
+    history = await load_session_history(workspace / "sessions.db", session_id) if session_id else []
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
         provider=OpenAIProvider(
@@ -38,7 +41,7 @@ def create_agent() -> Agent:
         ),
     )
     weather = MCP("http://127.0.0.1:8000/mcp", id="weather", tool_prefix=True)
-    return Agent(
+    agent = Agent(
         model,
         capabilities=[
             LocalWorkspace(workspace), Coder(),
@@ -62,3 +65,4 @@ def create_agent() -> Agent:
             "需要旧细节时先搜索笔记，再搜索当前会话历史；代码事实以当前文件为准。"
         ),
     )
+    return Conversation(agent, session_id, history=history)

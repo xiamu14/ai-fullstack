@@ -4,13 +4,14 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from pydantic_ai import Agent
+from pydantic_ai.exceptions import ModelRequestRejectedError
 from pydantic_ai.messages import ToolCallPart, ToolReturnPart, UserPromptPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai.usage import RunUsage
 
 from conversation import Conversation
 
-from tui.app import ChatApp
+from tui.shell import ChatShell
 from tui.messages import MessageHistory
 from tui.prompt import PromptTextArea as Prompt, PromptContainer
 from tui.tools import ToolCall, ToolCallHeader
@@ -32,7 +33,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             return result("**完整回复**")
 
         conversation = SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send))
-        app = ChatApp(conversation)
+        app = ChatShell(conversation)
         async with app.run_test(size=(90, 28)) as pilot:
             prompt = app.query_one(Prompt)
             self.assertIs(app.focused, prompt)
@@ -71,11 +72,11 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             if text == "失败请求":
                 started.set()
                 await release.wait()
-                raise RuntimeError("HTTP 400 secret-key")
+                raise ModelRequestRejectedError("test", "HTTP 400 secret-key")
             return result("恢复成功")
 
         conversation = SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send))
-        app = ChatApp(conversation)
+        app = ChatShell(conversation)
         with patch.dict("os.environ", {"OPENAI_API_KEY": "secret-key"}):
             async with app.run_test() as pilot:
                 prompt = app.query_one(Prompt)
@@ -106,7 +107,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 await asyncio.Event().wait()
             return result("继续成功")
 
-        app = ChatApp(SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send)))
+        app = ChatShell(SimpleNamespace(session_id="demo", history=[], send=AsyncMock(side_effect=send)))
         async with app.run_test() as pilot:
             prompt = app.query_one(Prompt)
             prompt.insert("耗时请求")
@@ -122,7 +123,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(list(app.query(".message"))[-1].content, "继续成功")
 
     async def test_scroll_back_is_preserved_and_small_terminal_keeps_input_visible(self):
-        app = ChatApp(SimpleNamespace(session_id="demo", history=[]))
+        app = ChatShell(SimpleNamespace(session_id="demo", history=[]))
         async with app.run_test(size=(48, 16)) as pilot:
             history = app.query_one(MessageHistory)
             for i in range(12):
@@ -146,7 +147,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             yield "这是"
             yield "回答"
 
-        app = ChatApp(Conversation(Agent(FunctionModel(stream_function=model))))
+        app = ChatShell(Conversation(Agent(FunctionModel(stream_function=model))))
         async with app.run_test() as pilot:
             self.assertIn("新会话", app.export_screenshot())
             for text in ("第一轮", "第二轮"):
@@ -170,7 +171,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 stopped.set()
 
-        app = ChatApp(SimpleNamespace(session_id="demo", history=[], send=send))
+        app = ChatShell(SimpleNamespace(session_id="demo", history=[], send=send))
         async with app.run_test() as pilot:
             app.query_one(Prompt).insert("耗时请求")
             await pilot.press("enter")
@@ -193,7 +194,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             else:
                 yield "检查完成。"
 
-        app = ChatApp(Conversation(Agent(FunctionModel(stream_function=model), tools=[shell])))
+        app = ChatShell(Conversation(Agent(FunctionModel(stream_function=model), tools=[shell])))
         async with app.run_test(size=(100, 36)) as pilot:
             self.assertEqual(app.theme, "dracula")
             self.assertEqual(app.screen.styles.background.hex, "#282A36")
@@ -219,7 +220,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(tool.expanded)
 
     async def test_invalid_tool_args_and_failed_results_do_not_break_display(self):
-        app = ChatApp(SimpleNamespace(session_id="demo", history=[]))
+        app = ChatShell(SimpleNamespace(session_id="demo", history=[]))
         async with app.run_test() as pilot:
             tool = ToolCall(ToolCallPart("shell", "{invalid-json"))
             await app.query_one("#contents").mount(tool)

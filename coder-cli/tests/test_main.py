@@ -13,23 +13,22 @@ class EntryTests(unittest.TestCase):
         with patch("sys.argv", ["main.py", "--sessionId", "demo"]), \
              patch("main.sys.stdin.isatty", return_value=True), \
              patch("main.sys.stdout.isatty", return_value=True), \
-             patch("main.create_agent") as create, patch("main.ChatApp") as app, \
-             patch("main.load_session_history", return_value=[]):
-            main()
-        self.assertEqual(app.call_args.args[0].session_id, "demo")
-        self.assertEqual(app.call_args.args[0].history, [])
-        create.return_value.run.assert_not_called()
+             patch("main.create_agent") as create, patch("main.ChatShell") as app:
+            app.return_value.return_code = 0
+            self.assertEqual(main(), 0)
+        create.assert_awaited_once_with("demo")
+        app.assert_called_once_with(create.return_value)
+        create.return_value.send.assert_not_called()
         app.return_value.run.assert_called_once_with()
 
     def test_default_session_is_left_to_agent(self):
         with patch("sys.argv", ["main.py"]), \
              patch("main.sys.stdin.isatty", return_value=True), \
              patch("main.sys.stdout.isatty", return_value=True), \
-             patch("main.create_agent"), patch("main.ChatApp") as app:
+             patch("main.create_agent") as create, patch("main.ChatShell") as app:
             main()
             main()
-        ids = [call.args[0].session_id for call in app.call_args_list]
-        self.assertEqual(ids, [None, None])
+        self.assertEqual([call.args for call in create.await_args_list], [(None,), (None,)])
 
     def test_removed_arguments_and_invalid_ids_are_rejected_before_creating_files(self):
         with TemporaryDirectory() as directory, chdir(directory):
