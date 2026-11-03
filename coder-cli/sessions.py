@@ -1,5 +1,8 @@
+import asyncio
+from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
+import sqlite3
 
 from pydantic_ai.messages import ModelMessage, UserPromptPart
 from pydantic_ai_harness.conversation_search import SnapshotHistorySource
@@ -82,15 +85,36 @@ async def list_sessions(database: Path) -> list[SessionInfo]:
 async def load_session_history(database: Path, session_id: str) -> list[ModelMessage]:
     if not database.exists():
         return []
+    run_id = await asyncio.to_thread(_latest_successful_run, database, session_id)
+    if run_id is None:
+        return []
     store = SqliteStepStore(database=str(database))
-    for run in reversed(await store.list_runs(conversation_id=session_id)):
-        if run.parent_run_id is not None:
-            continue
-        events = await store.list_events(run_id=run.run_id)
-        if not any(event.kind == "run_completed" for event in events):
-            continue
-        snapshot = await store.latest_snapshot(run_id=run.run_id)
-        if snapshot is None:
-            raise ValueError(f"会话 {session_id} 的成功轮次缺少消息快照，无法恢复")
-        return snapshot.messages
-    return []
+    snapshot = await store.latest_snapshot(run_id=run_id)
+    if snapshot is None:
+        raise ValueError(f"会话 {session_id} 的成功轮次缺少消息快照，无法恢复")
+    return snapshot.messages
+
+
+def _latest_successful_run(database: Path, session_id: str) -> str | None:
+    with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=rw", uri=True)) as connection:
+        connection.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_runs_top_conversation_started
+            ON runs(conversation_id, started_at)
+            WHERE parent_run_id IS NULL
+            """
+        )
+        row = connection.execute(
+            """
+            SELECT r.run_id FROM runs AS r
+            WHERE r.conversation_id = ? AND r.parent_run_id IS NULL
+              AND EXISTS (
+                  SELECT 1 FROM events AS e
+                  WHERE e.run_id = r.run_id AND e.kind = 'run_completed'
+              )
+            ORDER BY r.started_at DESC, r.rowid DESC
+            LIMIT 1
+            """,
+            (session_id,),
+        ).fetchone()
+    return row[0] if row is not None else None

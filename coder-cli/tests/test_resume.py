@@ -1,8 +1,10 @@
 import asyncio
-from contextlib import chdir, contextmanager, redirect_stderr
+from contextlib import chdir, closing, contextmanager, redirect_stderr
+from datetime import UTC, datetime, timedelta
 from io import StringIO
 import os
 from pathlib import Path
+import sqlite3
 import subprocess
 import sys
 from tempfile import TemporaryDirectory
@@ -198,6 +200,68 @@ class ResumeFactoryTests(unittest.IsolatedAsyncioTestCase):
 
 
 class ResumeHistoryTests(unittest.IsolatedAsyncioTestCase):
+    async def test_existing_database_gets_ordered_index_without_temporary_sort(self):
+        with TemporaryDirectory() as directory:
+            database = Path(directory) / "sessions.db"
+            store = SqliteStepStore(database=str(database))
+            now = datetime.now(UTC)
+            for run_id in ("z-first", "a-second"):
+                await store.register_run(RunRecord(
+                    run_id=run_id, conversation_id="saved", started_at=now,
+                ))
+                await store.append_event(StepEvent(run_id=run_id, kind="run_completed", step_index=1))
+                await store.save_snapshot(ContinuableSnapshot(
+                    run_id=run_id, step_index=1,
+                    messages=[ModelRequest(parts=[UserPromptPart(run_id)])],
+                ))
+            statements = []
+            connect = sqlite3.connect
+
+            def traced_connect(*args, **kwargs):
+                connection = connect(*args, **kwargs)
+                connection.set_trace_callback(statements.append)
+                return connection
+
+            with patch("sessions.sqlite3.connect", side_effect=traced_connect):
+                for _ in range(2):
+                    self.assertEqual(prompts(await load_session_history(database, "saved")), ["a-second"])
+            query = next(sql for sql in statements if "SELECT r.run_id FROM runs AS r" in sql)
+            with closing(connect(database)) as connection:
+                plan = [row[3] for row in connection.execute("EXPLAIN QUERY PLAN " + query)]
+                self.assertTrue(any("idx_runs_top_conversation_started" in detail for detail in plan), plan)
+                self.assertFalse(any("TEMP B-TREE" in detail for detail in plan), plan)
+                self.assertEqual(connection.execute("SELECT count(*) FROM runs").fetchone()[0], 2)
+
+    async def test_database_selects_latest_success_and_loads_only_one_snapshot(self):
+        with TemporaryDirectory() as directory:
+            database = Path(directory) / "sessions.db"
+            store = SqliteStepStore(database=str(database))
+            now = datetime.now(UTC)
+            for index, (run_id, session_id, parent, kind) in enumerate((
+                ("old", "saved", None, "run_completed"),
+                ("latest", "saved", None, "run_completed"),
+                ("failed", "saved", None, "run_failed"),
+                ("unfinished", "saved", None, "run_started"),
+                ("child", "saved", "latest", "run_completed"),
+                ("other", "other-session", None, "run_completed"),
+            )):
+                await store.register_run(RunRecord(
+                    run_id=run_id, conversation_id=session_id, parent_run_id=parent,
+                    started_at=now + timedelta(seconds=index),
+                ))
+                await store.append_event(StepEvent(run_id=run_id, kind=kind, step_index=1))
+                await store.save_snapshot(ContinuableSnapshot(
+                    run_id=run_id, step_index=1,
+                    messages=[ModelRequest(parts=[UserPromptPart(run_id)])],
+                ))
+            with patch("sessions.SqliteStepStore", return_value=store), \
+                 patch.object(store, "list_runs", side_effect=AssertionError("不能遍历 runs")), \
+                 patch.object(store, "list_events", side_effect=AssertionError("不能加载全部 events")), \
+                 patch.object(store, "latest_snapshot", wraps=store.latest_snapshot) as snapshot:
+                self.assertEqual(prompts(await load_session_history(database, "saved")), ["latest"])
+                snapshot.assert_awaited_once_with(run_id="latest")
+                self.assertEqual(await load_session_history(database, "saved' OR 1=1 --"), [])
+
     async def test_failed_child_and_other_sessions_do_not_replace_successful_context(self):
         with TemporaryDirectory() as directory:
             database = Path(directory) / "sessions.db"
