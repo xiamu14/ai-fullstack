@@ -18,9 +18,9 @@ from pydantic_ai.models.function import FunctionModel
 from pydantic_ai_harness import StepPersistence
 from pydantic_ai_harness.step_persistence import ContinuableSnapshot, RunRecord, SqliteStepStore, StepEvent
 
-from agent_runtime import create_agent
+from agent.runtime import create_agent
 from main import main
-from sessions import load_session_history
+from storage.sessions import load_session_history
 from tui.shell import ChatShell
 from tui.prompt import PromptTextArea
 from tui.tools import ToolCall
@@ -33,11 +33,11 @@ def prompts(messages):
 @contextmanager
 def runtime_model(model):
     env = {"MODEL_NAME": "test", "OPENAI_BASE_URL": "https://example.invalid/v1", "OPENAI_API_KEY": "test-key"}
-    with patch.dict(os.environ, env), patch("agent_runtime.load_dotenv"), \
-         patch("agent_runtime.OpenAIChatModel", return_value=model), \
-         patch("agent_runtime.MCP", return_value=Capability()), \
-         patch("agent_runtime.logfire.configure"), patch("agent_runtime.logfire.instrument_pydantic_ai"), \
-         patch("sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()):
+    with patch.dict(os.environ, env), patch("agent.runtime.load_dotenv"), \
+         patch("agent.runtime.OpenAIChatModel", return_value=model), \
+         patch("agent.runtime.MCP", return_value=Capability()), \
+         patch("agent.runtime.logfire.configure"), patch("agent.runtime.logfire.instrument_pydantic_ai"), \
+         patch("storage.sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()):
         yield
 
 
@@ -97,8 +97,8 @@ from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import TextPart, ToolReturnPart, UserPromptPart, ModelResponse
 from pydantic_ai.models.function import FunctionModel
 from pathlib import Path
-import sessions
-from agent_runtime import create_agent
+from storage import sessions
+from agent.runtime import create_agent
 from tui.shell import ChatShell
 from tui.prompt import PromptTextArea
 
@@ -113,9 +113,9 @@ async def stream_model(messages, info):
 
 async def run():
     sessions.SESSION_DATABASE = Path("workspace/sessions.db").resolve()
-    with patch("agent_runtime.load_dotenv"), patch("agent_runtime.MCP", return_value=Capability()), \\
-         patch("agent_runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \\
-         patch("agent_runtime.logfire.configure"), patch("agent_runtime.logfire.instrument_pydantic_ai"):
+    with patch("agent.runtime.load_dotenv"), patch("agent.runtime.MCP", return_value=Capability()), \\
+         patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \\
+         patch("agent.runtime.logfire.configure"), patch("agent.runtime.logfire.instrument_pydantic_ai"):
         conversation = await create_agent("saved-session")
     assert conversation.history
     app = ChatShell(conversation)
@@ -166,14 +166,14 @@ class ResumeFactoryTests(unittest.IsolatedAsyncioTestCase):
     async def test_factory_propagates_load_error_without_using_empty_history(self):
         with TemporaryDirectory() as directory, chdir(directory), \
              runtime_model(FunctionModel(lambda m, i: ModelResponse(parts=[TextPart("不应调用")]))), \
-             patch("agent_runtime.load_session_history", side_effect=ValueError("损坏的快照")):
+             patch("agent.runtime.load_session_history", side_effect=ValueError("损坏的快照")):
             with self.assertRaisesRegex(ValueError, "损坏的快照"):
                 await create_agent("saved-session")
 
     async def test_new_session_is_left_to_agent_and_does_not_read_history(self):
         with TemporaryDirectory() as directory, chdir(directory), \
              runtime_model(FunctionModel(lambda m, i: ModelResponse(parts=[TextPart("回复")]))), \
-             patch("agent_runtime.load_session_history") as load:
+             patch("agent.runtime.load_session_history") as load:
             conversation = await create_agent()
             self.assertIsNone(conversation.session_id)
             self.assertEqual(conversation.history, [])
@@ -190,7 +190,7 @@ class ResumeFactoryTests(unittest.IsolatedAsyncioTestCase):
 
         with TemporaryDirectory() as directory, chdir(directory), \
              runtime_model(FunctionModel(lambda m, i: ModelResponse(parts=[TextPart("回复")]))), \
-             patch("agent_runtime.load_session_history", side_effect=load):
+             patch("agent.runtime.load_session_history", side_effect=load):
             pending = asyncio.create_task(create_agent("demo"))
             await started.wait()
             self.assertFalse(pending.done())
@@ -222,7 +222,7 @@ class ResumeHistoryTests(unittest.IsolatedAsyncioTestCase):
                 connection.set_trace_callback(statements.append)
                 return connection
 
-            with patch("sessions.sqlite3.connect", side_effect=traced_connect):
+            with patch("storage.sessions.sqlite3.connect", side_effect=traced_connect):
                 for _ in range(2):
                     self.assertEqual(prompts(await load_session_history(database, "saved")), ["a-second"])
             query = next(sql for sql in statements if "SELECT r.run_id FROM runs AS r" in sql)
@@ -254,7 +254,7 @@ class ResumeHistoryTests(unittest.IsolatedAsyncioTestCase):
                     run_id=run_id, step_index=1,
                     messages=[ModelRequest(parts=[UserPromptPart(run_id)])],
                 ))
-            with patch("sessions.SqliteStepStore", return_value=store), \
+            with patch("storage.sessions.SqliteStepStore", return_value=store), \
                  patch.object(store, "list_runs", side_effect=AssertionError("不能遍历 runs")), \
                  patch.object(store, "list_events", side_effect=AssertionError("不能加载全部 events")), \
                  patch.object(store, "latest_snapshot", wraps=store.latest_snapshot) as snapshot:

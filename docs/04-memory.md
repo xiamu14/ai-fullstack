@@ -36,7 +36,7 @@
 
 因此，**当前 Coder Cli 选择文件存笔记、SQLite 存历史**。它是本地工具，先用框架现成能力即可；暂不增加 Redis，也不引入向量数据库。等确实出现读取慢，或“换个说法就找不到”的问题，再补对应能力。
 
-注意，`Memory` 让模型按需记笔记，完整运行历史由 `StepPersistence` 保存。当前 `agent_runtime.py` 已接入文件笔记、SQLite 历史和关键词搜索。
+注意，`Memory` 让模型按需记笔记，完整运行历史由 `StepPersistence` 保存。当前 `agent/runtime.py` 已接入文件笔记、SQLite 历史和关键词搜索。
 
 参考：[官方 Memory](https://pydantic.dev/docs/ai/harness/memory/)、[历史搜索](https://pydantic.dev/docs/ai/harness/conversation-search/)。
 
@@ -177,7 +177,7 @@ uv run python main.py --sessionId demo
 
 上面的“候选列表 → 校验 → 去重 → 新增或更新 → 同步向量”是完整写入流程的设计；当前 CLI 使用模型调用记忆工具的方式，尚未实现独立提取和向量同步流程。
 
-下面摘出 `agent_runtime.py` 中的记忆配置，省略了原有 Coder、Skills、MCP 和网页工具，复用前文的 `model`：
+下面摘出 `agent/runtime.py` 中的记忆配置，省略了原有 Coder、Skills、MCP 和网页工具，复用前文的 `model`：
 
 ```python
 from pathlib import Path

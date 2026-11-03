@@ -60,7 +60,7 @@ print(add(2, 3))
 
 ### 2.1 现有 capabilities
 
-`coder-cli/agent_runtime.py` 已组合两个 capability：
+`coder-cli/agent/runtime.py` 已组合两个 capability：
 
 ```python
 from pathlib import Path
@@ -110,7 +110,7 @@ async def web_fetch(url: str) -> str:
 
 函数名、说明和类型用于生成工具定义，函数体是实际实现。`ModelRetry` 把失败原因交回模型，让它修正调用。这里直接返回 HTML，不提取正文，也不执行网页 JavaScript。
 
-在 `agent_runtime.py` 导入函数，并在原有 `Agent(...)` 中增加 `tools=[web_fetch]`，保留原有 `instructions`：
+在 `agent/runtime.py` 导入函数，并在原有 `Agent(...)` 中增加 `tools=[web_fetch]`，保留原有 `instructions`：
 
 ```python
 from tools.web_tools import web_fetch
@@ -302,7 +302,7 @@ uv run weather.py
 mcp.run(transport="streamable-http", host="127.0.0.1", port=args.port)
 ```
 
-`agent_runtime.py` 当前启用 HTTP；stdio 作为下方独立示例展示：
+`agent/runtime.py` 当前启用 HTTP；stdio 作为下方独立示例展示：
 
 ```python
 weather = MCP("http://127.0.0.1:8000/mcp", id="weather", tool_prefix=True)
@@ -417,7 +417,7 @@ uv run python main.py
 ```
 下载是一套可复用的操作流程，说明按需加载，执行步骤由脚本固定，通用 Agent 不必常驻专用工具。代价是增加一次技能加载；它改善复用和上下文组织，不保证比内置工具少调用。
 
-当前 `agent_runtime.py` 使用 Skills。参考：[Pydantic AI Skills](https://pydantic.dev/docs/ai/harness/skills/)。
+当前 `agent/runtime.py` 使用 Skills。参考：[Pydantic AI Skills](https://pydantic.dev/docs/ai/harness/skills/)。
 
 ### 3.5 工程优化
 

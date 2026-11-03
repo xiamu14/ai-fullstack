@@ -9,7 +9,7 @@ from textual.containers import Center, HorizontalGroup, VerticalGroup
 from textual.screen import ModalScreen
 from textual.widgets import Button, DataTable, Markdown
 
-from sessions import SessionInfo
+from storage.sessions import SessionInfo
 
 
 class SessionResumeModal(ModalScreen):

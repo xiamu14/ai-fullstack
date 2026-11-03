@@ -11,9 +11,9 @@ from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolRetu
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai_harness.step_persistence import RunRecord, SqliteStepStore
 
-from agent_runtime import create_agent
+from agent.runtime import create_agent
 from main import main
-from sessions import session_workspace
+from storage.sessions import session_workspace
 
 
 class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
@@ -59,11 +59,11 @@ class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
                     yield {0: DeltaToolCall(name=part.tool_name, json_args=json.dumps(part.args))}
 
             env = {'MODEL_NAME': 'test', 'OPENAI_BASE_URL': 'https://example.invalid/v1', 'OPENAI_API_KEY': 'test-key'}
-            with patch.dict(os.environ, env), patch('agent_runtime.load_dotenv'), \
-                 patch('agent_runtime.OpenAIChatModel', return_value=FunctionModel(model, stream_function=stream_model)), \
-                 patch('agent_runtime.MCP', return_value=Capability()), \
-                 patch('agent_runtime.logfire.configure'), patch('agent_runtime.logfire.instrument_pydantic_ai'), \
-                 patch('sessions.SESSION_DATABASE', database):
+            with patch.dict(os.environ, env), patch('agent.runtime.load_dotenv'), \
+                 patch('agent.runtime.OpenAIChatModel', return_value=FunctionModel(model, stream_function=stream_model)), \
+                 patch('agent.runtime.MCP', return_value=Capability()), \
+                 patch('agent.runtime.logfire.configure'), patch('agent.runtime.logfire.instrument_pydantic_ai'), \
+                 patch('storage.sessions.SESSION_DATABASE', database):
                 with chdir(root):
                     first = await create_agent(path='project')
                     self.assertIsNone(first.session_id)

@@ -280,7 +280,7 @@ Parent directory 'hello' does not exist. Create the parent directory first.
 
 Request 里的路径是 `hello/README.md`，但模型还没有创建 `hello` 目录。Coder 的 `write_file` 不会自动创建父目录，所以三个写入都失败了。即使改成依次写入，目录不存在也一样会失败。
 
-**缺少的是前置步骤：先确认目录存在，再写文件。** 已在 `agent_runtime.py` 的 `instructions` 中补充：
+**缺少的是前置步骤：先确认目录存在，再写文件。** 已在 `agent/runtime.py` 的 `instructions` 中补充：
 
 - 写文件前，通过工具确认父目录存在。
 - 不存在时，先用 `shell` 执行 `mkdir -p`。

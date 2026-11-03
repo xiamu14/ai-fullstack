@@ -12,7 +12,7 @@ from textual.screen import Screen
 from textual.widgets import Footer
 from textual.worker import WorkerCancelled
 
-from conversation import Conversation, cache_statistics, error_message
+from agent.conversation import Conversation, cache_statistics, error_message
 from tui.messages import Conversation as ConversationView
 from tui.messages import MessageHistory
 from tui.prompt import Prompt, PromptTextArea, StatusLine

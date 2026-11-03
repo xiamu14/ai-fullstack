@@ -22,8 +22,8 @@ from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai.capabilities import MCP
 from pydantic_ai.usage import RequestUsage, RunUsage
 
-from agent_runtime import create_agent
-from conversation import cache_statistics
+from agent.runtime import create_agent
+from agent.conversation import cache_statistics
 import asyncio
 
 configure_logfire = logfire.configure
@@ -61,17 +61,17 @@ class CoderTests(unittest.TestCase):
                 time.sleep(0.05)
         else:
             raise RuntimeError("天气 HTTP 服务启动超时")
-        override = patch("agent_runtime.MCP", side_effect=lambda url, **kwargs: MCP(f"http://127.0.0.1:{port}/mcp", **kwargs))
+        override = patch("agent.runtime.MCP", side_effect=lambda url, **kwargs: MCP(f"http://127.0.0.1:{port}/mcp", **kwargs))
         override.start()
         cls.addClassCleanup(override.stop)
 
     def setUp(self):
         self.exporter = InMemorySpanExporter()
-        database = patch("agent_runtime.session_database", side_effect=lambda: Path("workspace/sessions.db").resolve())
+        database = patch("agent.runtime.session_database", side_effect=lambda: Path("workspace/sessions.db").resolve())
         database.start()
         self.addCleanup(database.stop)
         configure = patch(
-            "agent_runtime.logfire.configure",
+            "agent.runtime.logfire.configure",
             side_effect=lambda **kwargs: configure_logfire(
                 service_name="coder-cli", send_to_logfire=False, console=False,
                 additional_span_processors=[SimpleSpanProcessor(self.exporter)],
@@ -120,8 +120,8 @@ class CoderTests(unittest.TestCase):
         env = {"OPENAI_BASE_URL": "https://example.invalid/v1", "OPENAI_API_KEY": "test-key", "MODEL_NAME": "test"}
         with TemporaryDirectory() as directory, chdir(directory):
             output = StringIO()
-            with patch.dict("os.environ", env), patch("agent_runtime.load_dotenv"), \
-                 patch("agent_runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \
+            with patch.dict("os.environ", env), patch("agent.runtime.load_dotenv"), \
+                 patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \
                  redirect_stdout(output):
                 run_agent("创建并运行 hello world 项目")
             self.assertEqual(calls, 5)
@@ -161,8 +161,8 @@ class CoderTests(unittest.TestCase):
                 yield {0: DeltaToolCall(name=part.tool_name, json_args=json.dumps(part.args))}
 
         env = {"OPENAI_BASE_URL": "https://example.invalid/v1", "OPENAI_API_KEY": "test-key", "MODEL_NAME": "test"}
-        with patch.dict("os.environ", env), patch("agent_runtime.load_dotenv"), \
-             patch("agent_runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \
+        with patch.dict("os.environ", env), patch("agent.runtime.load_dotenv"), \
+             patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \
              redirect_stdout(StringIO()), redirect_stderr(StringIO()):
             run_agent(prompt, session)
         return observed
@@ -184,10 +184,10 @@ from unittest.mock import patch
 from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
-from agent_runtime import create_agent
-from conversation import cache_statistics
+from agent.runtime import create_agent
+from agent.conversation import cache_statistics
 from pathlib import Path
-import sessions
+from storage import sessions
 import asyncio
 
 sessions.SESSION_DATABASE = Path("workspace/sessions.db").resolve()
@@ -211,9 +211,9 @@ async def stream_model(messages, info):
         yield {0: DeltaToolCall(name=part.tool_name, json_args=json.dumps(part.args))}
 
 configure = logfire.configure
-with patch("agent_runtime.load_dotenv"), patch("agent_runtime.MCP", return_value=Capability()), \\
-     patch("agent_runtime.logfire.configure", side_effect=lambda **kwargs: configure(send_to_logfire=False, console=False)), \\
-     patch("agent_runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)):
+with patch("agent.runtime.load_dotenv"), patch("agent.runtime.MCP", return_value=Capability()), \\
+     patch("agent.runtime.logfire.configure", side_effect=lambda **kwargs: configure(send_to_logfire=False, console=False)), \\
+     patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)):
     async def run():
         conversation = await create_agent("second")
         return await conversation.send("读取端口约定")

@@ -5,9 +5,9 @@ import sys
 
 import httpx
 
-from agent_runtime import create_agent
-from conversation import error_message
-from sessions import list_sessions, session_database
+from agent.runtime import create_agent
+from agent.conversation import error_message
+from storage.sessions import list_sessions, session_database
 from tui.sessions import SessionsApp
 from tui.shell import ChatShell
 

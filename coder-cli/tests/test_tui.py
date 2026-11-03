@@ -9,7 +9,7 @@ from pydantic_ai.messages import ToolCallPart, ToolReturnPart, UserPromptPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai.usage import RunUsage
 
-from conversation import Conversation
+from agent.conversation import Conversation
 
 from tui.shell import ChatShell
 from tui.messages import MessageHistory

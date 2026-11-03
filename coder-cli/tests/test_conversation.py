@@ -8,7 +8,7 @@ from pydantic_ai import Agent
 from pydantic_ai.messages import ModelResponse, TextPart, ToolReturnPart, UserPromptPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 
-from conversation import Conversation, error_message
+from agent.conversation import Conversation, error_message
 
 
 class ConversationTests(unittest.IsolatedAsyncioTestCase):

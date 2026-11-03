@@ -12,7 +12,7 @@ from pydantic_ai_harness.step_persistence import ContinuableSnapshot, RunRecord,
 from textual.widgets import DataTable
 
 from main import main
-from sessions import SessionInfo, list_sessions
+from storage.sessions import SessionInfo, list_sessions
 from tui.sessions import SessionsApp
 
 
@@ -73,7 +73,7 @@ class SessionsCliTests(unittest.TestCase):
                 self.assertIn("复制", output.getvalue())
             with TemporaryDirectory() as directory, chdir(directory), \
                  patch("sys.argv", ["main.py", "--sessions"]), \
-                 patch("sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()), \
+                 patch("storage.sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()), \
                  redirect_stdout(StringIO()) as output:
                 main()
                 self.assertIn("暂无", output.getvalue())
