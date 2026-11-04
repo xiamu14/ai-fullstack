@@ -112,4 +112,18 @@ Logfire 终端输出已关闭，避免干扰 TUI。设置 `.env` 中的 `LOGFIRE
 
 ## 外部 MCP
 
-可直接要求 Agent 配置 MCP；它会按需加载内置 [mcp-config Skill](skills/mcp-config/SKILL.md)，使用运行时提供的有效配置路径。
+可直接要求 Agent 配置 MCP；它会按需加载内置 [mcp-config Skill](skills/mcp-config/SKILL.md)，使用 MCP 能力统一提供的有效配置路径。
+
+## Skills
+
+使用 Pydantic AI 原生 `Skills` 加载内置 `skills/` 和用户全局 `~/.agents/skills/`。内置技能优先；全局同名技能会被跳过并提示。全局目录不存在时不影响启动。
+
+外部技能可使用 [Skills CLI](https://github.com/vercel-labs/skills) 安装和更新：
+
+```bash
+npx skills add <owner/repo> -g
+npx skills check
+npx skills update
+```
+
+安装时确认技能位于 `~/.agents/skills/<技能目录>/SKILL.md`。每次 Agent 运行开始时重新发现技能，因此安装或更新后，下次发送消息即可生效；当前运行不刷新。Skills 只加载说明，不自动安装技能依赖的命令、MCP 服务或凭据。

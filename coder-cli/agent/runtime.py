@@ -1,4 +1,3 @@
-import json
 import os
 from functools import partial
 from pathlib import Path
@@ -63,6 +62,11 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
             AskUser(answerer=interaction.ask),
             LocalWorkspace(workspace), Coder(),
             Skills(str(Path(__file__).resolve().parents[1] / "skills")),
+            Skills(
+                Path.home() / ".agents" / "skills",
+                missing_directories="skip", duplicate_names="keep_first",
+            ),
+            mcp,
             StepPersistence(store=store, metadata={"workspace": str(workspace)}, capture_frontier=True),
             ConversationSearch(SnapshotHistorySource(store), scope="conversation", max_matches=3),
             SummarizingCompaction(max_messages=60, keep_messages=20),
@@ -75,9 +79,6 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8"),
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)
-    agent.instructions(name="mcp-config", on_change="rewrite")(
-        lambda: json.dumps({"mcp_config_path": str(mcp.path)}, ensure_ascii=False)
-    )
     if session_id is None:
         session_id = NativeConversation().conversation_id
     await save_session(database, session_id, workspace)

@@ -1,15 +1,16 @@
 """Trusted MCP configuration, refreshed by the framework before each model request."""
 import asyncio
-from contextlib import AsyncExitStack, asynccontextmanager
 import json
 import os
-from pathlib import Path
 import re
 import tempfile
+from contextlib import AsyncExitStack, asynccontextmanager
+from pathlib import Path
 
 import httpx2
 from fastmcp.client.transports import StdioTransport
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+from pydantic_ai.capabilities import AbstractCapability
 from pydantic_ai.mcp import MCPToolset
 from pydantic_ai.toolsets import AbstractToolset, CombinedToolset, DynamicToolset
 
@@ -80,9 +81,14 @@ def expand_env(value: str) -> str:
     return re.sub(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}", replace, value)
 
 
-class MCPRegistry:
+class MCPRegistry(AbstractCapability):
+    id = "mcp"
+
     def __init__(self, path: Path | None = None) -> None:
         self.path = (path or Path(os.getenv("CODER_MCP_CONFIG", "~/.config/coder-cli/mcp.json"))).expanduser().resolve()
+
+    def get_instructions(self) -> str:
+        return json.dumps({"mcp_config_path": str(self.path)}, ensure_ascii=False)
 
     def read(self) -> Config:
         try:
@@ -172,4 +178,3 @@ class MCPRegistry:
                 toolset = toolset.defer_loading()
             toolsets.append(toolset.prefixed(name))
         return CombinedToolset(toolsets)
-
