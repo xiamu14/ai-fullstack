@@ -504,16 +504,59 @@ result = await agent.run(
 
 --------
 ## 2. 护栏
+
+**中断与运行中反馈** 是为了补充任务细节或停止错误任务的必要工程能力。
+| 意图 | 行为 | 运行标识 |
+|---|---|---|
+| 手动停止后重新提问 | 取消当前运行，等待清理完成；恢复最近快照，再提交新问题 | 沿用 `conversation_id`，产生新的 `run_id` |
+| 执行中补充反馈 | 将补充信息送入当前运行，在后续模型请求中处理；不立即取消当前工具或模型请求 | 保持当前 `run_id` |
+
+`conversation_id`、`run_id` 沿用 [Pydantic AI 运行标识](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。补充反馈不会自动替换原任务；等待 `AskUser` 回答时，新输入先作为该问题的答案处理。
+
+#### 取消与恢复
+
+执行方传播取消信号，并在 `finally` 中清理资源。以下摘自 `Interaction` capability：
+
+```python
+async def wrap_run(self, ctx, *, handler):
+    try:
+        return await handler()
+    finally:
+        self.close()  # 清理运行上下文、待注入反馈与提问回调。
+```
+
+调用方取消运行任务后，必须等待它退出，才能开始新运行。当前 `Conversation.send()` 在运行前设置 `restore_required=True`，仅成功后清除；因此取消或失败后的下一次发送会先通过 `history_loader` 恢复最近持久化进度，再传给 `agent.run(message_history=...)`。
+
+快照恢复与 `repair_messages()` 见 1.1：未返回结果的工具调用标记为 `interrupted`，不自动重放。取消不回滚已完成的写入，也不能证明远端操作未生效；结果未知时先核实。
+
+#### 补充信息
+
+`Interaction.before_run()` 保存原生运行上下文；普通反馈调用 `enqueue()`，无需重建 Agent 或直接修改历史：
+
+```python
+async def before_run(self, ctx):
+    self.context = ctx
+    for text in self.pending:
+        ctx.enqueue(text)
+    self.pending.clear()
+
+# feedback() 中：已排除等待用户回答的分支。
+if self.context is not None:
+    self.context.enqueue(text)
+else:
+    self.pending.append(text)  # 当前运行尚未进入 before_run。
+```
+
+原生 [`RunContext.enqueue()`](https://pydantic.dev/docs/ai/api/pydantic-ai/tools/#pydantic_ai.tools.RunContext.enqueue) 默认按 `asap` 在可用的后续模型请求中注入；若 Agent 原本即将结束，框架会安排处理反馈。当前运行已经关闭时，由调用方将输入留到下一次运行，不能向失效上下文入队。
+
 ### 2.1 权限
-
-Human-in-the-loop
-
-用户中断
 
 ### 2.2 Token 预算
 
 ### 2.3 上下文隔离
 sessions 并行
+
+
 ## 3. 决策模式
 Planning 模式
 Reflection 模式
