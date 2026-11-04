@@ -74,7 +74,8 @@ class SessionStoreTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual([run.run_id for run in await store.list_runs()], ["b-first"])
             self.assertEqual(await load_session_history(database, "a"), [])
             history = await load_session_history(database, "b")
-            self.assertEqual([message.parts[0].content for message in history], ["shared evidence", "b-first"])
+            self.assertEqual([part.content for message in history for part in message.parts
+                              if isinstance(part, UserPromptPart)], ["shared evidence", "b-first"])
             with closing(sqlite3.connect(database)) as connection:
                 for table in ("events", "snapshots", "snapshot_idempotency_keys", "tool_effects"):
                     self.assertEqual(connection.execute(f"SELECT DISTINCT run_id FROM {table}").fetchall(), [("b-first",)])

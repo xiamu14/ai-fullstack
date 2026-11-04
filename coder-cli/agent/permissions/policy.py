@@ -39,7 +39,8 @@ class ExecutionPermissions(Permissions):
         self.refresh_readonly()
         self.forbidden = tuple(path.resolve() for path in (
             self.path, database, Path(str(database) + "-wal"), Path(str(database) + "-shm"),
-            database.parent / "permissions.jsonl", Path.home() / ".ssh", Path.home() / ".aws",
+            database.parent / "permissions.jsonl", database.parent / "execution-locks",
+            Path.home() / ".ssh", Path.home() / ".aws",
         ))
         if not self.root.is_relative_to(database.parent.resolve()):
             self.forbidden += (database.parent.resolve(),)

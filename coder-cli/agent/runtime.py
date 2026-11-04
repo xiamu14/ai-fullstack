@@ -29,6 +29,7 @@ from agent.permissions.workspace import RestrictedWorkspace
 from context.project import ProjectContext
 from integrations.mcp import MCPRegistry
 from integrations.provider import model_profile
+from storage.execution_lock import execution_lock
 from storage.sessions import (
     load_session_history,
     save_session,
@@ -49,6 +50,11 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     database.parent.mkdir(parents=True, exist_ok=True)
     store = SqliteStepStore(database=str(database))
     history = await load_session_history(database, session_id) if session_id else []
+    if session_id is None:
+        session_id = NativeConversation().conversation_id
+    await save_session(database, session_id, workspace)
+    # Concurrent first-open attempts must all bind to the workspace that won registration.
+    workspace = await session_workspace(database, session_id, None)
     project = ProjectContext(workspace, database.parent / "project-context")
     await project.refresh()
     mcp = MCPRegistry()
@@ -91,10 +97,8 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8"),
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)
-    if session_id is None:
-        session_id = NativeConversation().conversation_id
-    await save_session(database, session_id, workspace)
     return Conversation(
         agent, session_id, history=history, workspace=workspace, mcp=mcp, skills=skills, interaction=interaction,
         history_loader=partial(load_session_history, database),
+        execution_lock=partial(execution_lock, database, session_id, workspace),
     )

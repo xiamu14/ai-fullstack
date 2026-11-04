@@ -1,4 +1,5 @@
 """macOS process sandbox plus file-backend checks; never silently falls back."""
+import asyncio
 import json
 from fnmatch import translate
 import re
@@ -15,6 +16,21 @@ from pydantic_ai.capabilities import LocalWorkspace
 from pydantic_ai.workspaces import LocalWorkspaceBackend
 
 from agent.permissions.policy import CURRENT_GRANT
+
+
+async def _finish_mutation(operation):
+    # Cancelling an await cannot stop a filesystem thread; keep the execution lease until it exits.
+    task = asyncio.create_task(operation)
+    cancelled = False
+    while not task.done():
+        try:
+            await asyncio.shield(task)
+        except asyncio.CancelledError:
+            cancelled = True
+    result = task.result()
+    if cancelled:
+        raise asyncio.CancelledError
+    return result
 
 
 class RestrictedBackend(LocalWorkspaceBackend):
@@ -77,8 +93,7 @@ class RestrictedBackend(LocalWorkspaceBackend):
                 os.replace(name, target)
             finally:
                 Path(name).unlink(missing_ok=True)
-        import asyncio
-        return await asyncio.to_thread(write)
+        return await _finish_mutation(asyncio.to_thread(write))
 
     async def list_dir(self, path):
         self.check(path)
@@ -93,11 +108,11 @@ class RestrictedBackend(LocalWorkspaceBackend):
 
     async def make_dir(self, path):
         self.check(path, write=True)
-        return await super().make_dir(path)
+        return await _finish_mutation(super().make_dir(path))
 
     async def remove(self, path):
         self.check(path, write=True)
-        return await super().remove(path)
+        return await _finish_mutation(super().remove(path))
 
     async def exists(self, path):
         self.check(path)

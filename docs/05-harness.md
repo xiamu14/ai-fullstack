@@ -525,7 +525,7 @@ async def wrap_run(self, ctx, *, handler):
         self.close()  # 清理运行上下文、待注入反馈与提问回调。
 ```
 
-调用方取消运行任务后，必须等待它退出，才能开始新运行。当前 `Conversation.send()` 在运行前设置 `restore_required=True`，仅成功后清除；因此取消或失败后的下一次发送会先通过 `history_loader` 恢复最近持久化进度，再传给 `agent.run(message_history=...)`。
+调用方取消运行任务后，必须等待它退出，才能开始新运行。`Conversation.send()` 每次发送都在会话与工作目录的执行锁内，通过 `history_loader` 恢复最近持久化进度，再传给 `agent.run(message_history=...)`；取消或失败后的下一次发送也遵循这一流程。
 
 快照恢复与 `repair_messages()` 见 1.1：未返回结果的工具调用标记为 `interrupted`，不自动重放。取消不回滚已完成的写入，也不能证明远端操作未生效；结果未知时先核实。
 

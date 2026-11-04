@@ -1,6 +1,6 @@
 import os
 from collections.abc import Awaitable, Callable
-from contextlib import AsyncExitStack
+from contextlib import AbstractContextManager, AsyncExitStack, nullcontext
 from copy import deepcopy
 from pathlib import Path
 
@@ -37,6 +37,7 @@ class Conversation:
         skills: Skills | None = None,
         interaction: Interaction | None = None,
         history_loader: Callable[[str], Awaitable[list[ModelMessage]]] | None = None,
+        execution_lock: Callable[[], AbstractContextManager] = nullcontext,
     ) -> None:
         self.agent = agent
         self.session_id = session_id
@@ -46,7 +47,7 @@ class Conversation:
         self.skills = skills
         self.interaction = interaction or Interaction()
         self.history_loader = history_loader
-        self.restore_required = False
+        self.execution_lock = execution_lock
 
     def feedback(self, text: str) -> bool:
         return self.interaction.feedback(text)
@@ -77,6 +78,10 @@ class Conversation:
         on_question: Callable[[str], Awaitable[None]] | None = None,
         skill_name: str | None = None,
     ):
+        with self.execution_lock():
+            return await self._send(prompt, on_text, on_tool=on_tool, on_question=on_question, skill_name=skill_name)
+
+    async def _send(self, prompt, on_text, *, on_tool, on_question, skill_name):
         if skill_name is not None:
             catalog = await self.skill_catalog()
             skill = next((skill for skill in catalog.skills if skill.name == skill_name), None)
@@ -101,9 +106,8 @@ class Conversation:
 
         self.interaction.open(on_question)
         try:
-            if self.restore_required and self.history_loader is not None and self.session_id is not None:
+            if self.history_loader is not None and self.session_id is not None:
                 self.history = await self.history_loader(self.session_id)
-            self.restore_required = True
             async with AsyncExitStack() as stack:
                 toolsets = await stack.enter_async_context(self.mcp.toolsets()) if self.mcp else []
                 result = await self.agent.run(
@@ -120,7 +124,6 @@ class Conversation:
         # 仅提交成功轮次；压缩后的原生消息取代旧历史，不能重复追加。
         self.session_id = result.conversation_id
         self.history = result.all_messages()
-        self.restore_required = False
         return result
 
 

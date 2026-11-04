@@ -1,0 +1,52 @@
+"""Nonblocking process leases; keep lock files so every contender uses the same inode."""
+from contextlib import contextmanager, ExitStack
+from hashlib import sha256
+import os
+from pathlib import Path
+
+
+class ExecutionBusyError(RuntimeError):
+    pass
+
+
+@contextmanager
+def _lease(directory: Path, key: str, *, shared: bool, message: str):
+    if os.name != "posix":
+        raise OSError("当前平台不支持会话执行锁，拒绝运行")
+    import fcntl
+
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    name = sha256(key.encode()).hexdigest() + ".lock"
+    fd = os.open(directory / name, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    try:
+        mode = fcntl.LOCK_SH if shared else fcntl.LOCK_EX
+        try:
+            fcntl.flock(fd, mode | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise ExecutionBusyError(message) from None
+        yield
+    finally:
+        os.close(fd)
+
+
+@contextmanager
+def execution_lock(database: Path, session_id: str, workspace: Path):
+    """One run per conversation and per overlapping workspace; siblings remain independent."""
+    directory = database.resolve().parent / "execution-locks"
+    workspace = workspace.resolve(strict=True)
+    with ExitStack() as stack:
+        stack.enter_context(_lease(
+            directory, "session:" + session_id, shared=False,
+            message="该会话已有运行中的请求，请等待结束后重试。",
+        ))
+        # Shared ancestor leases let sibling directories run, but exclude a parent writer.
+        for parent in reversed(workspace.parents):
+            stack.enter_context(_lease(
+                directory, "workspace:" + str(parent), shared=True,
+                message="上级工作目录正在执行任务，请使用独立目录或等待结束。",
+            ))
+        stack.enter_context(_lease(
+            directory, "workspace:" + str(workspace), shared=False,
+            message="该工作目录或其子目录正在执行任务，请使用独立目录或等待结束。",
+        ))
+        yield
