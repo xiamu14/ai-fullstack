@@ -687,15 +687,7 @@ async def send(agent, database, conversation_id, workspace, prompt):
 
 最小验证：**同会话拒绝重入、重叠目录互斥、独立目录可并行、旧对象读取最新历史、项目笔记共享但聊天历史不串入、取消后安全释放锁**。使用边界见[项目 README](../coder-cli/README.md#并行与共享边界)。
 
-## 3. 决策模式
-Planning 模式
-Reflection 模式
-Chain-of-Thought
-
-## 4. Multi-Agent
+## 3. Multi-Agent
 减少 Token 消耗（将不同任务交付不同模型，且不同 agent 专注不同任务），提高速度；需要 router 设计（参考 Amp）。
-## 5. Sub-Agent
+## 4. Sub-Agent
 降低 context window 长度（防止 context 腐败），难点是交付和反馈，并行和串行的运行流；重点在上下文隔离
-## 6. Long-term Agent
-Dsh Super Agent
-> [dsh-superagent-prototype](https://github.com/deepseek-ai/dsh-superagent-prototype/tree/main)
