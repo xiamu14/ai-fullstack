@@ -5,6 +5,9 @@ from copy import deepcopy
 from pathlib import Path
 
 from pydantic_ai import Agent, UsageLimits
+from pydantic_ai.workspaces import LocalWorkspaceBackend
+from pydantic_ai_harness import Skills
+from pydantic_ai_harness.skills import SkillCatalog
 from pydantic_ai.messages import (
     FunctionToolCallEvent,
     FunctionToolResultEvent,
@@ -20,11 +23,16 @@ from agent.interaction import Interaction
 from integrations.mcp import MCPRegistry
 
 
+class SkillInvocationError(ValueError):
+    pass
+
+
 class Conversation:
     def __init__(
         self, agent: Agent, session_id: str | None = None, *, history: list[ModelMessage] | None = None,
         workspace: Path | None = None,
         mcp: MCPRegistry | None = None,
+        skills: Skills | None = None,
         interaction: Interaction | None = None,
         history_loader: Callable[[str], Awaitable[list[ModelMessage]]] | None = None,
     ) -> None:
@@ -33,6 +41,7 @@ class Conversation:
         self.workspace = (workspace if workspace is not None else Path.cwd()).resolve()
         self.history: list[ModelMessage] = history if history is not None else []
         self.mcp = mcp
+        self.skills = skills
         self.interaction = interaction or Interaction()
         self.history_loader = history_loader
         self.restore_required = False
@@ -40,12 +49,29 @@ class Conversation:
     def feedback(self, text: str) -> bool:
         return self.interaction.feedback(text)
 
+    async def skill_catalog(self) -> SkillCatalog:
+        if self.skills is None:
+            return SkillCatalog(skills=(), skipped=())
+        try:
+            return await self.skills.load(LocalWorkspaceBackend(self.workspace))
+        except ValueError as exc:
+            raise SkillInvocationError(f"技能目录加载失败：{exc}") from exc
+
     async def send(
         self, prompt: str,
         on_text: Callable[[str], Awaitable[None]] | None = None,
         *, on_tool: Callable[[FunctionToolCallEvent | FunctionToolResultEvent], Awaitable[None]] | None = None,
         on_question: Callable[[str], Awaitable[None]] | None = None,
+        skill_name: str | None = None,
     ):
+        if skill_name is not None:
+            catalog = await self.skill_catalog()
+            skill = next((skill for skill in catalog.skills if skill.name == skill_name), None)
+            if skill is None:
+                raise SkillInvocationError(f"技能不可用：{skill_name}；请重新选择。")
+            if not skill.user_invocable:
+                raise SkillInvocationError(f"技能不允许主动调用：{skill_name}")
+            prompt = skill.render(prompt)
         if not prompt.strip():
             raise ValueError("消息不能为空")
 

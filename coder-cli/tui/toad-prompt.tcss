@@ -92,6 +92,35 @@ Prompt {
         display: block;
     }
 
+    SlashComplete {
+        display: none;
+        overlay: screen;
+        offset-y: -16;
+        height: 16;
+        Input {
+            margin: 0 1;
+            padding: 0 1;
+        }
+        OptionList {
+            border: none;
+            height: 1fr;
+            padding: 0;
+            margin: 0 1;
+            overflow: hidden;
+            text-wrap: nowrap;
+            text-overflow: ellipsis;
+            & > .option-list--option {
+                padding: 0 1;
+            }
+        }
+    }
+
+    &.-show-slash-complete {
+        SlashComplete {
+            display: block;
+        }
+    }
+
 }
 
 MainScreen {    

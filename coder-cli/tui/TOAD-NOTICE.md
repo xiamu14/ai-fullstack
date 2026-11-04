@@ -10,8 +10,9 @@
 - highlighted_textarea.py：上游同名文件中的 Markdown 输入配色与缓存，只保留 Markdown 展示，移除 shell、路径和 slash 命令相关代码。
 - messages.py、prompt.py、tools.py 中的界面结构及工具标题呈现，依据对应的上游 widgets 组件裁剪适配；执行和消息事件由本项目实现。
 - messages.py 在 Contents 的布局后处理中按实际宽度重新测量消息高度，修正 Textual stream 布局未扣除水平 margin 导致的换行裁切；样式声明保持上游原样。
+- skills.py：依据 src/toad/widgets/slash_complete.py 的 Input、OptionList、选择与关闭结构裁剪，只用于 Skill 选择；以名称和描述过滤替代上游模糊搜索与 Columns。toad-prompt.tcss 补回 main.tcss 中 SlashComplete 的原始规则，移除未使用的其他组件选择器与子规则，声明值保持不变。读取日期 2026-11-04。
 
-样式仅移除未使用组件的完整规则，保留选择器、声明值及主题。未引入 ACP、会话管理、商店、侧栏、权限、规划、补全或独立 shell 执行器。不为未实现的功能显示入口。
+样式仅移除未使用组件的完整规则，保留使用中组件的声明值及主题。未引入 ACP、会话管理、商店、侧栏、权限、规划、路径补全或独立 shell 执行器。不为未实现的功能显示入口。
 
 原始文件 SHA-256（下载时的 main 分支内容）：
 

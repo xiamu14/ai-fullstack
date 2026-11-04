@@ -13,10 +13,11 @@ from textual.screen import Screen
 from textual.widgets import Footer
 from textual.worker import WorkerCancelled
 
-from agent.conversation import Conversation, cache_statistics, error_message
+from agent.conversation import Conversation, SkillInvocationError, cache_statistics, error_message
 from tui.messages import Conversation as ConversationView
 from tui.messages import MessageHistory
 from tui.prompt import Prompt, PromptTextArea, StatusLine
+from tui.skills import SlashComplete
 from tui.throbber import Throbber
 from tui.turn import TurnView, restore_messages
 
@@ -77,16 +78,50 @@ class ChatShell(App):
             self.query_one(StatusLine).update("已接收反馈" if accepted else "已排队")
             return
         await self.query_one(MessageHistory).add("user", event.text)
-        self.start_turn(event.text)
+        text = event.text.removeprefix(f"/{event.skill_name} ") if event.skill_name else event.text
+        self.start_turn(text, skill_name=event.skill_name)
 
-    def start_turn(self, text: str) -> None:
+    @on(PromptTextArea.SkillsRequested)
+    async def show_skills(self) -> None:
+        if self.busy:
+            return
+        try:
+            catalog = await self.conversation.skill_catalog()
+        except (SkillInvocationError, OSError) as error:
+            self.notify(str(error), severity="error")
+            return
+        for skipped in catalog.skipped:
+            self.notify(skipped.message, severity="warning")
+        skills = [(skill.name, skill.description) for skill in catalog.skills if skill.user_invocable]
+        prompt = self.query_one(PromptTextArea)
+        if self.busy or prompt.text != "/":
+            return
+        if not skills:
+            self.notify("没有可主动调用的技能", severity="warning")
+            return
+        self.query_one(Prompt).add_class("-show-slash-complete")
+        self.query_one(SlashComplete).show_skills(skills)
+
+    @on(SlashComplete.Completed)
+    def skill_selected(self, event: SlashComplete.Completed) -> None:
+        prompt = self.query_one(PromptTextArea)
+        prompt.load_text(f"/{event.name} ")
+        prompt.skill_name = event.name
+        prompt.move_cursor(prompt.document.end)
+        self.action_focus_prompt()
+
+    @on(SlashComplete.Dismissed)
+    def dismiss_skills(self) -> None:
+        self.action_focus_prompt()
+
+    def start_turn(self, text: str, *, skill_name: str | None = None) -> None:
         self.busy = self.query_one(PromptTextArea).busy = True
         self.query_one(Throbber).add_class("-busy")
         self.query_one(StatusLine).update("执行中 · Ctrl+C 停止")
-        self.turn_worker = self.run_turn(text)
+        self.turn_worker = self.run_turn(text, skill_name=skill_name)
 
     @work
-    async def run_turn(self, prompt: str) -> None:
+    async def run_turn(self, prompt: str, *, skill_name: str | None = None) -> None:
         history = self.query_one(MessageHistory)
         view = TurnView(history)
 
@@ -97,11 +132,12 @@ class ChatShell(App):
 
         try:
             try:
-                result = await self.conversation.send(prompt, view.write, on_tool=view.tool_event, on_question=question)
+                skill_args = {"skill_name": skill_name} if skill_name is not None else {}
+                result = await self.conversation.send(prompt, view.write, on_tool=view.tool_event, on_question=question, **skill_args)
                 await view.finish(str(result.output))
                 self.query_one(StatusLine).tooltip = "\n".join(cache_statistics(result))
             except* (
-                AgentRunError, MCPError, httpx.HTTPError, httpx2.HTTPError, OSError, sqlite3.Error,
+                AgentRunError, MCPError, SkillInvocationError, httpx.HTTPError, httpx2.HTTPError, OSError, sqlite3.Error,
                 BrokenResourceError, ClosedResourceError, EndOfStream,
             ) as errors:
                 await history.add("error", error_message(errors))
@@ -135,6 +171,7 @@ class ChatShell(App):
             self.turn_worker.cancel()
 
     def action_focus_prompt(self) -> None:
+        self.query_one(Prompt).remove_class("-show-slash-complete")
         self.query_one(PromptTextArea).focus()
 
     def action_history_up(self) -> None:

@@ -20,7 +20,7 @@
 
 - TUI 必须沿用 Toad 的原始样式、默认 Dracula 主题和对应组件结构，不自定义配色、间距、边框或布局样式。仅摘录本项目使用的 TUI 规则，并在 coder-cli/tui/TOAD-NOTICE.md 记录来源、保留上游许可证。
 - 不引入 Toad 的 ACP、Agent 管理、多会话并行、侧栏、商店、权限系统或其他无关代码；`--sessions` 仅复用会话表格的 TUI 样式，不接入 Toad 会话存储或恢复逻辑；Agent 执行继续使用现有 Pydantic AI Harness。
-- CLI 默认直接进入对话 TUI；`--sessions` 查看本项目已保存会话，支持复制 ID 和按 D 删除选中会话，`--help` 显示参数说明。这些均为 CLI 功能，不给 Agent 增加 slash 指令系统。不提供位置参数 prompt 或单次命令模式。
+- CLI 默认直接进入对话 TUI；`--sessions` 查看本项目已保存会话，支持复制 ID 和按 D 删除选中会话，`--help` 显示参数说明。这些均为 CLI 功能。TUI 允许通过 `/` 选择并主动引用一个 Skill，复用原生 Skills 加载与渲染，不扩展通用 slash 指令系统。不提供位置参数 prompt 或单次命令模式。
 - 会话参数为可选的 `--sessionId`：不传时由 `create_agent` 使用 Pydantic AI 的 `Conversation` 生成会话 ID，并立即保存空会话及工作目录；不需要发送消息。后续运行沿用同一个 `conversation_id`，传入时使用指定 ID。不添加 `--session`、`--sesionId` 等别名。
 - 传入已有 `--sessionId` 时，必须加载该会话最近有快照的顶层运行，保留失败、取消和未完成的进度（包括工具调用和结果），传给 Agent 的 `message_history` 并还原界面；不能只传 ID。未返回结果的工具调用通过 Pydantic AI `repair_messages` 标记为 interrupted，不自动重放；启用 frontier 快照保存请求和执行中的状态。历史读取失败时明确报错，不静默改用空历史。
 

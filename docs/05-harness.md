@@ -388,6 +388,120 @@ coder-cli ──受控连接──> MCP 服务 ──服务自身的网络策略
 参考：[Pydantic AI MCP Client](https://pydantic.dev/docs/ai/mcp/client/)、[Timeouts](https://pydantic.dev/docs/ai/core-concepts/timeouts/)、[OWASP SSRF](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)。
 
 ### 1.6 Skills
+
+Skill 把任务流程封装成说明与资源。工具定义“能做什么”，Skill 定义“何时用、怎样做、怎样判断完成”。
+
+#### Schema：元数据与执行说明
+
+沿用 [Agent Skills 规范](https://agentskills.io/specification)：一个技能目录至少包含 `SKILL.md`，文件由 YAML frontmatter 与 Markdown 正文组成。
+
+```text
+web-download/
+├── SKILL.md              # 触发条件、输入、执行入口、验收条件
+├── scripts/download.py   # 确定性步骤
+└── references/           # 可选：按需读取的细节
+```
+
+```markdown
+---
+name: web-download
+description: 下载网页中指定图片。用于已提供网页 URL 和 CSS 选择器的任务；不用于普通网页阅读或批量爬取。
+---
+
+# 网页图片下载
+
+输入：网页 URL、目标图片 CSS 选择器、工作目录内的输出目录。
+缺少选择器时先询问，不猜测目标图片。
+
+执行：使用本技能 scripts/download.py，按下方命令运行，不另写下载代码。
+验收：仅当返回 status=saved 且目标文件存在、大小与 bytes 一致时报告成功。
+失败：返回 status=failed 时报告 error 并停止，不更换工具重复下载。
+```
+
+| 字段 | 约定 |
+|---|---|
+| `name` | 必填，与目录名一致；1–64 字符，小写字母、数字和连字符；不以连字符开头或结尾，不连续使用连字符 |
+| `description` | 必填，1–1024 字符；写任务、触发条件与排除范围，不堆同义词 |
+| `license`、`compatibility`、`metadata` | 可选，分别描述许可证、环境要求和附加元数据；不代替依赖安装 |
+| Markdown 正文 | 写清输入、执行入口、输出、验收和失败处理；参数校验由脚本或工具负责 |
+
+当前 Harness 不执行 `allowed-tools`、`model`、`hooks` 等行为字段，会提示忽略。不能靠 frontmatter 授权工具、切换模型或自动注册 MCP；权限与运行时能力由应用配置。
+
+#### 少 token、短执行路径、可验证
+
+```mermaid
+flowchart LR
+    A[名称与简短描述] --> B[load_capability]
+    B --> C[正文与技能目录]
+    C --> D[直接调用已有脚本或工具]
+    D --> E[检查结构化结果与产物]
+```
+
+| 目标 | 写法 |
+|---|---|
+| 少 token | description 只用于选技能；正文保留必要步骤；长参考从正文直接链接，按需读取；脚本返回状态、路径、大小或错误，不回传整页 HTML、二进制或完整日志 |
+| 短执行路径 | 给一个明确入口和完整命令；固定步骤放脚本，避免“搜索脚本 → 阅读源码 → 临时重写”；路径以加载时给出的技能目录为基准，不猜安装位置；参考文件不层层跳转 |
+| 可验证 | 定义成功字段与产物检查；失败返回明确原因；MCP 工具可发现不等于调用成功，脚本退出成功不等于产物满足要求 |
+
+以 [web-download](../coder-cli/skills/web-download/SKILL.md) 为例，把 `<技能目录>` 替换为加载时提供的绝对路径，参数安全引用后直接执行：
+
+```bash
+uv run --locked --project "<技能目录>/../.." python "<技能目录>/scripts/download.py" '<网页 URL>' '<CSS 选择器>' --workspace . --output-dir outputs
+```
+
+这里 `../..` 指向本项目的依赖清单；外部技能应声明自己的依赖入口，不能假设安装位置相同。不要省掉输入校验与产物验收来减少调用，也不要自动重试结果未知的有副作用操作。
+
+渐进加载仍有加载交互的开销；所有可见技能的名称和描述也占上下文。比较同一任务的总输入、输出 token、模型请求数与验收结果，不能仅凭 `SKILL.md` 更短就声称成本更低。
+
+#### 常见的坑
+
+| 坑 | 怎样处理 |
+|---|---|
+| 指令模糊 | description 明确触发条件，正文给输入与验收。例如下载任务必须拿到 URL 和选择器；不能只写“帮助下载图片” |
+| 把声明当权限 | Skill 的 `allowed-tools` 被忽略，加载后仍可使用已注册的 Coder 工具。MCP 配置中的 `allowed_tools` 才由应用过滤；只读任务若需强制限制，必须在工具执行层控制，写“不要修改”不构成隔离 |
+| 把输出长度当预算 | Skill 中写 `caps` 或“最多 1000 token”不会设置框架预算。当前 `request_limit=50` 只限制模型请求次数，`timeout=30` 也不限制 token；输出上限与运行累计预算需分别配置 |
+| 静默降级 | 全局目录缺失可以跳过；格式无效的技能会被框架跳过并警告。任务依赖的技能或脚本不可用时，应报告原因，不改用默认流程假装完成，更不能用 `except Exception: pass` 隐藏错误 |
+
+#### 工程接入
+
+在 `agent/runtime.py` 中，沿用已配置的 `model` 和 `workspace`，将技能库加入 capabilities（其余能力省略）：
+
+```python
+from pathlib import Path
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import LocalWorkspace
+from pydantic_ai_harness import Skills
+from pydantic_ai_harness.coder import Coder
+
+agent = Agent(model, capabilities=[
+    LocalWorkspace(workspace), Coder(),
+    Skills(Path(__file__).resolve().parents[1] / "skills"),
+    Skills(
+        Path.home() / ".agents" / "skills",
+        missing_directories="skip", duplicate_names="keep_first",
+    ),
+])
+```
+
+框架合并两份技能库，内置优先，全局同名项跳过并提示。每次 Agent 运行开始时重新发现；模型先看到名称与描述，调用 `load_capability` 后才收到正文和技能目录。资源不自动读取或执行，实际执行仍通过 Coder。全局安装与更新见[项目 README](../coder-cli/README.md#skills)。
+
+MCP 配置路径由 MCP 能力统一提供，Skill 只引用 `mcp_config_path`；新增普通技能不增加专用 instructions。接入机制见 [Pydantic AI Skills](https://pydantic.dev/docs/ai/harness/skills/)。
+
+需要限制消耗时，在运行入口配置，而不是增加 Skill schema 字段。以下为预算示例，数值需按任务校准：
+
+```python
+from pydantic_ai import UsageLimits
+
+result = await agent.run(
+    prompt,
+    model_settings={"timeout": 30, "max_tokens": 1000},
+    usage_limits=UsageLimits(request_limit=10, total_tokens_limit=20_000),
+)
+```
+
+`max_tokens` 限制单次模型回复；`total_tokens_limit` 检查本次运行累计用量，回复返回后仍可能越过阈值，不能当作精确费用上限。见 [Pydantic AI UsageLimits](https://pydantic.dev/docs/ai/api/pydantic-ai/usage/#pydantic_ai.usage.UsageLimits)。
+
+
 --------
 ## 2. 护栏
 ### 2.1 权限

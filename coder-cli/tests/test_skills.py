@@ -5,10 +5,11 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from pydantic_ai.messages import TextPart, ToolCallPart
+from pydantic_ai.messages import TextPart, ToolCallPart, UserPromptPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 
 from agent.runtime import create_agent
+from agent.conversation import SkillInvocationError
 
 
 class SkillsTests(unittest.IsolatedAsyncioTestCase):
@@ -41,11 +42,11 @@ class SkillsTests(unittest.IsolatedAsyncioTestCase):
         self.enterContext(patch("agent.runtime.logfire.instrument_pydantic_ai"))
         self.enterContext(patch("storage.sessions.SESSION_DATABASE", self.root / "state/sessions.db"))
 
-    def write_skill(self, name, description, body):
+    def write_skill(self, name, description, body, frontmatter=""):
         package = self.global_skills / name
         package.mkdir(parents=True, exist_ok=True)
         (package / "SKILL.md").write_text(
-            f"---\nname: {name}\ndescription: {description}\n---\n\n{body}\n", encoding="utf-8",
+            f"---\nname: {name}\ndescription: {description}\n{frontmatter}---\n\n{body}\n", encoding="utf-8",
         )
 
     async def test_missing_global_library_then_install_and_update_between_runs(self):
@@ -81,3 +82,39 @@ class SkillsTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("GLOBAL_DUPLICATE_DESCRIPTION", self.observed[0])
         self.assertNotIn("GLOBAL_DUPLICATE_BODY", self.observed[-1])
         self.assertIn("## 合并与验证", self.observed[-1])
+
+    async def test_explicit_invocation_renders_latest_body_and_persists_it(self):
+        self.write_skill("explicit", "Explicit skill", "OLD_BODY", "disable-model-invocation: true\n")
+        conversation = await create_agent(path=str(self.workspace))
+        catalog = await conversation.skill_catalog()
+        skill = next(skill for skill in catalog.skills if skill.name == "explicit")
+        self.assertTrue(skill.user_invocable)
+        self.assertFalse(skill.model_invocable)
+        self.write_skill("explicit", "Explicit skill", "NEW_BODY: $ARGUMENTS", "disable-model-invocation: true\n")
+        self.replies = iter([TextPart("done")])
+        await conversation.send("target.txt", skill_name="explicit")
+        self.assertEqual(len(self.observed), 1)
+        self.assertIn("NEW_BODY: target.txt", self.observed[0])
+        self.assertNotIn("OLD_BODY", self.observed[0])
+        self.assertIn(str(self.global_skills / "explicit"), self.observed[0])
+        resumed = await create_agent(conversation.session_id)
+        prompts = [part.content for message in resumed.history for part in message.parts if isinstance(part, UserPromptPart)]
+        self.assertTrue(any("NEW_BODY: target.txt" in prompt for prompt in prompts))
+
+    async def test_explicit_invocation_checks_permissions_and_missing_skills(self):
+        self.write_skill("hidden", "Hidden skill", "hidden body", "user-invocable: false\n")
+        self.write_skill("removed", "Removed skill", "removed body")
+        conversation = await create_agent(path=str(self.workspace))
+        await conversation.skill_catalog()
+        (self.global_skills / "removed" / "SKILL.md").unlink()
+        for name, error in (("hidden", "不允许主动调用"), ("removed", "技能不可用"), ("unknown", "技能不可用")):
+            with self.subTest(name=name), self.assertRaisesRegex(SkillInvocationError, error):
+                await conversation.send("task", skill_name=name)
+        self.assertFalse(self.observed)
+        self.replies = iter([TextPart("builtin")])
+        self.write_skill("mcp-config", "Duplicate", "WRONG_BODY")
+        with self.assertWarns(UserWarning):
+            await conversation.send("configure docs", skill_name="mcp-config")
+        self.assertIn("## 合并与验证", self.observed[-1])
+        self.assertIn("ARGUMENTS: configure docs", self.observed[-1])
+        self.assertNotIn("WRONG_BODY", self.observed[-1])

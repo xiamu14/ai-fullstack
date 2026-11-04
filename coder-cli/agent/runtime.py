@@ -49,6 +49,13 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     project = ProjectContext(workspace, database.parent / "project-context")
     await project.refresh()
     mcp = MCPRegistry()
+    skills = Skills.combine([
+        Skills(Path(__file__).resolve().parents[1] / "skills"),
+        Skills(
+            Path.home() / ".agents" / "skills",
+            missing_directories="skip", duplicate_names="keep_first",
+        ),
+    ])
     interaction = Interaction()
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
@@ -61,11 +68,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         capabilities=[
             AskUser(answerer=interaction.ask),
             LocalWorkspace(workspace), Coder(),
-            Skills(str(Path(__file__).resolve().parents[1] / "skills")),
-            Skills(
-                Path.home() / ".agents" / "skills",
-                missing_directories="skip", duplicate_names="keep_first",
-            ),
+            skills,
             mcp,
             StepPersistence(store=store, metadata={"workspace": str(workspace)}, capture_frontier=True),
             ConversationSearch(SnapshotHistorySource(store), scope="conversation", max_matches=3),
@@ -83,6 +86,6 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         session_id = NativeConversation().conversation_id
     await save_session(database, session_id, workspace)
     return Conversation(
-        agent, session_id, history=history, workspace=workspace, mcp=mcp, interaction=interaction,
+        agent, session_id, history=history, workspace=workspace, mcp=mcp, skills=skills, interaction=interaction,
         history_loader=partial(load_session_history, database),
     )
