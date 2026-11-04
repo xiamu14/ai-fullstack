@@ -110,6 +110,10 @@ Logfire 终端输出已关闭，避免干扰 TUI。设置 `.env` 中的 `LOGFIRE
 
 底部信息栏显示会话 ID，执行时显示忙碌状态；悬停可查看本轮逐请求和累计缓存统计。读取量大于 0 表示服务商报告命中，写入量不代表命中；读写已包含在输入 token 内，0 也可能是兼容接口没有返回统计。费用仅在模型定价可识别时显示，以服务商账单为准。
 
+右侧 `Context ◑ 50%` 显示上下文窗口已用比例，圆形字符按占用变化。使用 Pydantic AI 原生 `context_window_used`，以最近一次响应的输入（含缓存）与输出 token 除以模型窗口容量；执行中定期刷新，恢复会话时也从已有响应读取。这是下次请求占用的估计，新增工具结果与上下文压缩会改变实际大小，不是整轮累计 token。窗口容量由模型 profile 与框架模型数据解析；容量或用量未知时显示 `--%`，不假定为 0%。
+
+部署的模型窗口容量在程序目录的 `provider.json` 管理，`models` 的键必须与 `.env` 的 `MODEL_NAME` 完全一致。当前 `GLM-5.3-Flash-Event` 配置为 `1,048,576` token。启动时读取为 Pydantic AI 原生 `profile.context_window`，覆盖框架自动解析值；未配置的模型继续使用框架数据，配置损坏或容量不是正整数则明确报错。修改后重启生效。
+
 ## 外部 MCP
 
 可直接要求 Agent 配置 MCP；它会按需加载内置 [mcp-config Skill](skills/mcp-config/SKILL.md)，使用 MCP 能力统一提供的有效配置路径。
@@ -117,6 +121,8 @@ Logfire 终端输出已关闭，避免干扰 TUI。设置 `.env` 中的 `LOGFIRE
 ## Skills
 
 使用 Pydantic AI 原生 `Skills` 加载内置 `skills/` 和用户全局 `~/.agents/skills/`。内置技能优先；全局同名技能会被跳过并提示。全局目录不存在时不影响启动。
+
+`web-download` 是全局外部技能，不随 coder-cli 分发。其脚本通过 `uv run --script` 使用独立依赖，并且只连接本机 Lightpanda；Lightpanda 缺失、检查失败或连接失败时退出，不回退到 Chromium。
 
 外部技能可使用 [Skills CLI](https://github.com/vercel-labs/skills) 安装和更新：
 

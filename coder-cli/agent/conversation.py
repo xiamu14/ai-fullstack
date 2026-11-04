@@ -4,7 +4,9 @@ from contextlib import AsyncExitStack
 from copy import deepcopy
 from pathlib import Path
 
-from pydantic_ai import Agent, UsageLimits
+from pydantic_ai import Agent, RunContext, UsageLimits
+from pydantic_ai.models import AbstractModel
+from pydantic_ai.usage import RunUsage
 from pydantic_ai.workspaces import LocalWorkspaceBackend
 from pydantic_ai_harness import Skills
 from pydantic_ai_harness.skills import SkillCatalog
@@ -48,6 +50,17 @@ class Conversation:
 
     def feedback(self, text: str) -> bool:
         return self.interaction.feedback(text)
+
+    @property
+    def context_window_used(self) -> float | None:
+        if self.interaction.context is not None:
+            return self.interaction.context.context_window_used
+        model = self.agent.model
+        if not isinstance(model, AbstractModel):
+            return None
+        return RunContext(
+            deps=None, model=model, usage=RunUsage(), messages=self.history,
+        ).context_window_used
 
     async def skill_catalog(self) -> SkillCatalog:
         if self.skills is None:

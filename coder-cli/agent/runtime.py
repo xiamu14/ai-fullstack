@@ -26,6 +26,7 @@ from agent.conversation import Conversation
 from agent.interaction import Interaction
 from context.project import ProjectContext
 from integrations.mcp import MCPRegistry
+from integrations.provider import model_profile
 from storage.sessions import (
     load_session_history,
     save_session,
@@ -59,6 +60,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     interaction = Interaction()
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
+        profile=model_profile(os.environ["MODEL_NAME"]),
         provider=OpenAIProvider(
             base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"]
         ),

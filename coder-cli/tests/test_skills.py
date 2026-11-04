@@ -58,7 +58,7 @@ class SkillsTests(unittest.IsolatedAsyncioTestCase):
         conversation = await create_agent(path=str(self.workspace))
         await conversation.send("检查可用技能")
         self.assertNotIn("GLOBAL_PROBE_DESCRIPTION", self.observed[-1])
-        self.assertIn("web-download", self.observed[-1])
+        self.assertIn("mcp-config", self.observed[-1])
         self.assertIn(str(self.root / "mcp.json"), self.observed[-1])
 
         self.write_skill("global-probe", "GLOBAL_PROBE_DESCRIPTION", "GLOBAL_BODY_V1")

@@ -144,7 +144,7 @@ uv add playwright
 uv run playwright install chromium
 ```
 
-在 `tools/image_download.py` 定义 `image_download(workspace)`，把 `web_fetch` 和新的 `download_image` 放入同一个 capability。`download_image` 一次完成打开网页、等待目标图片、下载和保存，只返回状态、来源和路径。当前脚本实现见 [download.py](../coder-cli/skills/web-download/scripts/download.py)。
+在 `tools/image_download.py` 定义 `image_download(workspace)`，把 `web_fetch` 和新的 `download_image` 放入同一个 capability。`download_image` 一次完成打开网页、等待目标图片、下载和保存，只返回状态、来源和路径。以下以 Chromium 演示工具封装；后面的外部 Skill 示例使用 Lightpanda。
 
 ```python
 import asyncio
@@ -375,15 +375,15 @@ weather_guard = ToolGuardrail(guard=weather_only)
 
 ### 3.4 Skills 复用技能
 
-把前面的网页图片下载流程改为 `web-download` Skill，不再常驻注册 `download_image` 工具。
+把前面的网页图片下载流程改为用户全局技能库中的 `web-download` Skill，不再常驻注册 `download_image` 工具。
 
 ```text
-coder-cli/skills/web-download/
+~/.agents/skills/web-download/
 ├── SKILL.md
 └── scripts/download.py
 ```
 
-`SKILL.md` 写明何时使用、如何运行脚本和处理结果；脚本保留原有渲染、下载、超时和保存路径检查。完整文件见 [SKILL.md](../coder-cli/skills/web-download/SKILL.md) 和 [download.py](../coder-cli/skills/web-download/scripts/download.py)。
+`SKILL.md` 写明何时使用、如何运行脚本和处理结果；脚本保留 JavaScript 执行、下载、超时和保存路径检查。此例使用本机 Lightpanda，通过 Playwright CDP 客户端连接；使用前检查可用性，失败立即退出，不回退到其他浏览器。脚本用内联依赖声明独立运行，不依赖 coder-cli 的目录位置。
 
 安装并接入：
 
@@ -399,7 +399,7 @@ agent = Agent(
     model,
     capabilities=[
         LocalWorkspace(workspace), Coder(),
-        Skills(str(Path(__file__).resolve().parent / "skills")), weather,
+        Skills(Path.home() / ".agents" / "skills", missing_directories="skip"), weather,
     ],
     tools=[web_fetch],
     # 保留原有 instructions。

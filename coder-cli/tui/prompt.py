@@ -100,7 +100,14 @@ class StatusLine(Label):
 
 
 class ModeInfo(Label):
-    pass
+    def show_context(self, fraction: float | None) -> None:
+        if fraction is None:
+            self.update("Context ○ --%")
+            self.tooltip = "上下文窗口或 token 用量未知；首次模型响应后更新。"
+            return
+        ring = "○◔◑◕●"[min(4, max(0, int(fraction * 4 + 0.5)))]
+        self.update(f"Context {ring} {fraction:.0%}")
+        self.tooltip = "最近一次模型响应的输入（含缓存）与输出 token ÷ 模型窗口容量；是下次请求占用的估计，非累计费用。"
 
 
 class Prompt(VerticalGroup):
@@ -120,5 +127,5 @@ class Prompt(VerticalGroup):
             display_path = "~" if self.workspace == home else f"~/{self.workspace.relative_to(home)}" if self.workspace.is_relative_to(home) else str(self.workspace)
             yield CondensedPath(display_path, markup=False)
             yield StatusLine(self.session_id or "新会话", id="session", markup=False)
-            yield ModeInfo("Default")
+            yield ModeInfo("Context ○ --%", markup=False)
         yield SlashComplete()

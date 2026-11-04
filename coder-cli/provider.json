@@ -1,0 +1,7 @@
+{
+  "models": {
+    "GLM-5.3-Flash-Event": {
+      "context_window": 1048576
+    }
+  }
+}

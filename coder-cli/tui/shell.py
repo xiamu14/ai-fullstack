@@ -16,7 +16,7 @@ from textual.worker import WorkerCancelled
 from agent.conversation import Conversation, SkillInvocationError, cache_statistics, error_message
 from tui.messages import Conversation as ConversationView
 from tui.messages import MessageHistory
-from tui.prompt import Prompt, PromptTextArea, StatusLine
+from tui.prompt import ModeInfo, Prompt, PromptTextArea, StatusLine
 from tui.skills import SlashComplete
 from tui.throbber import Throbber
 from tui.turn import TurnView, restore_messages
@@ -59,9 +59,15 @@ class ChatShell(App):
         prompt = self.query_one(PromptTextArea)
         prompt.disabled = True
         await restore_messages(self.query_one(MessageHistory), self.conversation.history)
+        self.update_context()
+        self.set_interval(0.5, self.update_context)
         self.busy = False
         prompt.disabled = False
         prompt.focus()
+
+    def update_context(self) -> None:
+        for label in self.query(ModeInfo):
+            label.show_context(getattr(self.conversation, "context_window_used", None))
 
     @on(PromptTextArea.Submitted)
     async def submitted(self, event: PromptTextArea.Submitted) -> None:
@@ -148,6 +154,7 @@ class ChatShell(App):
         finally:
             await view.close()
             if self.is_running:
+                self.update_context()
                 self.query_one(StatusLine).update(self.conversation.session_id or "新会话")
                 self.busy = self.query_one(PromptTextArea).busy = False
                 self.query_one(Throbber).remove_class("-busy")
