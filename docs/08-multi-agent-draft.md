@@ -1,6 +1,6 @@
 # Multi-Agent 与 Sub-Agent：设计草稿
 
-本章先记录方案，在 [Evaluation](./06-evaluation.md) 与 [Benchmark](./07-benchmark.md) 完成后，按实验结果选择实现。示例展示原生接口，不代表 coder-cli 已启用这些能力；决策模式见 [Ultra Harness](./09-ultra-harness.md)。
+本章先记录方案，在 [Evaluation](./06-evaluation.md) 与 [Benchmark](./07-benchmark.md) 完成后，按实验结果选择实现。示例展示原生接口，不代表 coder-cli 已启用这些能力；决策模式见 [Harness：决策模式](./05-harness.md#3-决策模式)。
 
 ## 1. 区分三个维度
 
