@@ -627,11 +627,8 @@ approval_key = (run_id, tool_call_id)
 
 配置与平台边界见[项目 README：工具权限](../coder-cli/README.md#工具权限)。
 
-### 2.2 Token 预算
-
-### 2.3 上下文隔离
+### 2.2 上下文隔离
 sessions 并行
-
 
 ## 3. 决策模式
 Planning 模式
@@ -639,7 +636,9 @@ Reflection 模式
 Chain-of-Thought
 
 ## 4. Multi-Agent
-
-## 5. Long-term Agent
+减少 Token 消耗（将不同任务交付不同模型，且不同 agent 专注不同任务），提高速度；需要 router 设计（参考 Amp）。
+## 5. Sub-Agent
+降低 context window 长度（防止 context 腐败），难点是交付和反馈，并行和串行的运行流；重点在上下文隔离
+## 6. Long-term Agent
 Dsh Super Agent
 > [dsh-superagent-prototype](https://github.com/deepseek-ai/dsh-superagent-prototype/tree/main)
