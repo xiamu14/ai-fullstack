@@ -2,7 +2,6 @@ import asyncio
 import json
 import os
 from pathlib import Path
-import shlex
 import socket
 import subprocess
 import sys
@@ -18,7 +17,7 @@ from agent.runtime import create_agent
 
 
 class MCPSkillTests(unittest.IsolatedAsyncioTestCase):
-    async def test_skill_shell_configuration_and_same_run_mcp_discovery(self):
+    async def test_skill_file_configuration_and_same_run_mcp_discovery(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             workspace = root / 'unrelated-project'
@@ -53,18 +52,6 @@ mcp.run(transport="streamable-http", host="127.0.0.1", port=''' + str(port) + ')
                 else:
                     self.fail('test MCP did not start')
                 endpoint = f'http://127.0.0.1:{port}'
-                edit = f'''import json,os,tempfile
-from pathlib import Path
-path=Path({str(config)!r})
-data=json.loads(path.read_text())
-data['mcpServers']['demo']={{'url':{endpoint + '/mcp'!r},'allowed_tools':['echo']}}
-for key in ['allowed_origins','allow_private_origins']:
-    data['network'].setdefault(key,[]).append({endpoint!r})
-fd,tmp=tempfile.mkstemp(dir=path.parent)
-with os.fdopen(fd,'w') as target:
-    json.dump(data,target)
-os.replace(tmp,path)
-'''
                 requests = []
                 def respond(request):
                     payload = json.loads(request.content)
@@ -86,9 +73,13 @@ os.replace(tmp,path)
                     elif index == 3:
                         self.assertIn('已授权', text)
                         self.assertIn('os.replace', text)
-                        call = ('shell', {'command': shlex.join([sys.executable, '-c', edit])})
+                        data = json.loads(config.read_text())
+                        data['mcpServers']['demo'] = {'url': endpoint + '/mcp', 'allowed_tools': ['echo']}
+                        for key in ('allowed_origins', 'allow_private_origins'):
+                            data['network'].setdefault(key, []).append(endpoint)
+                        call = ('write_file', {'path': str(config), 'content': json.dumps(data)})
                     elif index == 4:
-                        self.assertIn('search_tools', names)
+                        self.assertIn('search_tools', names, str(payload.get('messages'))[-2500:])
                         self.assertNotIn('demo_echo', names)
                         call = ('search_tools', {'queries': ['echo']})
                     elif index == 5:
@@ -131,8 +122,11 @@ os.replace(tmp,path)
                          patch('storage.sessions.SESSION_DATABASE', root / 'state/sessions.db'):
                         conversation = await create_agent(path=str(workspace))
                         async def answer(question):
-                            self.assertIn('请完成授权后反馈', question)
-                            self.assertTrue(conversation.feedback('已授权'))
+                            if '工具审批' in question:
+                                self.assertTrue(conversation.feedback('本次允许'))
+                            else:
+                                self.assertIn('请完成授权后反馈', question)
+                                self.assertTrue(conversation.feedback('已授权'))
                         result = await conversation.send('配置并验证 demo MCP，允许调用 echo。', on_question=answer)
                 self.assertEqual(result.output, 'Configured')
                 self.assertEqual(len(requests), 6)

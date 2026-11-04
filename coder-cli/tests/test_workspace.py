@@ -87,7 +87,9 @@ class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
                     shell = ChatShell(resumed)
                     async with shell.run_test():
                         self.assertEqual(shell.query_one(CondensedPath).content, str(project))
-                    await resumed.send('读取证据并确认目录')
+                    async def approve(question):
+                        resumed.feedback('本次允许')
+                    await resumed.send('读取证据并确认目录', on_question=approve)
                     await create_agent(first.session_id, str(elsewhere))
                     await create_agent(first.session_id, 'missing')
                     await create_agent(first.session_id, '')

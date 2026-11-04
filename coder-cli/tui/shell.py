@@ -14,6 +14,7 @@ from textual.widgets import Footer
 from textual.worker import WorkerCancelled
 
 from agent.conversation import Conversation, SkillInvocationError, cache_statistics, error_message
+from agent.permissions.config import PermissionConfigError
 from tui.messages import Conversation as ConversationView
 from tui.messages import MessageHistory
 from tui.prompt import ModeInfo, Prompt, PromptTextArea, StatusLine
@@ -143,7 +144,7 @@ class ChatShell(App):
                 await view.finish(str(result.output))
                 self.query_one(StatusLine).tooltip = "\n".join(cache_statistics(result))
             except* (
-                AgentRunError, MCPError, SkillInvocationError, httpx.HTTPError, httpx2.HTTPError, OSError, sqlite3.Error,
+                AgentRunError, MCPError, SkillInvocationError, PermissionConfigError, httpx.HTTPError, httpx2.HTTPError, OSError, sqlite3.Error,
                 BrokenResourceError, ClosedResourceError, EndOfStream,
             ) as errors:
                 await history.add("error", error_message(errors))

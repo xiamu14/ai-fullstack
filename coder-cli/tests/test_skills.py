@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from pydantic_ai.messages import TextPart, ToolCallPart, UserPromptPart
+from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, UserPromptPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 
 from agent.runtime import create_agent
@@ -22,9 +22,12 @@ class SkillsTests(unittest.IsolatedAsyncioTestCase):
         self.observed = []
         self.replies = iter(())
 
-        async def model(messages, info):
+        def respond(messages, info):
             self.observed.append(str(messages))
-            part = next(self.replies)
+            return ModelResponse(parts=[next(self.replies)])
+
+        async def model(messages, info):
+            part = respond(messages, info).parts[0]
             if isinstance(part, TextPart):
                 yield part.content
             else:
@@ -37,7 +40,7 @@ class SkillsTests(unittest.IsolatedAsyncioTestCase):
         (self.root / "mcp.json").write_text('{"mcpServers": {}}')
         self.enterContext(patch("agent.runtime.load_dotenv"))
         self.enterContext(patch("agent.runtime.Path.home", return_value=self.home))
-        self.enterContext(patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(stream_function=model)))
+        self.enterContext(patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(respond, stream_function=model)))
         self.enterContext(patch("agent.runtime.logfire.configure"))
         self.enterContext(patch("agent.runtime.logfire.instrument_pydantic_ai"))
         self.enterContext(patch("storage.sessions.SESSION_DATABASE", self.root / "state/sessions.db"))

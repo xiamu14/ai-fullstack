@@ -86,6 +86,7 @@ class MCPRegistry(AbstractCapability):
 
     def __init__(self, path: Path | None = None) -> None:
         self.path = (path or Path(os.getenv("CODER_MCP_CONFIG", "~/.config/coder-cli/mcp.json"))).expanduser().resolve()
+        self.authorize_stdio = None
 
     def get_instructions(self) -> str:
         return json.dumps({"mcp_config_path": str(self.path)}, ensure_ascii=False)
@@ -159,11 +160,15 @@ class MCPRegistry(AbstractCapability):
                 cwd = (self.path.parent / cwd).resolve()
                 if not cwd.is_dir():
                     raise MCPConfigError("stdio MCP 的 cwd 不是有效目录")
+                command, args = os.path.expanduser(server.command), server.args
+                execution_env = {}
+                if self.authorize_stdio is not None:
+                    command, args, execution_env = await self.authorize_stdio(name, server, cwd, stack)
                 # The framework owns process teardown; stderr must not corrupt the TUI.
                 stderr = stack.enter_context(tempfile.TemporaryFile(mode="w+", encoding="utf-8"))
                 transport = StdioTransport(
-                    command=os.path.expanduser(server.command), args=server.args,
-                    env={key: expand_env(value) for key, value in server.env.items()},
+                    command=command, args=args,
+                    env={**execution_env, **{key: expand_env(value) for key, value in server.env.items()}},
                     cwd=str(cwd), keep_alive=False, log_file=stderr,
                 )
             toolset: AbstractToolset = MCPConnection(

@@ -61,7 +61,31 @@ main.py 运行时只输出 hello world。读取 main.py，再运行它确认结�
 
 界面沿用 [Toad](https://github.com/batrachianai/toad/tree/main/src/toad) 的原始 Dracula 主题与 TUI 样式，保留输入、滚动消息、Markdown、工具结果和底部信息栏所需结构；不自定义配色、边框或间距。未引入 ACP、多会话、侧栏或独立 shell 执行器。样式来源与上游 AGPL-3.0 许可证见 [TOAD-NOTICE.md](tui/TOAD-NOTICE.md)。代码分层与多轮流程见 [第五章](../docs/05-harness.md)。
 
-`LocalWorkspace` 不是沙箱，Coder 能修改文件和执行本机命令，只用于可信的本地练习。停止、失败或退出不会回滚已经执行的工具操作。
+当前使用原生 `LocalWorkspace` 的受限后端：文件工具检查实际路径，macOS 的 shell 与本地 MCP 子进程经过 `sandbox-exec`。这仍是本地开发工具，不是容器或虚拟机；停止、失败或退出不会回滚已经执行的工具操作。
+
+## 工具权限
+
+Harness 已升级至 0.65.0，Pydantic AI 为 2.65.0。工具统一经过原生 `Permissions` 扩展与 `HandleDeferredToolCalls`，审批复用现有问答交互；模型是否主动调用 `ask_user_question` 不影响审批门禁。
+
+| 判定 | 默认行为 |
+|---|---|
+| 权限配置、运行存储、`~/.ssh`、`~/.aws` | 拒绝，普通批准不能覆盖 |
+| 项目普通文件、已安装技能包的只读资源 | 允许；真实路径仍需通过边界检查 |
+| `.env*`、`.git`、密钥文件、目录外文件 | 逐次询问；目录外文件用文件工具精确授权 |
+| shell、MCP 调用和未分类工具 | 默认询问；命中明确放行规则才自动执行 |
+| 本地 stdio MCP | 工具发现前先询问，再启动隔离进程；服务工具调用另行判定 |
+
+审批显示完整参数和工作目录，凭据脱敏；“本次允许”才批准，自由文本、拒绝、5 分钟无回答或没有交互回调均不批准。Ctrl+C 取消等待并清理未执行的批准。工具串行执行；批准后重新检查参数、实际目标状态、权限配置和 MCP 配置，变化则拒绝旧批准。失败或重启恢复时只修复未完成调用，不复用旧批准、不自动重放；需要重新发起调用并批准。
+
+权限配置默认读取 `~/.config/coder-cli/permissions.json`，不存在时使用上述默认规则；也可在启动前设置 `CODER_PERMISSION_CONFIG`。配置只从用户指定位置读取，不加载项目内权限文件。参照 [permissions.example.json](permissions.example.json) 手动配置；配置损坏、超限或包含未知字段时明确报错。
+
+规则字段为 `tool`、`pattern`、`action`（`deny / ask / allow`），工具名与资源使用 glob 匹配；文件资源是规范化绝对路径，shell 资源是完整命令，其他工具默认使用工具名。可用 `argument` 指定外部工具参数，例如 `{"tool":"docs_search","argument":"query","pattern":"public:*","action":"allow"}`。优先级固定为硬限制 → deny → 受保护路径 → ask → 模式与 allow → 默认询问，不受数组排列影响。`auto` 放行普通项目文件；`read-only` 额外询问写入和所有命令；`full` 取消普通调用询问，但不覆盖硬拒绝与受保护资源。
+
+只有可信配置中的 `ask` 规则显式设置 `remember: true` 时，适合的外部调用才提供“本会话允许相同调用”。记忆绑定会话、工作目录、工具、完整参数与配置版本，只保留在进程内；shell、写入与受保护资源不提供记忆。审批记录追加到会话数据库旁的 `permissions.jsonl`，包含原生会话/运行/工具调用 ID、时间、原因与调用指纹，不记录参数正文；执行结果由原生运行记录追踪。
+
+默认 `sandbox: true`，目前实现并验证 macOS 后端；缺少 `sandbox-exec` 或启动失败时不退回无限制执行。子进程只能写工作目录和私有临时目录，只读必要系统运行库和技能资源；无法直接读写权限配置、凭据目录或 `.env`。普通 shell 不能直接改 `.git`，以 `git` 启动的已允许命令可更新当前项目的 Git 元数据。批准的 shell/MCP 启动可使用 TCP 网络，Unix socket 连接仍禁止；HTTP MCP 的 origin、DNS 和云元数据检查继续独立执行，并不覆盖已批准命令的全部 TCP 目的地。其他平台应接入适用的隔离后端；可信用户可手动设 `sandbox: false` 关闭子进程隔离，关闭后不可将审批宣称为沙箱。
+
+当前关闭 Coder 的任务委派，避免出现未接入同一审批交互的子运行；保留已有 Pydantic AI 执行框架。升级不删除或迁移会话数据库，已验证旧版快照在新版继续运行；回退依赖需同时恢复 `pyproject.toml` 与 `uv.lock`。
 
 ## 代码结构
 

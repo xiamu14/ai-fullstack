@@ -32,7 +32,9 @@ configure_logfire = logfire.configure
 def run_agent(prompt, session="test"):
     async def run():
         conversation = await create_agent(session)
-        return await conversation.send(prompt)
+        async def approve(question):
+            conversation.feedback('本次允许')
+        return await conversation.send(prompt, on_question=approve)
 
     result = asyncio.run(run())
     print(result.output)

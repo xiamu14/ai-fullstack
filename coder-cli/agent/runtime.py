@@ -5,7 +5,7 @@ from pathlib import Path
 import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
-from pydantic_ai.capabilities import LocalWorkspace
+from pydantic_ai.capabilities import HandleDeferredToolCalls
 from pydantic_ai.conversation import Conversation as NativeConversation
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -24,6 +24,8 @@ from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 from agent.conversation import Conversation
 from agent.interaction import Interaction
+from agent.permissions.policy import ExecutionPermissions
+from agent.permissions.workspace import RestrictedWorkspace
 from context.project import ProjectContext
 from integrations.mcp import MCPRegistry
 from integrations.provider import model_profile
@@ -58,6 +60,8 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         ),
     ])
     interaction = Interaction()
+    permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
+    mcp.authorize_stdio = permissions.authorize_stdio
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
         profile=model_profile(os.environ["MODEL_NAME"]),
@@ -69,7 +73,10 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         model,
         capabilities=[
             AskUser(answerer=interaction.ask),
-            LocalWorkspace(workspace), Coder(),
+            RestrictedWorkspace(workspace, permissions),
+            Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
+            permissions,
+            HandleDeferredToolCalls(handler=permissions.handle),
             skills,
             mcp,
             StepPersistence(store=store, metadata={"workspace": str(workspace)}, capture_frontier=True),

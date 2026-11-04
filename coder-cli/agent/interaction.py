@@ -5,7 +5,7 @@ from collections.abc import Awaitable, Callable
 
 from pydantic_ai import ModelRetry, RunContext
 from pydantic_ai.capabilities import AbstractCapability
-from pydantic_ai_harness.ask_user import AskUserAnswer, AskUserRequest, AskUserResponse, Question, check_response
+from pydantic_ai_harness.ask_user import AskUserAnswer, AskUserRequest, AskUserResponse, Question, QuestionOption, check_response
 
 
 class Interaction(AbstractCapability):
@@ -79,21 +79,42 @@ class Interaction(AbstractCapability):
         return True
 
     async def ask(self, request: AskUserRequest) -> AskUserResponse:
+        async with self.lock:
+            return await self._ask(request)
+
+    async def _ask(self, request: AskUserRequest, prefix: str = "") -> AskUserResponse:
         if self.on_question is None:
             raise RuntimeError('当前外壳未提供用户提问回调')
-        async with self.lock:
-            answers = []
-            for question in request.questions:
-                future = asyncio.get_running_loop().create_future()
-                self.waiting = (question, future)
-                options = '\n'.join(f'{i}. {option.label}' + (f'：{option.description}' if option.description else '')
-                                    for i, option in enumerate(question.options, 1))
-                try:
-                    await self.on_question(f'**{question.header}**\n\n{question.question}\n\n{options}\n\n输入选项编号、名称或直接回答。')
-                    answers.append(await future)
-                finally:
-                    self.waiting = None
-            return AskUserResponse(answers=tuple(answers))
+        answers = []
+        for question in request.questions:
+            future = asyncio.get_running_loop().create_future()
+            self.waiting = (question, future)
+            options = '\n'.join(f'{i}. {option.label}' + (f'：{option.description}' if option.description else '')
+                                for i, option in enumerate(question.options, 1))
+            try:
+                await self.on_question(f'{prefix}\n\n**{question.header}**\n\n{question.question}\n\n{options}\n\n输入选项编号、名称或直接回答。')
+                answers.append(await future)
+            finally:
+                self.waiting = None
+        return AskUserResponse(answers=tuple(answers))
+
+    async def approve(self, details: str, *, rememberable: bool) -> tuple[bool, bool]:
+        if self.on_question is None:
+            return False, False
+        labels = ["本次允许", "拒绝"]
+        if rememberable:
+            labels.append("本会话允许相同调用")
+        question = Question(header="工具审批", question="是否允许以上完整调用？只有选择允许才会执行。",
+                            options=tuple(QuestionOption(label=label) for label in labels))
+        try:
+            async with asyncio.timeout(300), self.lock:
+                response = await self._ask(AskUserRequest(questions=(question,)), prefix=details)
+        except TimeoutError:
+            return False, False
+        if response.cancelled or not response.answers:
+            return False, False
+        selected = response.answers[0].selected
+        return selected in ((labels[0],), ("本会话允许相同调用",)), selected == ("本会话允许相同调用",)
 
     def close(self) -> None:
         self.active = False
