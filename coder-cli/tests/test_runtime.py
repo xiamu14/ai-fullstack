@@ -19,10 +19,10 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
-from pydantic_ai.capabilities import MCP
 from pydantic_ai.usage import RequestUsage, RunUsage
 
 from agent.runtime import create_agent
+from integrations.mcp import Config
 from agent.conversation import cache_statistics
 import asyncio
 
@@ -61,7 +61,15 @@ class CoderTests(unittest.TestCase):
                 time.sleep(0.05)
         else:
             raise RuntimeError("天气 HTTP 服务启动超时")
-        override = patch("agent.runtime.MCP", side_effect=lambda url, **kwargs: MCP(f"http://127.0.0.1:{port}/mcp", **kwargs))
+        directory = TemporaryDirectory()
+        cls.addClassCleanup(directory.cleanup)
+        config = Path(directory.name) / "mcp.json"
+        config.write_text(json.dumps({
+            "mcpServers": {"weather": {"url": f"http://127.0.0.1:{port}/mcp", "defer_loading": False}},
+            "network": {"allowed_origins": [f"http://127.0.0.1:{port}"],
+                        "allow_private_origins": [f"http://127.0.0.1:{port}"]},
+        }))
+        override = patch.dict(os.environ, {"CODER_MCP_CONFIG": str(config)})
         override.start()
         cls.addClassCleanup(override.stop)
 
@@ -181,12 +189,12 @@ class CoderTests(unittest.TestCase):
             probe = '''
 import logfire
 from unittest.mock import patch
-from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from agent.runtime import create_agent
 from agent.conversation import cache_statistics
 from pathlib import Path
+from integrations.mcp import Config
 from storage import sessions
 import asyncio
 
@@ -211,7 +219,7 @@ async def stream_model(messages, info):
         yield {0: DeltaToolCall(name=part.tool_name, json_args=json.dumps(part.args))}
 
 configure = logfire.configure
-with patch("agent.runtime.load_dotenv"), patch("agent.runtime.MCP", return_value=Capability()), \\
+with patch("agent.runtime.load_dotenv"), patch("integrations.mcp.MCPRegistry.read", return_value=Config()), \\
      patch("agent.runtime.logfire.configure", side_effect=lambda **kwargs: configure(send_to_logfire=False, console=False)), \\
      patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)):
     async def run():

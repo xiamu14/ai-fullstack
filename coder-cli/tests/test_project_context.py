@@ -8,11 +8,11 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 
 from agent.runtime import create_agent
+from integrations.mcp import Config
 from context.project import MAX_CONTEXT_CHARS, ProjectContext
 from context.sources import summarize
 
@@ -240,7 +240,7 @@ class PromptRuntimeTests(unittest.IsolatedAsyncioTestCase):
             env = {'MODEL_NAME': 'test', 'OPENAI_BASE_URL': 'https://example.invalid/v1', 'OPENAI_API_KEY': 'test-key'}
             with patch.dict(os.environ, env), patch('agent.runtime.load_dotenv'), \
                  patch('agent.runtime.OpenAIChatModel', return_value=FunctionModel(stream_function=stream_model)), \
-                 patch('agent.runtime.MCP', return_value=Capability()), \
+                 patch('integrations.mcp.MCPRegistry.read', return_value=Config()), \
                  patch('agent.runtime.logfire.configure'), patch('agent.runtime.logfire.instrument_pydantic_ai'), \
                  patch('storage.sessions.SESSION_DATABASE', Path(directory).resolve() / 'state/sessions.db'):
                 conversation = await create_agent(path=str(root))

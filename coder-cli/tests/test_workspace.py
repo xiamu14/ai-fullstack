@@ -6,12 +6,12 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai_harness.step_persistence import RunRecord, SqliteStepStore
 
 from agent.runtime import create_agent
+from integrations.mcp import Config
 from main import main
 from storage.sessions import session_workspace
 from tui.prompt import CondensedPath
@@ -63,7 +63,7 @@ class WorkspaceTests(unittest.IsolatedAsyncioTestCase):
             env = {'MODEL_NAME': 'test', 'OPENAI_BASE_URL': 'https://example.invalid/v1', 'OPENAI_API_KEY': 'test-key'}
             with patch.dict(os.environ, env), patch('agent.runtime.load_dotenv'), \
                  patch('agent.runtime.OpenAIChatModel', return_value=FunctionModel(model, stream_function=stream_model)), \
-                 patch('agent.runtime.MCP', return_value=Capability()), \
+                 patch('integrations.mcp.MCPRegistry.read', return_value=Config()), \
                  patch('agent.runtime.logfire.configure'), patch('agent.runtime.logfire.instrument_pydantic_ai'), \
                  patch('storage.sessions.SESSION_DATABASE', database):
                 with chdir(root):

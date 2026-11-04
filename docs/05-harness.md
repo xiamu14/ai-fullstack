@@ -44,22 +44,25 @@ second = agent.run_sync(
 
 #### 保存与恢复
 
-`StepPersistence` 可以将原生消息快照保存到 SQLite。重启后，先由数据库筛选最近成功的顶层运行，只返回一个 `run_id`，再通过框架加载它的完整快照：
+`StepPersistence(capture_frontier=True)` 在模型请求前、模型回复后和工具完成等边界保存原生快照。失败、取消或未完成的运行也可能包含有效进度，不能只按 `run_completed` 筛选历史。
+
+数据库选择最近有快照的顶层运行，只读取一个 `run_id`，再加载一份最新快照；成功运行缺少快照时仍明确报错：
 
 ```sql
-SELECT r.run_id
-FROM runs AS r
-WHERE r.conversation_id = ?
-  AND r.parent_run_id IS NULL
-  AND EXISTS (
+SELECT r.run_id FROM runs AS r
+WHERE r.conversation_id = ? AND r.parent_run_id IS NULL
+  AND (
+    EXISTS (SELECT 1 FROM snapshots AS s WHERE s.run_id = r.run_id)
+    OR EXISTS (
       SELECT 1 FROM events AS e
       WHERE e.run_id = r.run_id AND e.kind = 'run_completed'
+    )
   )
 ORDER BY r.started_at DESC, r.rowid DESC
 LIMIT 1;
 ```
 
-会话 ID 通过参数绑定传入。`EXISTS` 只判断成功事件是否存在，不把事件内容加载到应用中。按运行开始时间倒序选取，时间相同时按 SQLite 行号倒序确定顺序。为了同时支持会话筛选与时间排序，可以为顶层运行增加部分复合索引：
+没有快照的启动失败不会遮住已有进度。会话 ID 使用参数绑定；查询放到工作线程执行。复用部分复合索引，按时间倒序寻找记录，避免临时排序：
 
 ```sql
 CREATE INDEX IF NOT EXISTS idx_runs_top_conversation_started
@@ -67,19 +70,15 @@ ON runs(conversation_id, started_at)
 WHERE parent_run_id IS NULL;
 ```
 
-固定 `conversation_id` 后，SQLite 反向扫描该索引，可按 `started_at DESC, rowid DESC` 依次检查运行，找到第一个成功记录后停止。这里利用 [SQLite 索引排序规则](https://www.sqlite.org/queryplanner.html#multi_column_indices)：普通索引在键相同时按隐含 `rowid` 排列，保留同时间运行的原有选择顺序。成功事件检查继续使用 `events(run_id, seq)` 索引。
-
-索引在恢复时通过 `IF NOT EXISTS` 自动补齐，首次创建会读取已有记录并写入数据库；之后复用已有索引。可以通过 `EXPLAIN QUERY PLAN` 确认使用 `idx_runs_top_conversation_started`，且不再出现 `USE TEMP B-TREE FOR ORDER BY`。索引让结果按所需顺序产生，但若最近多次运行均未成功，仍需继续检查更早的候选记录。
-
-将这个查询放到工作线程执行，避免阻塞异步事件循环。查询没有结果时使用空历史；否则通过已有的 `store` 读取一个快照：
+`EXISTS` 使用框架已有的 `snapshots(run_id, seq)`、`events(run_id, seq)` 索引。可用 `EXPLAIN QUERY PLAN` 验证没有 `USE TEMP B-TREE FOR ORDER BY`。索引排序原理见 [SQLite Query Planner](https://www.sqlite.org/queryplanner.html#multi_column_indices)。
 
 ```python
-history = []
-if run_id is not None:
-    snapshot = await store.latest_snapshot(run_id=run_id)
-    if snapshot is None:
-        raise ValueError("成功运行缺少消息快照")
-    history = snapshot.messages
+from pydantic_ai.messages import repair_messages
+
+snapshot = await store.latest_snapshot(run_id=run_id, include_interrupted=True)
+if snapshot is None:
+    raise ValueError("运行缺少消息快照")
+history = repair_messages(snapshot.messages)
 
 result = await agent.run(
     "继续完成上次的任务。",
@@ -88,11 +87,11 @@ result = await agent.run(
 )
 ```
 
-这里选择顶层运行中标记为 `run_completed` 的记录，保留完整工具调用、工具结果和压缩摘要。失败、取消、未完成和子 Agent 运行不能覆盖最近成功的上下文。历史读取失败时应明确报错，不能静默改用空历史。
+`repair_messages()` 为未返回结果的工具调用补上 `outcome="interrupted"`，保留原有消息并阻止恢复时自动重放。interrupted 不代表操作没有执行：文件写入、发信等副作用需查验工具执行记录和实际结果，不能盲目重试。
 
-恢复消息历史不会重新执行其中已完成的工具。继续运行后，框架保存新一轮快照，供之后恢复。已执行的文件写入或外部操作不会因为运行失败而自动回滚。
+同一进程内失败后继续请求，也要先恢复最新快照，避免用旧的成功历史覆盖未完成进度。历史读取失败时明确报错，不静默使用空历史。恢复只包含已持久化的消息，进程终止前尚未写入的流式片段无法找回。[Pydantic AI Step Persistence](https://pydantic.dev/docs/ai/harness/step-persistence/)
 
-消息恢复和历史检索是两件事：前者把当前上下文重新交给模型，后者按需找回旧原文。摘要压缩后，当前上下文不再保留的细节仍可通过历史检索回查；笔记、检索和摘要机制见[第四章](./04-memory.md)。
+消息恢复与历史检索不同：前者恢复当前上下文，后者按需找回压缩前的原文；见[第四章](./04-memory.md)。
 
 ### 1.2 workspace
 
@@ -164,7 +163,7 @@ sessions.conversation_id：同一会话，可以有零到多次运行
 | 会话 ID | `sessions.conversation_id`；运行通过 `runs.conversation_id` 关联，应用中的 `session_id` 对应该值 |
 | 标题 | 优先读取运行的 `metadata.title`，否则从首条用户消息提取；没有独立标题列 |
 | 工作目录 | 会话登记表的 `workspace`；运行的 `metadata.workspace` 同时记录执行目录 |
-| 消息历史 | 最近成功的顶层运行所保存的完整消息快照 |
+| 消息历史 | 最近有快照的顶层运行，包含未完成进度 |
 | 运行结果状态 | 从 `events.kind` 判断，例如 `run_completed`、`run_failed`；没有独立 session 状态列 |
 
 会话列表合并会话登记与运行记录，按最近活动排序；还没有消息时使用默认标题，出现消息后再提取标题。旧的运行记录即使没有会话登记，也可以继续按 `conversation_id` 聚合。运行 metadata 中仍保留工作目录：
@@ -192,7 +191,7 @@ sessions.conversation_id：同一会话，可以有零到多次运行
 
 快照在逻辑上包含完整历史，但物理存储可以复用已有消息：`snapshot_message_refs.position` 保留顺序，`sha256` 指向 `snapshot_messages` 中的正文。此时 `snapshots.messages` 保存存储标记；读取时由框架还原为 `list[ModelMessage]`。
 
-最后区分两个状态：`snapshots.state="complete"` 表示消息中的工具调用已有对应结果，不等于整次运行成功。恢复最近成功上下文时，还需要检查该运行存在 `run_completed` 事件。`tool_effects.status` 为 `started`、`completed` 或 `failed`；进程中断后仍停在 `started` 的调用，外部操作是否已生效需要另行确认。
+最后区分两个状态：`snapshots.state="complete"` 表示消息中的工具调用已有对应结果，不等于整次运行成功。恢复历史不要求存在 `run_completed` 事件；挂起的工具调用先补为 interrupted，再交给模型继续。`tool_effects.status` 为 `started`、`completed` 或 `failed`；进程中断后仍停在 `started` 的调用，外部操作是否已生效需要另行确认。
 
 ### 1.4 System Prompt
 System Prompt 分成两层：固定的角色与通用规则，以及会随项目变化的概览。分层思路参考[项目感知与上下文组织设计](https://fivwvysqdz.feishu.cn/wiki/D079wzybGiVdxnkbQ6kcwB12nIb)，组装使用 [Pydantic AI 的 instructions](https://pydantic.dev/docs/ai/api/pydantic-ai/agent/#pydantic_ai.agent.Agent.instructions)。
@@ -291,8 +290,6 @@ mcp = MCPToolset("http://127.0.0.1:8000/mcp")
 agent = Agent(model, toolsets=[mcp.defer_loading()])
 ```
 
-#### 打印模型请求
-
 [可运行示例](../coder-cli/examples/tool_disclosure.py) 用模拟 HTTP 响应捕获 OpenAI Chat 请求，不调用在线模型。分别打印启用前、发现前、发现后的 `tools` 与 `messages`：
 
 ```bash
@@ -322,13 +319,73 @@ uv run python examples/tool_disclosure.py
 
 来源：[Pydantic AI Tool Search](https://pydantic.dev/docs/ai/api/pydantic-ai/capabilities/#pydantic_ai.capabilities.ToolSearch)、[Toolset Deferred Loading](https://pydantic.dev/docs/ai/tools-toolsets/toolsets/#deferred-loading)。
 
-<!--TODO-->
-**MCP**
-MCP 是连接外部工具的协议，和内置 Tools 的差异在于：
-1. 需要 register 才能被发现
-2. 需要 下轮对话才能载入到 context
-3. 对于外部工具，需要做安全防护，避免 SSRF 工具
-4. 网络请求需要有 retries 和 timeout
+#### MCP：注册与调用
+
+MCP 将外部服务的工具定义与调用接入 Agent。注册是应用读取服务配置；工具发现通过 MCP 的 `tools/list` 完成，不需要额外的 `register` 协议。
+
+| 传输 | 配置入口 | 生命周期 |
+|---|---|---|
+| HTTP | `url`、`headers` | 客户端连接已启动的服务 |
+| stdio | `command`、`args`、`env`、`cwd` | 框架启动本地子进程，结束或取消时回收 |
+
+```json
+{"mcpServers":{"local-tools":{"command":"python","args":["server.py"],"cwd":"/path/to/project"}}}
+```
+
+两种传输共用工具发现、工具白名单和渐进披露；每个服务只选 `url` 或 `command`。stdio 发现工具时就可能执行启动命令，因此配置必须来自可信来源。
+
+```mermaid
+flowchart LR
+    A[服务配置] --> B[每次模型请求前检查配置]
+    B --> C[校验配置与传输策略]
+    C --> D[MCP tools/list]
+    D --> E[search_tools 发现候选]
+    E --> F[披露 Schema]
+    F --> G[MCP tools/call]
+```
+
+沿用框架动态 toolset 的默认行为：每次模型请求前检查配置，新增服务先变为可发现，无需等待下一轮用户消息。配置未变化时复用当前连接。`defer_loading` 控制完整工具定义何时对模型可见，不代表工具发现一定不连接 MCP 服务。
+
+[动态工厂](https://pydantic.dev/docs/ai/tools-toolsets/toolsets/#dynamically-building-a-toolset)按模型请求求值；返回当前配置对应的工具集：
+
+```python
+from pydantic_ai.toolsets import DynamicToolset
+
+# build_current_mcp(ctx) 读取配置，返回 MCPToolset 或 CombinedToolset。
+agent = Agent(model, toolsets=[DynamicToolset(build_current_mcp)])
+```
+
+MCP 连接使用受控客户端：
+
+```python
+from pydantic_ai.mcp import MCPToolset
+
+toolset = MCPToolset(
+    server_url, id="weather", http_client=policy_client,
+    init_timeout=5, read_timeout=30,
+    include_instructions=False,
+    max_retries=0, tool_error_behavior="failed",
+)
+agent = Agent(model, toolsets=[toolset.prefixed("weather").defer_loading()])
+```
+
+| 约束 | 作用 |
+|---|---|
+| 工具白名单 | 限定可发现、可调用的工具名 |
+| 网络白名单 | 限定 HTTP MCP 连接的 scheme、host、port |
+| SSRF 防护 | 校验全部 DNS 结果并固定连接地址；拒绝未授权内网、云元数据和重定向 |
+| Timeout | 分别限制连接、初始化、请求读取和工具调用总时长 |
+| Retry | 仅重试连接建立失败；请求已发送后的超时可能意味着执行结果未知，不自动重放 |
+
+Pydantic AI 提供配置加载、发现、工具列表缓存、渐进披露及超时接口；配置变化检查、网络白名单与 MCP 的 SSRF 防护由应用实现。工具纠错重试与 HTTP 连接重试是不同预算。外部服务的 instructions 不自动提升为 Agent 指令。
+
+```text
+coder-cli ──受控连接──> MCP 服务 ──服务自身的网络策略──> 外部 API
+```
+
+上述网络策略用于 HTTP MCP，只约束第一段链路。stdio 子进程的网络访问需由其自身或执行环境限制。MCP 服务内部请求需在服务端限制；它也不能替代 shell 等执行环境的网络隔离。[配置实验](../coder-cli/skills/mcp-config/SKILL.md)可验证：同次运行中添加配置后可发现、删除后不可调用、未授权地址连接失败。
+
+参考：[Pydantic AI MCP Client](https://pydantic.dev/docs/ai/mcp/client/)、[Timeouts](https://pydantic.dev/docs/ai/core-concepts/timeouts/)、[OWASP SSRF](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)。
 
 ### 1.6 Skills
 --------
@@ -336,6 +393,8 @@ MCP 是连接外部工具的协议，和内置 Tools 的差异在于：
 ### 2.1 权限
 
 Human-in-the-loop
+
+用户中断
 
 ### 2.2 Token 预算
 

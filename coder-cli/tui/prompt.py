@@ -32,7 +32,7 @@ class PromptTextArea(HighlightedTextArea):
         self.busy = False
 
     def action_submit(self) -> None:
-        if self.busy or not self.text.strip():
+        if not self.text.strip():
             return
         text = self.text
         self.inputs.append(text)

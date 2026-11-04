@@ -2,6 +2,7 @@ import asyncio
 import sqlite3
 
 import httpx
+import httpx2
 from anyio import BrokenResourceError, ClosedResourceError, EndOfStream
 from pydantic_ai.exceptions import AgentRunError
 from pydantic_ai.mcp import MCPError
@@ -41,6 +42,7 @@ class ChatShell(App):
         self.conversation = conversation
         self.busy = True
         self.turn_worker = None
+        self.pending: list[str] = []
 
     def get_default_screen(self) -> Screen:
         return MainScreen()
@@ -63,24 +65,43 @@ class ChatShell(App):
     @on(PromptTextArea.Submitted)
     async def submitted(self, event: PromptTextArea.Submitted) -> None:
         if self.busy:
+            try:
+                accepted = self.conversation.feedback(event.text)
+            except ValueError as error:
+                self.query_one(PromptTextArea).load_text(event.text)
+                self.notify(str(error), severity="error")
+                return
+            await self.query_one(MessageHistory).add("user", event.text)
+            if not accepted:
+                self.pending.append(event.text)
+            self.query_one(StatusLine).update("已接收反馈" if accepted else "已排队")
             return
+        await self.query_one(MessageHistory).add("user", event.text)
+        self.start_turn(event.text)
+
+    def start_turn(self, text: str) -> None:
         self.busy = self.query_one(PromptTextArea).busy = True
         self.query_one(Throbber).add_class("-busy")
         self.query_one(StatusLine).update("执行中 · Ctrl+C 停止")
-        await self.query_one(MessageHistory).add("user", event.text)
-        self.turn_worker = self.run_turn(event.text)
+        self.turn_worker = self.run_turn(text)
 
     @work
     async def run_turn(self, prompt: str) -> None:
         history = self.query_one(MessageHistory)
         view = TurnView(history)
+
+        async def question(text: str) -> None:
+            await view.question(text)
+            self.query_one(StatusLine).update("等待回答 · 输入后按 Enter")
+            self.query_one(PromptTextArea).focus()
+
         try:
             try:
-                result = await self.conversation.send(prompt, view.write, on_tool=view.tool_event)
+                result = await self.conversation.send(prompt, view.write, on_tool=view.tool_event, on_question=question)
                 await view.finish(str(result.output))
                 self.query_one(StatusLine).tooltip = "\n".join(cache_statistics(result))
             except* (
-                AgentRunError, MCPError, httpx.HTTPError, OSError, sqlite3.Error,
+                AgentRunError, MCPError, httpx.HTTPError, httpx2.HTTPError, OSError, sqlite3.Error,
                 BrokenResourceError, ClosedResourceError, EndOfStream,
             ) as errors:
                 await history.add("error", error_message(errors))
@@ -95,8 +116,11 @@ class ChatShell(App):
                 self.busy = self.query_one(PromptTextArea).busy = False
                 self.query_one(Throbber).remove_class("-busy")
                 self.query_one(PromptTextArea).focus()
+                if self.pending:
+                    self.start_turn(self.pending.pop(0))
 
     async def action_quit(self) -> None:
+        self.pending.clear()
         if self.busy and self.turn_worker is not None:
             self.turn_worker.cancel()
             try:
@@ -106,6 +130,7 @@ class ChatShell(App):
         self.exit()
 
     def action_cancel_turn(self) -> None:
+        self.pending.clear()
         if self.busy and self.turn_worker is not None:
             self.turn_worker.cancel()
 

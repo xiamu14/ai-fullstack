@@ -1,14 +1,17 @@
+import json
 import os
+from functools import partial
 from pathlib import Path
 
 import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
-from pydantic_ai.capabilities import MCP, LocalWorkspace
+from pydantic_ai.capabilities import LocalWorkspace
 from pydantic_ai.conversation import Conversation as NativeConversation
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai_harness import (
+    AskUser,
     ConversationSearch,
     Memory,
     Skills,
@@ -21,7 +24,9 @@ from pydantic_ai_harness.memory import FileStore
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 from agent.conversation import Conversation
+from agent.interaction import Interaction
 from context.project import ProjectContext
+from integrations.mcp import MCPRegistry
 from storage.sessions import (
     load_session_history,
     save_session,
@@ -44,19 +49,21 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     history = await load_session_history(database, session_id) if session_id else []
     project = ProjectContext(workspace, database.parent / "project-context")
     await project.refresh()
+    mcp = MCPRegistry()
+    interaction = Interaction()
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
         provider=OpenAIProvider(
             base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"]
         ),
     )
-    weather = MCP("http://127.0.0.1:8000/mcp", id="weather", tool_prefix=True)
     agent = Agent(
         model,
         capabilities=[
+            AskUser(answerer=interaction.ask),
             LocalWorkspace(workspace), Coder(),
-            Skills(str(Path(__file__).resolve().parents[1] / "skills")), weather,
-            StepPersistence(store=store, metadata={"workspace": str(workspace)}),
+            Skills(str(Path(__file__).resolve().parents[1] / "skills")),
+            StepPersistence(store=store, metadata={"workspace": str(workspace)}, capture_frontier=True),
             ConversationSearch(SnapshotHistorySource(store), scope="conversation", max_matches=3),
             SummarizingCompaction(max_messages=60, keep_messages=20),
             Memory(
@@ -68,7 +75,13 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8"),
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)
+    agent.instructions(name="mcp-config", on_change="rewrite")(
+        lambda: json.dumps({"mcp_config_path": str(mcp.path)}, ensure_ascii=False)
+    )
     if session_id is None:
         session_id = NativeConversation().conversation_id
     await save_session(database, session_id, workspace)
-    return Conversation(agent, session_id, history=history, workspace=workspace)
+    return Conversation(
+        agent, session_id, history=history, workspace=workspace, mcp=mcp, interaction=interaction,
+        history_loader=partial(load_session_history, database),
+    )

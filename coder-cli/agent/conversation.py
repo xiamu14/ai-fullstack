@@ -1,5 +1,6 @@
 import os
 from collections.abc import Awaitable, Callable
+from contextlib import AsyncExitStack
 from copy import deepcopy
 from pathlib import Path
 
@@ -15,21 +16,35 @@ from pydantic_ai.messages import (
     TextPartDelta,
 )
 
+from agent.interaction import Interaction
+from integrations.mcp import MCPRegistry
+
 
 class Conversation:
     def __init__(
         self, agent: Agent, session_id: str | None = None, *, history: list[ModelMessage] | None = None,
         workspace: Path | None = None,
+        mcp: MCPRegistry | None = None,
+        interaction: Interaction | None = None,
+        history_loader: Callable[[str], Awaitable[list[ModelMessage]]] | None = None,
     ) -> None:
         self.agent = agent
         self.session_id = session_id
         self.workspace = (workspace if workspace is not None else Path.cwd()).resolve()
         self.history: list[ModelMessage] = history if history is not None else []
+        self.mcp = mcp
+        self.interaction = interaction or Interaction()
+        self.history_loader = history_loader
+        self.restore_required = False
+
+    def feedback(self, text: str) -> bool:
+        return self.interaction.feedback(text)
 
     async def send(
         self, prompt: str,
         on_text: Callable[[str], Awaitable[None]] | None = None,
         *, on_tool: Callable[[FunctionToolCallEvent | FunctionToolResultEvent], Awaitable[None]] | None = None,
+        on_question: Callable[[str], Awaitable[None]] | None = None,
     ):
         if not prompt.strip():
             raise ValueError("消息不能为空")
@@ -45,17 +60,28 @@ class Conversation:
                 elif isinstance(event, PartDeltaEvent) and isinstance(event.delta, TextPartDelta):
                     await on_text(event.delta.content_delta)
 
-        result = await self.agent.run(
-            prompt,
-            conversation_id=self.session_id,
-            message_history=deepcopy(self.history),
-            usage_limits=UsageLimits(request_limit=10),
-            model_settings={"timeout": 30},
-            event_stream_handler=handle_events if on_text or on_tool else None,
-        )
+        self.interaction.open(on_question)
+        try:
+            if self.restore_required and self.history_loader is not None and self.session_id is not None:
+                self.history = await self.history_loader(self.session_id)
+            self.restore_required = True
+            async with AsyncExitStack() as stack:
+                toolsets = await stack.enter_async_context(self.mcp.toolsets()) if self.mcp else []
+                result = await self.agent.run(
+                    prompt,
+                    conversation_id=self.session_id,
+                    message_history=deepcopy(self.history),
+                    toolsets=toolsets, capabilities=[self.interaction],
+                    usage_limits=UsageLimits(request_limit=50),
+                    model_settings={"timeout": 30},
+                    event_stream_handler=handle_events if on_text or on_tool else None,
+                )
+        finally:
+            self.interaction.close()
         # 仅提交成功轮次；压缩后的原生消息取代旧历史，不能重复追加。
         self.session_id = result.conversation_id
         self.history = result.all_messages()
+        self.restore_required = False
         return result
 
 

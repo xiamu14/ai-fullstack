@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from pydantic_ai import Agent
 from pydantic_ai.exceptions import ModelRequestRejectedError
@@ -53,7 +53,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
     async def test_multiline_paste_streaming_and_input_history(self):
         started, release = asyncio.Event(), asyncio.Event()
 
-        async def send(text, on_text, *, on_tool=None):
+        async def send(text, on_text, *, on_tool=None, on_question=None):
             await on_text("**流式")
             await on_text("回复**")
             started.set()
@@ -93,17 +93,17 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
             self.assertLessEqual(prompt.region.bottom, 28)
             self.assertIn("demo", app.export_screenshot())
 
-    async def test_busy_rejects_second_submit_and_error_allows_next_turn(self):
+    async def test_busy_accepts_feedback_and_error_allows_next_turn(self):
         started, release = asyncio.Event(), asyncio.Event()
 
-        async def send(text, on_text, *, on_tool=None):
+        async def send(text, on_text, *, on_tool=None, on_question=None):
             if text == "失败请求":
                 started.set()
                 await release.wait()
                 raise ModelRequestRejectedError("test", "HTTP 400 secret-key")
             return result("恢复成功")
 
-        conversation = SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[], send=AsyncMock(side_effect=send))
+        conversation = SimpleNamespace(workspace=Path.cwd(), session_id="demo", history=[], send=AsyncMock(side_effect=send), feedback=Mock(return_value=True))
         app = ChatShell(conversation)
         with patch.dict("os.environ", {"OPENAI_API_KEY": "secret-key"}):
             async with app.run_test() as pilot:
@@ -114,7 +114,8 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 prompt.insert("恢复请求")
                 await pilot.press("enter")
                 self.assertEqual(conversation.send.await_count, 1)
-                self.assertEqual(prompt.text, "恢复请求")
+                self.assertEqual(prompt.text, "")
+                conversation.feedback.assert_called_once_with("恢复请求")
                 release.set()
                 await app.turn_worker.wait()
                 await pilot.pause()
@@ -122,6 +123,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("HTTP 400", errors[0].content)
                 self.assertNotIn("secret-key", errors[0].content)
                 self.assertFalse(app.busy)
+                prompt.insert("恢复请求")
                 await pilot.press("enter")
                 await app.turn_worker.wait()
                 self.assertEqual(list(app.query(".message"))[-1].content, "恢复成功")
@@ -129,7 +131,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
     async def test_cancel_does_not_exit_and_next_turn_can_run(self):
         started = asyncio.Event()
 
-        async def send(text, on_text, *, on_tool=None):
+        async def send(text, on_text, *, on_tool=None, on_question=None):
             if text == "耗时请求":
                 started.set()
                 await asyncio.Event().wait()
@@ -192,7 +194,7 @@ class TuiTests(unittest.IsolatedAsyncioTestCase):
     async def test_quit_cleans_up_active_stream(self):
         started, stopped = asyncio.Event(), asyncio.Event()
 
-        async def send(text, on_text, *, on_tool=None):
+        async def send(text, on_text, *, on_tool=None, on_question=None):
             started.set()
             try:
                 await asyncio.Event().wait()

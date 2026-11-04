@@ -12,13 +12,13 @@ import unittest
 from unittest.mock import patch
 
 from pydantic_ai import Agent
-from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import ModelRequest, ModelResponse, TextPart, ToolCallPart, ToolReturnPart, UserPromptPart
 from pydantic_ai.models.function import FunctionModel
 from pydantic_ai_harness import StepPersistence
 from pydantic_ai_harness.step_persistence import ContinuableSnapshot, RunRecord, SqliteStepStore, StepEvent
 
 from agent.runtime import create_agent
+from integrations.mcp import Config
 from main import main
 from storage.sessions import load_session_history, list_sessions
 from tui.shell import ChatShell
@@ -35,7 +35,7 @@ def runtime_model(model):
     env = {"MODEL_NAME": "test", "OPENAI_BASE_URL": "https://example.invalid/v1", "OPENAI_API_KEY": "test-key"}
     with patch.dict(os.environ, env), patch("agent.runtime.load_dotenv"), \
          patch("agent.runtime.OpenAIChatModel", return_value=model), \
-         patch("agent.runtime.MCP", return_value=Capability()), \
+         patch("integrations.mcp.MCPRegistry.read", return_value=Config()), \
          patch("agent.runtime.logfire.configure"), patch("agent.runtime.logfire.instrument_pydantic_ai"), \
          patch("storage.sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()):
         yield
@@ -93,10 +93,10 @@ class ResumeEntryTests(unittest.TestCase):
             probe = """
 import asyncio
 from unittest.mock import patch
-from pydantic_ai.capabilities import Capability
 from pydantic_ai.messages import TextPart, ToolReturnPart, UserPromptPart, ModelResponse
 from pydantic_ai.models.function import FunctionModel
 from pathlib import Path
+from integrations.mcp import Config
 from storage import sessions
 from agent.runtime import create_agent
 from tui.shell import ChatShell
@@ -113,7 +113,7 @@ async def stream_model(messages, info):
 
 async def run():
     sessions.SESSION_DATABASE = Path("workspace/sessions.db").resolve()
-    with patch("agent.runtime.load_dotenv"), patch("agent.runtime.MCP", return_value=Capability()), \\
+    with patch("agent.runtime.load_dotenv"), patch("integrations.mcp.MCPRegistry.read", return_value=Config()), \\
          patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \\
          patch("agent.runtime.logfire.configure"), patch("agent.runtime.logfire.instrument_pydantic_ai"):
         conversation = await create_agent("saved-session")
@@ -270,7 +270,7 @@ class ResumeHistoryTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(any("TEMP B-TREE" in detail for detail in plan), plan)
                 self.assertEqual(connection.execute("SELECT count(*) FROM runs").fetchone()[0], 2)
 
-    async def test_database_selects_latest_success_and_loads_only_one_snapshot(self):
+    async def test_database_selects_latest_frontier_and_loads_only_one_snapshot(self):
         with TemporaryDirectory() as directory:
             database = Path(directory) / "sessions.db"
             store = SqliteStepStore(database=str(database))
@@ -296,11 +296,11 @@ class ResumeHistoryTests(unittest.IsolatedAsyncioTestCase):
                  patch.object(store, "list_runs", side_effect=AssertionError("不能遍历 runs")), \
                  patch.object(store, "list_events", side_effect=AssertionError("不能加载全部 events")), \
                  patch.object(store, "latest_snapshot", wraps=store.latest_snapshot) as snapshot:
-                self.assertEqual(prompts(await load_session_history(database, "saved")), ["latest"])
-                snapshot.assert_awaited_once_with(run_id="latest")
+                self.assertEqual(prompts(await load_session_history(database, "saved")), ["unfinished"])
+                snapshot.assert_awaited_once_with(run_id="unfinished", include_interrupted=True)
                 self.assertEqual(await load_session_history(database, "saved' OR 1=1 --"), [])
 
-    async def test_failed_child_and_other_sessions_do_not_replace_successful_context(self):
+    async def test_latest_failed_run_is_restored_but_child_and_other_sessions_are_excluded(self):
         with TemporaryDirectory() as directory:
             database = Path(directory) / "sessions.db"
             first = await save_first_turn(database)
@@ -313,10 +313,10 @@ class ResumeHistoryTests(unittest.IsolatedAsyncioTestCase):
                 await store.register_run(RunRecord(run_id=run_id, conversation_id=session_id, parent_run_id=parent))
                 await store.save_snapshot(ContinuableSnapshot(
                     run_id=run_id, step_index=1,
-                    messages=[ModelRequest(parts=[UserPromptPart("不应恢复")])],
+                    messages=[ModelRequest(parts=[UserPromptPart(f"{run_id}进度")])],
                 ))
                 await store.append_event(StepEvent(run_id=run_id, kind=kind, step_index=1))
-            self.assertEqual(prompts(await load_session_history(database, "saved-session")), ["记住证据"])
+            self.assertEqual(prompts(await load_session_history(database, "saved-session")), ["failed进度"])
             self.assertEqual(await load_session_history(database, "missing-session"), [])
 
     async def test_missing_database_is_empty_but_missing_successful_snapshot_is_an_error(self):

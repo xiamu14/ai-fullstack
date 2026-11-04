@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 import sqlite3
 
-from pydantic_ai.messages import ModelMessage, UserPromptPart
+from pydantic_ai.messages import ModelMessage, UserPromptPart, repair_messages
 from pydantic_ai_harness.conversation_search import SnapshotHistorySource
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
@@ -128,17 +128,17 @@ async def list_sessions(database: Path) -> list[SessionInfo]:
 async def load_session_history(database: Path, session_id: str) -> list[ModelMessage]:
     if not database.exists():
         return []
-    run_id = await asyncio.to_thread(_latest_successful_run, database, session_id)
+    run_id = await asyncio.to_thread(_latest_history_run, database, session_id)
     if run_id is None:
         return []
     store = SqliteStepStore(database=str(database))
-    snapshot = await store.latest_snapshot(run_id=run_id)
+    snapshot = await store.latest_snapshot(run_id=run_id, include_interrupted=True)
     if snapshot is None:
-        raise ValueError(f"会话 {session_id} 的成功轮次缺少消息快照，无法恢复")
-    return snapshot.messages
+        raise ValueError(f"会话 {session_id} 的运行缺少消息快照，无法恢复")
+    return repair_messages(snapshot.messages)
 
 
-def _latest_successful_run(database: Path, session_id: str) -> str | None:
+def _latest_history_run(database: Path, session_id: str) -> str | None:
     with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=rw", uri=True)) as connection:
         if not connection.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='runs'").fetchone():
             return None
@@ -153,9 +153,12 @@ def _latest_successful_run(database: Path, session_id: str) -> str | None:
             """
             SELECT r.run_id FROM runs AS r
             WHERE r.conversation_id = ? AND r.parent_run_id IS NULL
-              AND EXISTS (
-                  SELECT 1 FROM events AS e
-                  WHERE e.run_id = r.run_id AND e.kind = 'run_completed'
+              AND (
+                  EXISTS (SELECT 1 FROM snapshots AS s WHERE s.run_id = r.run_id)
+                  OR EXISTS (
+                      SELECT 1 FROM events AS e
+                      WHERE e.run_id = r.run_id AND e.kind = 'run_completed'
+                  )
               )
             ORDER BY r.started_at DESC, r.rowid DESC
             LIMIT 1

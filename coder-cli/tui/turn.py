@@ -42,6 +42,11 @@ class TurnView:
             self.response.content = text
             await self.response.update(text)
 
+    async def question(self, text: str) -> None:
+        await self.close()
+        self.response = None
+        await self.history.add("assistant", text)
+
     async def close(self) -> None:
         if self.stream is not None:
             await self.stream.stop()
