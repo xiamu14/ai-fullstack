@@ -551,6 +551,82 @@ else:
 
 ### 2.1 权限
 
+权限是为了在工程层面禁止 AI 执行危险操作、调用未许可的工具。核心问题是：**这个动作，该不该放行？**
+
+模型提出调用，执行层决定 `allow / ask / deny`。提示词与 Skill 可以说明规则，但不能授予权限；模型主动调用 `ask_user_question` 只是提问，不能替代执行前的审批。
+
+#### 判定与执行
+
+```mermaid
+flowchart LR
+    A[工具名 + 参数 + 工作目录] --> B{权限判定}
+    B -->|deny| C[返回拒绝结果]
+    B -->|allow| F[执行边界检查]
+    B -->|ask| D[挂起调用，等待批准]
+    D -->|拒绝 / 超时 / 取消| C
+    D -->|批准| E{调用、目标、策略仍一致？}
+    E -->|否| C
+    E -->|是| F
+    F -->|通过| G[执行工具并记录结果]
+    F -->|越界| C
+```
+
+以 coder-cli 的默认策略为例，按以下顺序判断：
+
+| 优先级 | 条件 | 结果 |
+|---|---|---|
+| 1 | 访问权限配置、运行存储、凭据目录；或命中 `deny` | 拒绝，普通批准不能覆盖 |
+| 2 | 受保护文件、工作目录外文件；或命中 `ask` | 逐次询问；已安装技能资源可只读放行 |
+| 3 | 模式限制与明确的 `allow` | 按规则处理 |
+| 4 | 项目普通文件、框架内部工具 | 放行；shell、外部及未分类工具默认询问 |
+
+`auto` 使用上述默认值；`read-only` 额外询问写入和所有命令；`full` 放行普通调用，仍保留硬拒绝、受保护资源与执行边界。模式名称来自原生 `Permissions`，具体规则由应用扩展，不能将本项目默认值当作框架默认值。
+
+**审批决定能否发起，沙箱限制实际影响。** 批准一条命令，不应使它获得任意文件访问权。文件工具检查解析符号链接后的实际路径；shell 与本地 MCP 还需进程隔离。本地 MCP 必须在启动前检查，因为启动程序本身就会执行代码，不能等到工具调用时才审批。
+
+#### 工程接入
+
+[Pydantic AI Permissions](https://pydantic.dev/docs/ai/harness/permissions/) 用 `ApprovalRequired` 挂起调用；[HandleDeferredToolCalls](https://pydantic.dev/docs/ai/capabilities/handle-deferred-tool-calls/) 在运行内处理批准结果。通用流程可用原生 `ask_permissions`；本项目扩展 `Permissions`，补充统一规则、完整调用指纹与审计，继续复用原生延迟工具协议。
+
+以下为 `create_agent()` 中与权限相关的接线，其余能力省略：
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import HandleDeferredToolCalls
+from pydantic_ai_harness.coder import Coder
+
+from agent.permissions.policy import ExecutionPermissions
+from agent.permissions.workspace import RestrictedWorkspace
+
+permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
+mcp.authorize_stdio = permissions.authorize_stdio  # 连接前检查本地子进程。
+
+agent = Agent(model, capabilities=[
+    RestrictedWorkspace(workspace, permissions),
+    Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
+    permissions,
+    HandleDeferredToolCalls(handler=permissions.handle),
+])
+```
+
+这里 `unrestricted_filesystem=True` 让文件工具能请求指定的目录外文件，实际边界由 `RestrictedWorkspace` 检查；脱离受限后端使用会改变安全边界。审批处理器将明确批准转成 `ToolApproved()`，其余转成 `ToolDenied(...)`；拒绝结果返回模型，工具不执行。原生机制见[延迟工具](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)。
+
+审批必须绑定**完整调用**，而不是只记住“允许 shell”或“允许某工具”。本项目指纹结构如下（示意）：
+
+```text
+fingerprint = hash(
+    权限配置版本, MCP 配置版本, 工作目录,
+    工具名, 全部参数, 实际目标路径, 目标文件状态
+)
+approval_key = (run_id, tool_call_id)
+```
+
+执行前重算指纹；参数、目标或策略变化时，旧批准失效。只有可信规则显式允许记忆时，适合的外部调用才可按 `conversation_id + fingerprint` 在进程内复用；shell、写入与受保护资源不记忆。取消或恢复运行不复用未执行的批准，也不自动重放调用。
+
+策略只从可信用户配置读取，工具不能修改；审批展示参数时脱敏，审计只保存原生运行标识、原因与指纹，工具结果由运行记录追踪。最小验证：**拒绝后无副作用、批准后仅执行原调用、目标变化使批准失效、子进程越界被阻止**。
+
+配置与平台边界见[项目 README：工具权限](../coder-cli/README.md#工具权限)。
+
 ### 2.2 Token 预算
 
 ### 2.3 上下文隔离
