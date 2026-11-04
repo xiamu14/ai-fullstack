@@ -628,7 +628,64 @@ approval_key = (run_id, tool_call_id)
 配置与平台边界见[项目 README：工具权限](../coder-cli/README.md#工具权限)。
 
 ### 2.2 上下文隔离
-sessions 并行
+
+上下文隔离要回答两个问题：**这次运行能看到谁的历史？能修改哪些共享资源？** 不同会话使用不同历史，同一项目仍可共享文件和长期记忆。
+
+#### 隔离与共享
+
+| 数据 | 边界 |
+|---|---|
+| 消息历史、历史检索 | 按 `conversation_id` 隔离，每次运行使用自己的消息副本 |
+| 运行上下文、反馈与待审批调用 | 绑定当前运行，不跨会话复用 |
+| 项目文件、项目笔记 | 同一工作目录共享，不随新建会话复制 |
+| 项目概览缓存 | 按规范化工作目录复用，只提供项目导航 |
+
+`conversation_id` 标识会话，`run_id` 标识一次运行，沿用 [Pydantic AI 术语](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。ID 用于关联数据；文件访问边界仍由 2.1 的权限与执行隔离约束。
+
+两个实例可能同时读到同一份旧历史，然后各自续写；仅给数据库写入加锁不能避免这种分叉。[Pydantic AI 建议串行化同一会话的更新](https://pydantic.dev/docs/ai/production/)，锁必须覆盖“读取 → 执行 → 持久化”。
+
+```mermaid
+flowchart LR
+    A[提交请求] --> B{会话与目录锁可用？}
+    B -->|否| C[拒绝本次运行]
+    B -->|是| D[重新读取最新历史]
+    D --> E[独立消息副本运行 Agent]
+    E --> F[持久化成功或未完成进度]
+    F --> G[等待工具清理完成]
+    G --> H[释放执行锁]
+```
+
+#### 工程接入
+
+coder-cli 使用两层锁：同一会话只运行一个请求；相同或互相包含的工作目录只运行一个任务。互不包含的目录可并行。首次注册会话后，工厂重新读取已保存的工作目录，避免并发创建把同一会话绑定到不同目录。
+
+以下将 `Conversation.send()` 的关键步骤合并为示意；`agent` 已配置 `StepPersistence`，工具资源的进入与清理省略：
+
+```python
+from copy import deepcopy
+from storage.execution_lock import execution_lock
+from storage.sessions import load_session_history
+
+async def send(agent, database, conversation_id, workspace, prompt):
+    with execution_lock(database, conversation_id, workspace):
+        history = await load_session_history(database, conversation_id)
+        result = await agent.run(
+            prompt,
+            conversation_id=conversation_id,
+            message_history=deepcopy(history),
+        )
+        return result
+```
+
+即使对象已经打开，也要在取得锁后重新读取历史，不能继续它启动时的旧快照。恢复失败就报错，不换成空历史；取消后恢复未完成进度，不自动重放工具。
+
+目录锁采用 POSIX 非阻塞文件锁，跨本机进程生效；祖先目录持共享锁，目标目录持排他锁，因此父子目录互斥、兄弟目录可并行。忙时直接拒绝，不排队。正常退出或进程终止会释放锁；取消运行时先等待文件写线程和子进程清理，避免后一个任务提前写入。
+
+项目记忆继续使用原生 `FileStore`；它要求[同目录单写者](https://pydantic.dev/docs/ai/harness/memory/)，目录锁同时保护共享笔记。需要并行修改代码时，各任务使用独立工作目录。该锁协调本机 coder-cli 实例，不约束其他程序或已批准访问的目录外资源。
+
+会话互斥保护历史顺序，目录锁保护共享写入；模型 API 的并发额度另行限制，可复用原生 [ConcurrencyLimitedModel](https://pydantic.dev/docs/ai/models/overview/)，不需要用任务池实现上下文隔离。
+
+最小验证：**同会话拒绝重入、重叠目录互斥、独立目录可并行、旧对象读取最新历史、项目笔记共享但聊天历史不串入、取消后安全释放锁**。使用边界见[项目 README](../coder-cli/README.md#并行与共享边界)。
 
 ## 3. 决策模式
 Planning 模式
