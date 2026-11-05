@@ -13,6 +13,7 @@ from pydantic_ai_harness import (
     AskUser,
     ConversationSearch,
     Memory,
+    Planning,
     Skills,
     StepPersistence,
     SummarizingCompaction,
@@ -20,10 +21,12 @@ from pydantic_ai_harness import (
 from pydantic_ai_harness.coder import Coder
 from pydantic_ai_harness.conversation_search import SnapshotHistorySource
 from pydantic_ai_harness.memory import FileStore
+from pydantic_ai_harness.planning import SqlitePlanStore
 from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 from agent.conversation import Conversation
 from agent.interaction import Interaction
+from agent.planning import GUIDANCE, StrictPlanning
 from agent.permissions.policy import ExecutionPermissions
 from agent.permissions.workspace import RestrictedWorkspace
 from context.project import ProjectContext
@@ -67,6 +70,10 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     ])
     interaction = Interaction()
     permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
+    plan_store = SqlitePlanStore(str(database), session=session_id)
+    planning = StrictPlanning(plan_store, interaction)
+    permissions.planning = planning
+    mcp.allow_stdio = lambda: planning.approved is not None
     mcp.authorize_stdio = permissions.authorize_stdio
     model = OpenAIChatModel(
         model_name=os.environ['MODEL_NAME'],
@@ -82,6 +89,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
             RestrictedWorkspace(workspace, permissions),
             Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
             permissions,
+            Planning(tools=["write_plan"], store=plan_store, guidance=GUIDANCE),
             HandleDeferredToolCalls(handler=permissions.handle),
             skills,
             mcp,
@@ -101,4 +109,5 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         agent, session_id, history=history, workspace=workspace, mcp=mcp, skills=skills, interaction=interaction,
         history_loader=partial(load_session_history, database),
         execution_lock=partial(execution_lock, database, session_id, workspace),
+        planning=planning,
     )

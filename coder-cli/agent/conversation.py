@@ -38,6 +38,7 @@ class Conversation:
         interaction: Interaction | None = None,
         history_loader: Callable[[str], Awaitable[list[ModelMessage]]] | None = None,
         execution_lock: Callable[[], AbstractContextManager] = nullcontext,
+        planning=None,
     ) -> None:
         self.agent = agent
         self.session_id = session_id
@@ -48,8 +49,11 @@ class Conversation:
         self.interaction = interaction or Interaction()
         self.history_loader = history_loader
         self.execution_lock = execution_lock
+        self.planning = planning
 
     def feedback(self, text: str) -> bool:
+        if self.planning is not None and self.interaction.waiting is None:
+            self.planning.invalidate()
         return self.interaction.feedback(text)
 
     @property
@@ -105,6 +109,8 @@ class Conversation:
                     await on_text(event.delta.content_delta)
 
         self.interaction.open(on_question)
+        if self.planning is not None:
+            self.planning.invalidate()
         try:
             if self.history_loader is not None and self.session_id is not None:
                 self.history = await self.history_loader(self.session_id)

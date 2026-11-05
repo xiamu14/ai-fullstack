@@ -701,9 +701,7 @@ async def send(agent, database, conversation_id, workspace, prompt):
 
 ### 3.1 Planning：任务计划与执行阶段
 
-长任务容易遗漏步骤，结构化计划将目标变成可更新的清单；简单修改通常不需要。原生 `Planning` 提供步骤、状态及持久化存储，计划通过消息和工具结果保持可见，避免反复改写系统指令破坏缓存。默认计划只保留一次运行，跨轮使用需配置存储。[Pydantic AI Planning](https://pydantic.dev/docs/ai/harness/planning/)
-
-最小接线如下，变量由运行工厂提供：
+[Pydantic AI Planning](https://pydantic.dev/docs/ai/harness/planning/) 管理步骤，Harness 控制执行。计划复用 Pydantic AI 的 [`conversation_id`](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。
 
 ```python
 from pydantic_ai_harness import Planning
@@ -711,23 +709,62 @@ from pydantic_ai_harness.planning import SqlitePlanStore
 
 planning = Planning(
     tools=["write_plan"],
-    store=SqlitePlanStore(plan_database, session=conversation_id),
+    store=SqlitePlanStore(str(database), session=conversation_id),
 )
 ```
 
-`conversation_id` 沿用 [Pydantic AI 会话标识](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)，不另造计划会话 ID。计划存储也要纳入工具不可修改的运行存储；内部计划工具应明确归类，避免每次更新清单都询问权限。
+#### 严格规划的执行门禁
 
-**任务清单不等于 Plan mode。** `Planning` 不会禁止修改代码，也不保证步骤按顺序执行。Claude Code 的常规规划流程包含研究、提交方案、批准后执行；具体命令行为仍取决于权限配置。[Claude Code Plan mode](https://code.claude.com/docs/en/permission-modes#analyze-before-you-edit-with-plan-mode)
-
-如果需要严格规划阶段，应用还须控制：
-
-```text
-规划：读取与研究 → 提交计划 → 等待批准
-执行：批准当前计划 → 开放对应工具 → 实施与验证
-变更：任务范围或计划实质变化 → 重新确认
+```mermaid
+flowchart TD
+    R["每次运行从只读研究开始<br/>可读文件、历史和记忆，可提问"]
+    R --> W["write_plan 保存有序步骤<br/>写明范围和验收条件"]
+    W --> A{"用户明确批准当前计划？"}
+    A -->|"拒绝、超时或取消"| R
+    A -->|批准| G{"有进行中的步骤<br/>且工具权限允许？"}
+    G -->|允许| E["执行与验证<br/>写入、shell、外部工具、本地 MCP"]
+    G -->|拒绝| B["阻止调用"]
+    E -->|"仅更新进度"| G
+    E -->|"计划实质变更或收到新反馈"| R
+    E -->|"全部步骤结束"| F["关闭执行门禁"]
 ```
 
-规划时禁止项目写入及其他有副作用的操作，仅允许受控计划存储更新；不能只加一句“请先规划”。上一章的 `read-only` 会询问写入，不能直接当成严格规划阶段。批准计划也不覆盖工具权限，MCP 启动等前置操作仍需受控。
+```text
+进行中：completed* → in_progress → pending*
+已结束：无 in_progress
+```
+
+计划审批和工具权限在执行前分别检查。计划更新与工具执行串行处理。批准仅在当前运行有效，恢复会话时重新审批。
+
+#### 用 HTTP 示例验证
+
+实验任务：用 Python 标准库实现 API Router，支持 GET、POST、PATCH 和 JSON，在临时本地端口测试。
+
+| 操作 | 应观察到的结果 |
+| --- | --- |
+| 批准前尝试调用 shell | 调用被拦截 |
+| 批准后执行 | 示例生成，接口测试通过 |
+| 改变步骤内容或恢复会话 | 下一次执行前重新审批 |
+
+在会话数据库中查询示例的最终计划。删除会话时，相关计划行一并删除。
+
+```sql
+SELECT status, COUNT(*) AS steps
+FROM plan_items
+WHERE session = '01a1a22b-2e93-73ad-88f8-e91bcd0c5556'
+GROUP BY status;
+```
+
+```text
+status     steps
+completed  10
+```
+
+接口验收以测试输出为准。在 [mini_http 示例目录](../coder-cli/example/mini_http/README.md) 运行：
+
+```bash
+python3 -m unittest test_app -q
+```
 
 ### 3.2 Reflection：优先形成验证闭环
 
@@ -788,6 +825,6 @@ coder-cli 目前通过 `OpenAIChatModel` 访问模型；兼容接口不代表推
 
 固定任务、验收标准、模型版本和预算，保留多次运行结果；比较真实改动与验证证据。计划标记完成、模型声称通过，都不算任务成功。
 
-增强顺序：**最小 Planning → 验证反馈 → 模型 Thinking 适配**。严格 Plan mode 与独立 Reflection Agent 在评测证明有收益后再接入。
+增强顺序：**Planning 与所需执行门禁 → 验证反馈 → 模型 Thinking 适配**。独立 Reflection Agent 在评测证明有收益后再接入。
 
 ## 5. hooks

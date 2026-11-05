@@ -197,3 +197,5 @@ def _delete_session(database: Path, session_id: str) -> None:
                     connection.execute(f"DELETE FROM {table} WHERE run_id IN (SELECT run_id FROM deleting_runs)")
             if "sessions" in tables:
                 connection.execute("DELETE FROM sessions WHERE conversation_id = ?", (session_id,))
+            if "plan_items" in tables:
+                connection.execute("DELETE FROM plan_items WHERE session = ?", (session_id,))

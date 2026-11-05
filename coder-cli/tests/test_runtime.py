@@ -92,6 +92,7 @@ class CoderTests(unittest.TestCase):
 
     def test_runtime_uses_coder_to_create_and_run_project(self):
         responses = iter([
+            ToolCallPart("write_plan", {"items": [{"content": "创建 hello 项目并运行验证", "status": "in_progress"}]}),
             ToolCallPart("shell", {"command": "mkdir -p hello"}),
             [
                 ToolCallPart("write_file", {"path": "hello/pyproject.toml", "content": '[project]\nname = "hello"\nversion = "0.1.0"\n'}),
@@ -134,7 +135,7 @@ class CoderTests(unittest.TestCase):
                  patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model, stream_function=stream_model)), \
                  redirect_stdout(output):
                 run_agent("创建并运行 hello world 项目")
-            self.assertEqual(calls, 5)
+            self.assertEqual(calls, 6)
             self.assertTrue(self.exporter.get_finished_spans(), "应记录 Agent 执行追踪")
             self.assertIn("hello world 验证通过", output.getvalue())
             self.assertEqual(Path("hello/main.py").read_text(), 'print("hello world")\n')
@@ -181,6 +182,7 @@ class CoderTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         with TemporaryDirectory() as directory, chdir(directory):
             self.run_memory_cli("记住端口约定", "first", [
+                ToolCallPart("write_plan", {"items": [{"content": "保存端口约定", "status": "in_progress"}]}),
                 ToolCallPart("write_memory", {"content": "PORT_PROBE=8001"}),
                 TextPart("saved"),
             ])
@@ -240,6 +242,7 @@ with patch("agent.runtime.load_dotenv"), patch("integrations.mcp.MCPRegistry.rea
             self.assertIn("MEMORY_RESTART_OK", result.stdout)
 
             self.run_memory_cli("端口改为 8002", "third", [
+                ToolCallPart("write_plan", {"items": [{"content": "更新端口约定", "status": "in_progress"}]}),
                 ToolCallPart("write_memory", {"old_text": "PORT_PROBE=8001", "content": "PORT_PROBE=8002"}),
                 TextPart("updated"),
             ])

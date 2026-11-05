@@ -87,6 +87,7 @@ class MCPRegistry(AbstractCapability):
     def __init__(self, path: Path | None = None) -> None:
         self.path = (path or Path(os.getenv("CODER_MCP_CONFIG", "~/.config/coder-cli/mcp.json"))).expanduser().resolve()
         self.authorize_stdio = None
+        self.allow_stdio = lambda: True
 
     def get_instructions(self) -> str:
         return json.dumps({"mcp_config_path": str(self.path)}, ensure_ascii=False)
@@ -110,15 +111,20 @@ class MCPRegistry(AbstractCapability):
     @asynccontextmanager
     async def toolsets(self):
         async with AsyncExitStack() as stack:
-            previous: Config | None = None
+            previous = None
             current: AbstractToolset | None = None
 
             async def refresh(ctx):
                 nonlocal previous, current
                 config = self.read()
-                if config != previous:
-                    current = await self.build(config, stack)
-                    previous = config
+                state = (config, self.allow_stdio())
+                if state != previous:
+                    selected = config.model_copy(update={"mcpServers": {
+                        name: server for name, server in config.mcpServers.items()
+                        if server.command is None or state[1]
+                    }})
+                    current = await self.build(selected, stack)
+                    previous = state
                 return current
 
             # DynamicToolset owns session changes; clients stay open through session teardown.

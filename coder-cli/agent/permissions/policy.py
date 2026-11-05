@@ -35,6 +35,7 @@ class ExecutionPermissions(Permissions):
         self.path = config_path()
         self.settings, _ = load_settings(self.path)
         self.mcp_path = mcp_path
+        self.planning = None
         self.libraries = (Path(__file__).resolve().parents[2] / "skills", Path.home() / ".agents/skills")
         self.refresh_readonly()
         self.forbidden = tuple(path.resolve() for path in (
@@ -92,6 +93,8 @@ class ExecutionPermissions(Permissions):
             file.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
     async def before_tool_execute(self, ctx, *, call, tool_def, args):
+        if self.planning is not None:
+            await self.planning.check(call.tool_name, tool_def)
         decision, fingerprint = self.evaluate(call.tool_name, tool_def, args)
         key = (ctx.run_id, call.tool_call_id)
         if decision.action == "deny":
@@ -154,6 +157,8 @@ class ExecutionPermissions(Permissions):
         return requests.build_results(approvals=approvals)
 
     async def authorize_stdio(self, name, server, cwd, stack):
+        if self.planning is not None and self.planning.approved is None:
+            raise PermissionError("严格规划阶段禁止启动本地 MCP")
         from fnmatch import fnmatchcase
         from agent.permissions.workspace import RestrictedBackend
         settings, version = load_settings(self.path)
@@ -203,6 +208,10 @@ class ExecutionPermissions(Permissions):
     async def wrap_tool_execute(self, ctx, *, call, tool_def, args, handler):
         # Serial execution makes approval and target rechecks precede every side effect.
         async with self.lock:
+            if self.planning is not None:
+                await self.planning.check(call.tool_name, tool_def)
+                if call.tool_name == "write_plan":
+                    return await self.planning.write(args, handler)
             decision, _ = self.evaluate(call.tool_name, tool_def, args)
             token = CURRENT_GRANT.set(decision)
             try:

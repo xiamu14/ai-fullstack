@@ -7,6 +7,7 @@ from agent.permissions.config import Settings
 
 
 INTERNAL = frozenset({
+    "write_plan",
     "ask_user_question", "load_capability", "search_tools", "search_conversation_history",
     "read_memory", "write_memory", "search_memory", "delete_memory",
 })
