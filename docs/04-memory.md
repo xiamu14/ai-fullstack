@@ -206,8 +206,8 @@ agent = Agent(
         ),
     ],
     instructions=(
-        "保存用户明确要求和已验证结论，已有笔记过期时替换旧内容。"
-        "需要旧细节时，先搜索笔记，再搜索对话历史；找不到就说明找不到。"
+        "任务细节留在会话历史，可复用的专题经验写入指定专题文件。"
+        "只有多数后续任务都应提前知道的稳定项目事实和偏好才写入 MEMORY.md。"
     ),
 )
 ```
@@ -238,3 +238,19 @@ uv run python -m unittest discover -s tests -p 'test_runtime.py' -v
 本地 CLI 先用本地向量索引；用 PostgreSQL 的服务可考虑 pgvector，无需为此同时引入 Redis 和另一套数据库。更换 Embedding 模型或配置后，要重新生成已有内容的向量。当前兼容聊天接口是否支持 Embedding 也需单独验证。
 
 参考：[《记忆架构》8.4–8.6 节](https://waylandz.com/ai-agent-book/第08章-记忆架构/)、[Pydantic AI Embeddings](https://pydantic.dev/docs/ai/embeddings/)、[向量搜索与过滤](https://qdrant.tech/documentation/concepts/search/)、[Memory](https://pydantic.dev/docs/ai/harness/memory/)、[Conversation Search](https://pydantic.dev/docs/ai/harness/conversation-search/)。
+
+### 1.6 memory 优化
+
+在同一工作目录测试 mini-http 的 Planning 时，模型上下文出现了此前 EvoLink 配置任务的笔记。回查运行快照发现，配置任务中的模型曾显式调用 `write_memory(file="MEMORY.md", ...)`，把安装、登录状态和当时余额写入项目主记忆。旧提示要求每个阶段保存已验证结论和未完成工作，却没有说明这些信息应该写到哪一层。
+
+[Pydantic AI Harness Memory](https://pydantic.dev/docs/ai/harness/memory/) 默认在预算内自动注入 `MEMORY.md` 正文，其他专题笔记只列文件名，正文按需读取。同一工作目录共享这套笔记，所以一条信息只要进了主记忆，就可能出现在后续无关任务的上下文中。Planning 可以控制何时允许写入，写到哪一层仍由模型判断。
+
+修正后的写入规则先判断信息的作用域，再选择存放位置：
+
+| 存放位置 | 写入条件 | EvoLink 示例 |
+| --- | --- | --- |
+| 会话历史与计划 | 只服务本次任务或续跑 | 安装过程、登录状态、余额和单次生成结果留在历史，未完成步骤留在计划 |
+| 专题笔记 | 对该工作目录中某类任务有长期复用价值 | 如果项目经常生成素材，可将已验证的流程和常见问题写入 `evolink.md` |
+| `MEMORY.md` | 简短、稳定，且多数后续任务都应提前知道 | 这次配置任务没有产生符合条件的信息 |
+
+Agent 仍可自主维护主记忆。写项目笔记前先查已有内容、注明来源，发现旧条目时更新它。调用 `write_memory` 时明确传入文件名，因为省略 `file` 会默认写进 `MEMORY.md`。阶段结束本身不构成写入理由。这个案例的修正在写入端：即使改进检索，也无法阻止主记忆中的无关正文按现有规则进入上下文。

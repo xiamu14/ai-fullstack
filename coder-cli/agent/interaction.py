@@ -98,13 +98,17 @@ class Interaction(AbstractCapability):
                 self.waiting = None
         return AskUserResponse(answers=tuple(answers))
 
-    async def approve(self, details: str, *, rememberable: bool) -> tuple[bool, bool]:
+    async def approve(
+        self, details: str, *, rememberable: bool, header: str = "工具审批",
+        prompt: str = "是否允许以上完整调用？只有选择允许才会执行。",
+        remember_label: str = "本会话允许相同调用",
+    ) -> tuple[bool, bool]:
         if self.on_question is None:
             return False, False
         labels = ["本次允许", "拒绝"]
         if rememberable:
-            labels.append("本会话允许相同调用")
-        question = Question(header="工具审批", question="是否允许以上完整调用？只有选择允许才会执行。",
+            labels.append(remember_label)
+        question = Question(header=header, question=prompt,
                             options=tuple(QuestionOption(label=label) for label in labels))
         try:
             async with asyncio.timeout(300), self.lock:
@@ -114,7 +118,8 @@ class Interaction(AbstractCapability):
         if response.cancelled or not response.answers:
             return False, False
         selected = response.answers[0].selected
-        return selected in ((labels[0],), ("本会话允许相同调用",)), selected == ("本会话允许相同调用",)
+        remember = rememberable and selected == (remember_label,)
+        return selected == (labels[0],) or remember, remember
 
     def close(self) -> None:
         self.active = False

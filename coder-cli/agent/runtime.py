@@ -39,10 +39,14 @@ from storage.sessions import (
     session_database,
     session_workspace,
 )
+from tools.external_hooks import external_result_hooks, hook_config_path, load_hook_settings
+from tools.output_hooks import output_hooks
 from tools.web_tools import web_fetch
 
 
 async def create_agent(session_id: str | None = None, path: str | None = None) -> Conversation:
+    hook_path = hook_config_path()
+    hook_settings = load_hook_settings(hook_path)
     load_dotenv()
     if not all((os.getenv("MODEL_NAME"), os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))):
         raise ValueError("请在 .env 配置 OPENAI_BASE_URL、OPENAI_API_KEY 和 MODEL_NAME。")
@@ -70,6 +74,8 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     ])
     interaction = Interaction()
     permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
+    if hook_path is not None:
+        permissions.forbidden += (hook_path,)
     plan_store = SqlitePlanStore(str(database), session=session_id)
     planning = StrictPlanning(plan_store, interaction)
     permissions.planning = planning
@@ -89,6 +95,10 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
             RestrictedWorkspace(workspace, permissions),
             Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
             permissions,
+            output_hooks,
+            external_result_hooks(
+                hook_settings, interaction, database=database, workspace=workspace, config_path=hook_path,
+            ),
             Planning(tools=["write_plan"], store=plan_store, guidance=GUIDANCE),
             HandleDeferredToolCalls(handler=permissions.handle),
             skills,

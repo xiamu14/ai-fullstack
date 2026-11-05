@@ -177,3 +177,19 @@ npx skills update
 空闲时在输入框键入 `/`，搜索技能名称或描述，用 ↑ / ↓ 选择、Enter 插入引用、Esc 关闭；再填写任务参数并提交。每条消息可主动引用一个技能，技能名显示为 `/技能名`。只有从列表选择才是主动引用，直接粘贴的绝对路径仍作为普通文本。删除或修改引用前缀会取消该引用。
 
 列表只显示允许用户调用的技能（`user-invocable` 不为 false）；`disable-model-invocation: true` 只禁止模型自动加载，不禁止用户主动调用。提交时重新读取并校验技能，原生 `render()` 替换 `$ARGUMENTS` 或追加参数，模型无需先调用 `load_capability`。界面显示原始引用与参数，历史保存模型实际接收的技能说明。执行中的输入继续作为反馈，不展开新技能。
+
+## 外部 Hook
+
+通过启动进程的环境变量 `CODER_HOOK_CONFIG` 指定 JSON 配置的绝对路径。工作目录和项目 `.env` 不自动加载 Hook。省略变量时仅使用内置 Hook。
+
+```json
+{
+  "hooks": [
+    {"tool": "shell", "remove_prefix": "DEBUG: polling", "extra_chars": 1024}
+  ]
+}
+```
+
+支持 `shell` 和 `web_fetch` 文本结果，每个工具最多一条规则。`remove_prefix` 匹配行首。`extra_chars` 默认为 0，可申请对默认 4096 字符后的额外片段做过滤，最多 4096 字符。HTTP JSON 和 HTML 不使用外部行过滤。
+
+Hook 审批与工具审批独立。选择「以后都允许」会保存授权，之后在同一工作目录、配置路径和规则下无需再询问，重启后仍有效。将规则的 `extra_chars` 设为 0 可停止使用额外范围。配置不支持导入 Python、执行命令、读写文件或联网，包含未支持字段时会报错。

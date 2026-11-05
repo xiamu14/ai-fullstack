@@ -768,31 +768,65 @@ python3 -m unittest test_app -q
 
 ### 3.2 Reflection：优先形成验证闭环
 
-Pydantic AI 的原生自我纠正包括参数与输出校验失败后的重试，以及工具、输出验证器通过 `ModelRetry` 返回纠正信息；这些机制不自动判断代码是否满足需求。[Reflection and self-correction](https://pydantic.dev/docs/ai/core-concepts/agent/#reflection-and-self-correction)
+Pydantic AI 将工具参数和结构化输出的校验错误反馈给模型。工具或输出验证器也可抛出 `ModelRetry`，说明下一次该如何修正。[Pydantic AI 自我纠正](https://pydantic.dev/docs/ai/core-concepts/agent/#reflection-and-self-correction)
+
+#### 在 coder-cli 接入验证闭环
+
+由执行 Agent 和独立评审 Agent 分工的验证闭环属于多 Agent（multi-agent）能力。当前 coder-cli 仍是单 Agent（single-agent）Harness，由同一个 Agent 实施、读取测试结果并修复。
+
+复用现有 Agent、shell 和工具权限。测试失败沿用普通工具结果，模型根据退出码和断言修复。下面是拟接入的验收逻辑，示例预算为一次修复、两次验证。
 
 ```mermaid
 flowchart LR
-    A[按需规划] --> B[实施]
-    B --> C[运行相关验证]
-    C -->|失败且可修复| D[根据证据调整]
+    A["按批准的计划实施"] --> B["用 shell 运行指定测试"]
+    B -->|"退出码 0"| C["记录证据，核对验收项"]
+    B -->|"非零退出码，仍可修复"| D["读取失败断言，修复代码"]
     D --> B
-    C -->|通过| E[核对需求并结束]
-    C -->|预算耗尽或无法继续| F[报告阻塞与未验证项]
+    B -->|"预算耗尽或工具不可用"| E["报告失败或未验证"]
 ```
 
-| 反馈来源 | 用法 |
-|---|---|
-| 测试、类型检查、命令结果 | 优先使用可核实的证据；按改动范围选择检查 |
-| 同模型复查 | 对照需求与 diff 查遗漏，不能代替验证 |
-| 独立评审模型 | 有明确评价标准且收益可测时再加入 |
+```text
+每次运行登记验收命令、验证次数上限和修复次数上限
+指定测试返回 → 保存退出码和失败摘要，状态为通过或失败
+测试通过后又修改相关文件 → 清除通过记录，状态为未验证
+输出验证器发现模型声称完成，但缺少有效通过记录
+    还有验证额度且可以执行 → ModelRetry("请运行指定测试并根据结果汇报")
+    无法继续 → 只接受如实报告失败或未验证的输出
+```
 
-Anthropic 的 evaluator-optimizer 模式强调明确评价标准与可衡量的迭代收益，编码任务可用测试结果反馈。[Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+预算由 Harness 检查。现有 `UsageLimits(request_limit=50)` 限制模型请求数，`ModelRetry` 使用框架的重试预算，测试失败则由验收逻辑计数。
 
-工程上先补齐验收条件、通过／失败／未运行的结果记录，以及修复次数和消耗上限。普通测试失败可直接作为工具结果反馈，不必全部转换成 `ModelRetry`；后者更适合参数或输出不符合约定的情况。
+#### 按运行观察证据
 
-不固定追加“再反思一次”，不让评审只读取最终总结，也不为所有任务增加第二个 Agent。同模型可能重复原来的误判，独立模型则增加请求、上下文和协调成本。
+| 观察点 | 现有数据来源 |
+| --- | --- |
+| 框架要求模型纠正什么 | 在快照消息中查 `RetryPromptPart` |
+| 测试是否通过、修复顺序是否正确 | 按 `run_id` 查 SQLite 的 `events`，再从消息快照核对工具结果中的退出码与断言 |
+| 修复消耗 | 用 Logfire 查看模型和工具耗时，用 `result.usage` 查看请求数和 token |
+
+`tool_call_completed` 只说明工具调用结束。测试通过以指定命令的退出码 `0` 为准。[Pydantic AI 的 Logfire 观测](https://pydantic.dev/docs/ai/integrations/logfire/)
+
+3.1 的 HTTP 示例已包含验证环节：Planning 把测试列为最后一步，Reflection 根据测试结果决定结束，还是修复后重测。示例的测试直接通过，展示了验收环节。
+
+#### Multi-Agent 实现后验证 PATCH
+
+在 [mini_http](../coder-cli/example/mini_http/README.md) 的临时副本中，让 PATCH 返回新名称，但保留内存中的旧值。现有用例会用 GET 检查修改是否保存。在示例目录运行：
+
+```bash
+python3 -m unittest test_app.ItemsAPITest.test_patch_updates_name -v
+```
+
+```text
+验证 Agent：运行用例，记录 GET 读到旧值，退出码 1
+执行 Agent：根据失败证据修复 PATCH
+验证 Agent：独立重跑同一用例，核对退出码 0
+```
+
+待 Multi-Agent Harness 实现后，用不同 Agent 执行上述流程。记录各自的 `run_id`、测试退出码和失败断言，核对证据如何在 Agent 之间传递。
 
 ### 3.3 Thinking：使用模型原生推理
+
+Thinking 对应 Codex 的「推理强度」这一概念：调节模型在回答或决定下一步行动前的推理投入。具体档位和行为由模型及供应商决定，Codex 的档位与 Pydantic AI 的设置值不一定一一对应。本节仅说明机制，coder-cli 暂不接入。
 
 CoT 是推理方法，Thinking 是模型侧推理能力。工程产物保留计划、结论和验证证据，不要求模型输出完整思维链，也不把思考文字当作正确性证明。
 
@@ -812,19 +846,81 @@ coder-cli 目前通过 `OpenAIChatModel` 访问模型；兼容接口不代表推
 
 增强时优先使用原生模型适配和配置，不自定义 `<think>` 解析器；保留框架消息结构，不手工拼接或改写供应商要求回传的推理块。
 
-### 3.4 评测后再增强
+## 5. Hook
 
-先以当前 Harness 为基线，在小修复、多文件功能、重构任务上逐项比较，再测试有效能力的组合：
+Hook 在一次 Agent 运行的指定节点执行 Python 回调。单个回调用 `Hooks` 注册，权限和交互等跨节点逻辑用 `AbstractCapability` 组织。[Pydantic AI Hooks](https://pydantic.dev/docs/ai/core-concepts/hooks/)
 
-| 实验 | 要验证的收益 | 同时观察的代价 |
-|---|---|---|
-| 加任务计划 | 步骤遗漏、任务偏离是否减少 | 计划更新的 token 与工具调用 |
-| 加验证反馈约束 | 验收通过与回归情况是否改善 | 检查耗时、修复次数 |
-| 调节 Thinking | 困难任务成功率是否提高 | 总耗时、输入／输出与推理 token（接口提供时） |
-| 加独立评审 | 是否发现前述流程遗漏的问题 | 额外请求、误报与修复成本 |
+```mermaid
+flowchart LR
+    R["before_run"] --> M["模型请求前后"]
+    M --> V["工具参数校验"]
+    V --> B["before_tool_execute"]
+    B -->|"允许"| T["执行工具"]
+    B -->|"拒绝或待审批"| S["本次不执行"]
+    T --> A["after_tool_execute"]
+    A -->|"工具结果进入上下文"| M
+    M -->|"模型给出最终输出"| F["输出校验 → after_run"]
+```
 
-固定任务、验收标准、模型版本和预算，保留多次运行结果；比较真实改动与验证证据。计划标记完成、模型声称通过，都不算任务成功。
+coder-cli 在 `before_tool_execute` 检查严格规划和权限，用 `wrap_run` 的 `finally` 清理运行状态。工具副作用已经发生后，`after_tool_execute` 仍可修改返回值。
 
-增强顺序：**Planning 与所需执行门禁 → 验证反馈 → 模型 Thinking 适配**。独立 Reflection Agent 在评测证明有收益后再接入。
+### 内置示例：压缩工具结果
 
-## 5. hooks
+```python
+from pydantic_ai.capabilities import Hooks
+
+output_hooks = Hooks()
+
+@output_hooks.on.after_tool_execute(tools=["shell", "web_fetch"])
+async def compact_tool_output(ctx, *, call, tool_def, args, result):
+    # 示意：具体规则见下表
+    return compact(call.tool_name, result)
+
+# 将 output_hooks 加入 Agent(..., capabilities=[..., output_hooks])
+```
+
+| 工具 | 压缩规则 | 保留的信息 |
+| --- | --- | --- |
+| `shell` | 连续相同的日志行出现至少三次时，折叠为一行和次数 | 不同的日志行、错误、退出状态和原始日志路径 |
+| `web_fetch` | 去除 JSON 对象或数组在字符串外的排版空白 | 字段、值及字符串中的空白；HTML 和普通文本原样返回 |
+
+```text
+shell:     waiting × 5 + ERROR + exit code
+模型收到:  waiting + [上一行共出现 5 次] + ERROR + exit code
+
+HTTP JSON: { "message": "a b", "count": 5 }
+模型收到:  {"message":"a b","count":5}
+```
+
+Hook 仅在结果文本变短时替换。可用 `FunctionModel` 检查下一次模型请求收到的工具结果；实际 token 节省以模型返回的用量为准。
+
+### 外部 Hook 的权限边界
+
+外部 Hook 从启动环境变量 `CODER_HOOK_CONFIG` 指定的 JSON 文件加载。Harness 只接受指定工具、行首过滤规则和额外字符数。项目文件不会自动注册 Hook。配置包含脚本、文件操作或网络等不支持的字段时，启动阶段直接报错。
+
+```json
+{
+  "hooks": [
+    {"tool": "shell", "remove_prefix": "DEBUG: polling", "extra_chars": 1024}
+  ]
+}
+```
+
+```text
+工具结果 → 默认范围直接过滤 → 结果交回模型
+         └─ 申请额外范围
+            ├─ 已授权 → 直接过滤
+            └─ 未授权 → 本次允许 / 以后都允许 / 拒绝
+```
+
+| | Tool 权限 | 外部 Hook 权限 |
+| --- | --- | --- |
+| 检查时机 | 工具执行前 | 工具执行后，结果进入模型上下文前 |
+| 检查对象 | 工具名、参数、目标资源及可能的副作用 | 工具结果中允许过滤的字符范围 |
+| 权限来源 | 工具权限配置与执行边界。严格规划另行检查 | 独立 Hook 配置与 Harness 固定上限 |
+| 审批 | 按工具规则审批具体调用，部分授权可在会话内复用 | 可单次允许，也可为相同 Hook 保存长期授权 |
+| 拒绝后 | 工具不执行，拒绝结果交回模型 | 只过滤默认范围，范围外的文本原样保留 |
+
+上例允许 Hook 在前 4096 字符内按规则过滤完整行。结果超出该范围时，`extra_chars: 1024` 表示可申请再处理最多 1024 字符，申请上限为 4096。审批展示工具名、字符范围和过滤前缀，用户可选「本次允许」「以后都允许」或「拒绝」。长期授权保存在会话数据库的独立表中，绑定工作目录、配置路径、过滤规则和额外范围上限，跨会话与重启复用。JSON 和 HTML 响应跳过外部行过滤。
+
+**两套授权不互通。** Tool 的 `full` 模式不会扩大 Hook 的过滤范围。批准 Hook 处理更多文本也不会授权工具调用或文件访问。配置和启动方式见 [coder-cli README](../coder-cli/README.md#外部-hook)。
