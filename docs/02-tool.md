@@ -82,50 +82,27 @@ agent = Agent(
 
 capability 可以提供工具、说明和运行过程的扩展，供多个 Agent 复用。列表用于组合能力，不代表工具执行顺序。
 
-### 2.2 定义 web_fetch
+### 2.2 网页读取与搜索
 
-在 `tools/web_tools.py` 中定义工具，获取网页并返回响应文本：
-
-```python
-import httpx
-from pydantic_ai import ModelRetry
-
-
-async def web_fetch(url: str) -> str:
-    """获取 HTTP/HTTPS 网页，返回响应文本（HTML 不转正文）；失败时返回错误。
-
-    Args:
-        url: 网页的完整 HTTP 或 HTTPS 地址。
-    """
-    try:
-        if httpx.URL(url).scheme not in ("http", "https"):
-            raise ValueError("只支持 HTTP 或 HTTPS 地址")
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-            response = await client.get(url)
-            response.raise_for_status()
-        return response.text
-    except (httpx.HTTPError, httpx.InvalidURL, ValueError) as exc:
-        raise ModelRetry(f"网页获取失败：{exc}") from exc
-```
-
-函数名、说明和类型用于生成工具定义，函数体是实际实现。`ModelRetry` 把失败原因交回模型，让它修正调用。这里直接返回 HTML，不提取正文，也不执行网页 JavaScript。
-
-在 `agent/runtime.py` 导入函数，并在原有 `Agent(...)` 中增加 `tools=[web_fetch]`，保留原有 `instructions`：
+网页读取使用框架的 `WebFetch` capability，网页搜索使用 `tavily-python` 的异步客户端。安装 `pydantic-ai-slim[web-fetch]` 与 `tavily-python`，并在 `.env` 设置 `TAVILY_API_KEY`。
 
 ```python
-from tools.web_tools import web_fetch
+from pydantic_ai.capabilities import WebFetch
+from tools.web_tools import web_search
 
 agent = Agent(
     model,
-    capabilities=[LocalWorkspace(workspace), Coder()],
-    tools=[web_fetch],
+    capabilities=[LocalWorkspace(workspace), Coder(), WebFetch(native=False, local=True)],
+    tools=[web_search],
     # 保留原有 instructions。
 )
 ```
 
-不需要手写 JSON，框架负责生成定义、校验参数、执行函数并返回结果。
+`native=False` 让请求走本地工具执行链，保留工具权限检查与 Hook；`local=True` 使用框架自带的网页读取实现。它把 HTML 转为 Markdown，返回 URL、标题和内容；二进制内容通过 `BinaryContent` 返回，是否能理解取决于模型。它不执行网页 JavaScript。[WebFetch 文档](https://pydantic.dev/docs/ai/capabilities/web-fetch/)
 
-先单独注册 `web_fetch`。在 `coder-cli` 目录运行下面的示例，按图片的 `alt` 属性查找并保存图片：
+`web_search(query)` 用 `AsyncTavilyClient.search()` 检索，返回最多五个来源的标题、URL 和摘要，不请求 Tavily 生成答案。模型先搜索来源，再按需调用 `web_fetch` 阅读。客户端从 `TAVILY_API_KEY` 获取凭据，查询参数由框架校验。[Tavily Python SDK](https://docs.tavily.com/sdk/python/reference)
+
+先用上述网页工具执行一个任务。在 `coder-cli` 目录运行下面的示例，按图片的 `alt` 属性查找并保存图片：
 
 ```bash
 uv run python main.py
@@ -144,7 +121,7 @@ uv add playwright
 uv run playwright install chromium
 ```
 
-在 `tools/image_download.py` 定义 `image_download(workspace)`，把 `web_fetch` 和新的 `download_image` 放入同一个 capability。`download_image` 一次完成打开网页、等待目标图片、下载和保存，只返回状态、来源和路径。以下以 Chromium 演示工具封装；后面的外部 Skill 示例使用 Lightpanda。
+在 `tools/image_download.py` 定义 `image_download(workspace)`，用 capability 封装新的 `download_image`，并复用 `WebFetch` 内置的 `web_fetch_tool()`。`download_image` 一次完成打开网页、等待目标图片、下载和保存，只返回状态、来源和路径。以下以 Chromium 演示工具封装；后面的外部 Skill 示例使用 Lightpanda。
 
 ```python
 import asyncio
@@ -155,7 +132,7 @@ import httpx
 from playwright.async_api import Error as BrowserError, async_playwright
 from pydantic_ai.capabilities import Capability
 
-from tools.web_tools import web_fetch
+from pydantic_ai.common_tools.web_fetch import web_fetch_tool
 
 
 def image_download(workspace: Path) -> Capability:
@@ -164,7 +141,7 @@ def image_download(workspace: Path) -> Capability:
             "下载网页中指定图片时，直接调用 download_image，不先用 web_fetch 或 shell 探索。"
             "工具内部完成渲染、定位和下载；成功后报告路径，失败后立即报告原因并结束，不再调用任何工具，包括 web_fetch 和 shell。"
         ),
-        tools=[web_fetch],
+        tools=[web_fetch_tool()],
     )
 
     @web.tool_plain
@@ -393,15 +370,16 @@ uv add 'pydantic-ai-harness[coder,skills]'
 
 ```python
 from pydantic_ai_harness import Skills
-from tools.web_tools import web_fetch
+from pydantic_ai.capabilities import WebFetch
+from tools.web_tools import web_search
 
 agent = Agent(
     model,
     capabilities=[
-        LocalWorkspace(workspace), Coder(),
+        LocalWorkspace(workspace), Coder(), WebFetch(native=False, local=True),
         Skills(Path.home() / ".agents" / "skills", missing_directories="skip"), weather,
     ],
-    tools=[web_fetch],
+    tools=[web_search],
     # 保留原有 instructions。
 )
 ```

@@ -5,7 +5,7 @@ from pathlib import Path
 import logfire
 from dotenv import load_dotenv
 from pydantic_ai import Agent
-from pydantic_ai.capabilities import HandleDeferredToolCalls
+from pydantic_ai.capabilities import HandleDeferredToolCalls, WebFetch
 from pydantic_ai.conversation import Conversation as NativeConversation
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
@@ -41,7 +41,7 @@ from storage.sessions import (
 )
 from tools.external_hooks import external_result_hooks, hook_config_path, load_hook_settings
 from tools.output_hooks import output_hooks
-from tools.web_tools import web_fetch
+from tools.web_tools import web_search
 
 
 async def create_agent(session_id: str | None = None, path: str | None = None) -> Conversation:
@@ -95,6 +95,8 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
             RestrictedWorkspace(workspace, permissions),
             Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
             permissions,
+            # Local execution keeps fetches inside the tool permission and hook pipeline.
+            WebFetch(native=False, local=True),
             output_hooks,
             external_result_hooks(
                 hook_settings, interaction, database=database, workspace=workspace, config_path=hook_path,
@@ -111,7 +113,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
                 injection_errors="raise",
             ),
         ],
-        tools=[web_fetch],
+        tools=[web_search],
         instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8"),
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)

@@ -54,7 +54,7 @@ Never prefix bash tool commands with `cd <dir> &&` or `cd <dir>;` to change dire
 
 When searching for text or files, prefer using `rg` or `rg --files` respectively because `rg` is much faster than alternatives like `grep`. (If the `rg` command is not found, then use alternatives.)
 
-Use the available `list_directory`, `grep`, `read_file`, and `shell` tools for repository discovery. Search for relevant paths and symbols before opening file contents. Use `web_fetch` or available MCP tools for external references when needed. Do not call tools that are not offered in this run.
+Use the available `list_directory`, `grep`, `read_file`, and `shell` tools for repository discovery. Search for relevant paths and symbols before opening file contents. Use `web_search` to find sources and `web_fetch` to read their contents, or available MCP tools for external references when needed. Do not call tools that are not offered in this run.
 </tool_use>
 
 <mcp_configuration>

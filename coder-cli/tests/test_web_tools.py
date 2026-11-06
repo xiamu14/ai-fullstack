@@ -1,69 +1,92 @@
+import asyncio
 import json
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
-import httpx
+import httpx2
 from pydantic_ai import Agent, ModelRetry
-from pydantic_ai.capabilities import Capability, LocalWorkspace
-from pydantic_ai.messages import ToolReturnPart
+from pydantic_ai.capabilities import LocalWorkspace, WebFetch
+from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import DeltaToolCall, FunctionModel
 from pydantic_ai_harness.coder import Coder
+from tavily.errors import TimeoutError as TavilyTimeout
 
-from tools.web_tools import web_fetch
+from tools.web_tools import web_search
+from tools.output_hooks import output_hooks
 
 
 class WebToolsTests(unittest.IsolatedAsyncioTestCase):
-    def client_mock(self, handler):
-        client_class = httpx.AsyncClient
-        return patch("tools.web_tools.httpx.AsyncClient", side_effect=lambda **kwargs: client_class(
-            transport=httpx.MockTransport(handler), **kwargs
-        ))
+    async def test_tavily_sources_and_client_cleanup(self):
+        client = AsyncMock()
+        client.__aenter__.return_value = client
+        client.search.return_value = {"results": [
+            {"title": "Source", "url": "https://example.com", "content": "Evidence", "score": 0.9},
+        ]}
+        with patch.dict(os.environ, {"TAVILY_API_KEY": "secret-test-key"}), patch(
+            "tools.web_tools.AsyncTavilyClient", return_value=client,
+        ) as factory:
+            self.assertEqual(await web_search("query"), [
+                {"title": "Source", "url": "https://example.com", "content": "Evidence"},
+            ])
+        factory.assert_called_once_with(api_key="secret-test-key")
+        client.search.assert_awaited_once_with(
+            "query", search_depth="basic", max_results=5,
+            include_answer=False, include_raw_content=False, timeout=30,
+        )
+        client.__aexit__.assert_awaited_once()
 
-    async def test_fetch_redirect_and_failures(self):
-        def handler(request):
-            if request.url.path == "/redirect":
-                return httpx.Response(302, headers={"location": "/page"})
-            if request.url.path == "/missing":
-                return httpx.Response(404)
-            if request.url.path == "/timeout":
-                raise httpx.ReadTimeout("读取超时", request=request)
-            return httpx.Response(200, text="<h1>工具课程</h1>")
+    async def test_missing_key_timeout_and_cancellation(self):
+        with patch.dict(os.environ, {"TAVILY_API_KEY": ""}):
+            with self.assertRaisesRegex(ModelRetry, "TAVILY_API_KEY"):
+                await web_search("query")
+        client = AsyncMock()
+        client.__aenter__.return_value = client
+        with patch.dict(os.environ, {"TAVILY_API_KEY": "test-key"}), patch(
+            "tools.web_tools.AsyncTavilyClient", return_value=client,
+        ):
+            client.search.side_effect = TavilyTimeout(30)
+            with self.assertRaises(ModelRetry):
+                await web_search("query")
+            client.search.side_effect = asyncio.CancelledError
+            with self.assertRaises(asyncio.CancelledError):
+                await web_search("query")
 
-        with self.client_mock(handler):
-            self.assertEqual(await web_fetch("https://example.com/redirect"), "<h1>工具课程</h1>")
-            for url in ("file:///tmp/a", "https://example.com/missing", "https://example.com/timeout"):
-                with self.subTest(url=url), self.assertRaises(ModelRetry):
-                    await web_fetch(url)
-
-    async def test_direct_and_capability_registration_with_coder(self):
-        async def stream_model(messages, info):
+    async def test_native_fetch_with_coder_preserves_structured_result(self):
+        def model(messages, info):
             names = {tool.name for tool in info.function_tools}
-            self.assertTrue({"web_fetch", "read_file", "write_file", "shell"} <= names)
+            self.assertTrue({"web_fetch", "web_search", "read_file", "write_file", "shell"} <= names)
             results = [part for message in messages for part in message.parts
                        if isinstance(part, ToolReturnPart) and part.tool_name == "web_fetch"]
             if results:
-                self.assertEqual(results[-1].content, "<h1>工具课程</h1>")
-                yield "工具课程"
-            else:
-                yield {0: DeltaToolCall(name="web_fetch", json_args=json.dumps({"url": "https://example.com"}))}
+                self.assertEqual(results[-1].content["title"], "Tools")
+                self.assertIn("Evidence", results[-1].content["content"])
+                self.assertNotIn("<h1>", results[-1].content["content"])
+                return ModelResponse(parts=[TextPart("done")])
+            return ModelResponse(parts=[ToolCallPart("web_fetch", {"url": "https://example.com"})])
 
-        with TemporaryDirectory() as directory, self.client_mock(
-            lambda request: httpx.Response(200, text="<h1>工具课程</h1>")
+        async def stream(messages, info):
+            response = model(messages, info)
+            for part in response.parts:
+                if isinstance(part, ToolCallPart):
+                    yield {0: DeltaToolCall(name=part.tool_name, json_args=json.dumps(part.args))}
+                else:
+                    yield part.content
+
+        response = httpx2.Response(
+            200, text="<html><head><title>Tools</title></head><body><h1>Evidence</h1></body></html>",
+            headers={"content-type": "text/html"}, request=httpx2.Request("GET", "https://example.com"),
+        )
+        with TemporaryDirectory() as directory, patch(
+            "pydantic_ai.common_tools.web_fetch.safe_download", AsyncMock(return_value=response),
         ):
-            for bundled in (False, True):
-                with self.subTest(bundled=bundled):
-                    capabilities = [LocalWorkspace(Path(directory)), Coder()]
-                    if bundled:
-                        capabilities.append(Capability(tools=[web_fetch], instructions="需要网页内容时调用 web_fetch。"))
-                    agent = Agent(
-                        FunctionModel(stream_function=stream_model),
-                        capabilities=capabilities,
-                        tools=[] if bundled else [web_fetch],
-                    )
-                    result = await agent.run("获取网页标题")
-                    self.assertEqual(result.output, "工具课程")
+            agent = Agent(
+                FunctionModel(model, stream_function=stream), tools=[web_search],
+                capabilities=[LocalWorkspace(Path(directory)), Coder(), WebFetch(native=False, local=True), output_hooks],
+            )
+            self.assertEqual((await agent.run("read page")).output, "done")
 
 
 if __name__ == "__main__":

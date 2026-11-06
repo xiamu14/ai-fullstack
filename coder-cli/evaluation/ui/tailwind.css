@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "./node_modules/preline/variants.css";
+@source "../report.py";
+@source "./dashboard.js";
+
+@source "../report_views.py";
+@source "./node_modules/preline/dist/overlay.js";
+
+@source "./node_modules/preline/dist/tooltip.js";

@@ -1,19 +1,26 @@
+"""Tavily search; URL fetching is provided by the native WebFetch capability."""
+
+import os
+from typing import Annotated
+
 import httpx
+from pydantic import Field
 from pydantic_ai import ModelRetry
+from tavily import AsyncTavilyClient
+from tavily.errors import BadRequestError, TimeoutError as TavilyTimeout
 
 
-async def web_fetch(url: str) -> str:
-    """获取 HTTP/HTTPS 网页，返回响应文本（HTML 不转正文）；失败时返回错误。
-
-    Args:
-        url: 网页的完整 HTTP 或 HTTPS 地址。
-    """
+async def web_search(query: Annotated[str, Field(min_length=1, max_length=2000)]) -> list[dict]:
+    """Search the web with Tavily and return source titles, URLs, and content snippets."""
+    key = os.getenv("TAVILY_API_KEY")
+    if not key:
+        raise ModelRetry("网页搜索需要配置 TAVILY_API_KEY。")
     try:
-        if httpx.URL(url).scheme not in ("http", "https"):
-            raise ValueError("只支持 HTTP 或 HTTPS 地址")
-        async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
-            response = await client.get(url)
-            response.raise_for_status()
-        return response.text
-    except (httpx.HTTPError, httpx.InvalidURL, ValueError) as exc:
-        raise ModelRetry(f"网页获取失败：{exc}") from exc
+        async with AsyncTavilyClient(api_key=key) as client:
+            response = await client.search(
+                query, search_depth="basic", max_results=5,
+                include_answer=False, include_raw_content=False, timeout=30,
+            )
+    except (BadRequestError, TavilyTimeout, httpx.RequestError) as exc:
+        raise ModelRetry(f"Tavily 搜索失败（{type(exc).__name__}），请调整查询或稍后重试。") from None
+    return [{key: item[key] for key in ("title", "url", "content")} for item in response["results"]]

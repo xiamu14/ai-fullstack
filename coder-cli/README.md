@@ -9,7 +9,7 @@
 ```bash
 uv sync --locked
 cp -n .env.example .env
-# 在 .env 填写 OPENAI_BASE_URL、OPENAI_API_KEY、MODEL_NAME。
+# 在 .env 填写 OPENAI_BASE_URL、OPENAI_API_KEY、MODEL_NAME、TAVILY_API_KEY。
 ```
 
 MCP 是可选配置，默认不连接外部服务。要使用天气示例，先在另一个终端启动服务：
@@ -190,6 +190,48 @@ npx skills update
 }
 ```
 
-支持 `shell` 和 `web_fetch` 文本结果，每个工具最多一条规则。`remove_prefix` 匹配行首。`extra_chars` 默认为 0，可申请对默认 4096 字符后的额外片段做过滤，最多 4096 字符。HTTP JSON 和 HTML 不使用外部行过滤。
+支持 `shell` 和 `web_fetch` 文本结果，每个工具最多一条规则。`remove_prefix` 匹配行首。`extra_chars` 默认为 0，可申请对默认 4096 字符后的额外片段做过滤，最多 4096 字符。HTTP JSON 和 HTML 文本不使用外部行过滤。框架 WebFetch 返回的结构化结果或 BinaryContent 直接保留，不应用文本行过滤。
 
 Hook 审批与工具审批独立。选择「以后都允许」会保存授权，之后在同一工作目录、配置路径和规则下无需再询问，重启后仍有效。将规则的 `extra_chars` 设为 0 可停止使用额外范围。配置不支持导入 Python、执行命令、读写文件或联网，包含未支持字段时会报错。
+
+## 网页工具与 GAIA 验证
+
+`web_fetch` 使用 Pydantic AI `WebFetch(native=False, local=True)`，保留本地权限与 Hook 执行链，HTML 转 Markdown。`web_search` 使用 `tavily-python`，从 `.env` 的 `TAVILY_API_KEY` 读取密钥，返回最多五个来源的标题、URL 和摘要。搜索不请求 Tavily 代答。原生 WebFetch 的私网访问保护和下载预算保持默认值。
+
+GAIA 首轮使用独立的 **web-only Pydantic AI 基线**，只配备上述两项工具，不包含完整 coder-cli Harness 的规划、文件、shell、记忆和交互能力。它不作为完整 coder-cli 或全量 GAIA 的成绩。每题使用新 conversation，无历史继承；标准答案和标注只在评分进程使用。
+
+先在 [GAIA 数据页](https://huggingface.co/datasets/gaia-benchmark/GAIA) 接受访问条件，再用 Hugging Face 本地登录凭据或 `.env` 中的 `HF_TOKEN`：
+
+在 `coder-cli` 目录执行：
+
+```bash
+uv sync --locked --group eval
+# 仅预览题单。无参数列出全量 validation 的 165 个任务 ID
+uv run --group eval python -m evaluation.gaia_data
+# 固定 10 道只需文本的任务
+uv run --group eval python -m evaluation.gaia --subset text
+# 从有附件的 Level 2 题中取前 3 道，可把同一组参数传给 gaia_data 预览
+uv run --group eval python -m evaluation.gaia --level 2 --attachment with --limit 3
+# 无参数实际运行全量 validation，会调用模型和搜索服务
+uv run --group eval python -m evaluation.gaia
+```
+
+两个入口共用 `--subset {all,text}`、`--level {1,2,3}`、`--attachment {any,with,without}` 与 `--limit N`。默认选所有等级和附件状态。普通筛选按任务 ID 排序，`text` 按 `evaluation/gaia_text_subset.json` 中审核过的顺序。零匹配或数量超过可用任务会报错。数据与附件均锁定到同一个 revision。单个附件预算 32 MiB，UTF-8 文本直接送入提示，其余文件通过模型的二进制输入传入。模型无法处理的格式计入错误。
+
+每题默认 `--timeout 180 --request-limit 20`，工具调用上限为 30。运行保存到 仓库根目录的 `benchmark/gaia/<UTC时间>/`。测试标题自动使用短 commit 和北京时间，如 `02b9fc66 · 11-06 08:56`，与 Dashboard 展示一致。页头点击“复测命令”可复制复测命令，修改代码后复跑会自动生成新标题，每次运行独立留档。打开固定的 [Benchmark Dashboard](../benchmark/gaia/index.html) 查看最新结果分布、类别表现、同题单测试选择、Agent commit 与配置版本和逐题表格。默认定位最新测试，侧栏可切换历史测试。比较自动选用当前测试之前最近一次同题单、不同 Agent 配置指纹的记录。没有符合条件的记录时显示空状态。各版本保留可离线打开的快照。配置记录模型、依赖、源码指纹、Git 提交、数据和评分版本。错误与未完成题均保留在计划题数中。
+
+报告包含受限题目、参考答案与模型消息，仅供本地私有查看。网页内容会随时间变化。
+
+
+Dashboard 的测试历史表与逐题表记录耗时、Token（输入加输出）、LLM 请求数和工具执行数，均来自 Pydantic AI 的 RunUsage。累计指标在全部题目均有对应数据时展示，存在缺失时显示空值。比较区分别绘制四项指标，坐标轴独立。
+
+GAIA 命令使用 `.env` 中的 `LOGFIRE_TOKEN` 或本机 Logfire 配置开启采集，结束前刷新上传。两张表的 Logfire 入口打开该次 Evals 评测，逐题 JSON 记录保留 case 的 trace_id 和 span_id。既有离线记录未关联云端评测时显示“未采集”。云端访问仍需对应项目权限。
+
+
+启动 Dashboard，在仓库根目录运行并保持终端开启：
+
+```bash
+python3 -m http.server 8876 --bind 127.0.0.1 --directory benchmark/gaia
+```
+
+然后打开 [Dashboard](http://127.0.0.1:8876/)。评测终端会显示总进度条和每题开始、结束及耗时。
