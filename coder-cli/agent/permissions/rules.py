@@ -7,9 +7,10 @@ from agent.permissions.config import Settings
 
 
 INTERNAL = frozenset({
-    "write_plan",
+    "write_plan", "review_diff",
     "ask_user_question", "load_capability", "search_tools", "search_conversation_history",
     "read_memory", "write_memory", "search_memory", "delete_memory",
+    "delegate_task", "list_tasks", "message_task", "answer_task", "cancel_task", "ask_parent",
 })
 
 
@@ -22,10 +23,12 @@ class Decision:
     write: bool = False
     command: bool = False
     forced: bool = False
+    sandbox_only: bool = False
 
 
 def decide(settings: Settings, name: str, kind: str | None, args: dict, *, root: Path,
-           readonly: tuple[Path, ...], forbidden: tuple[Path, ...], command_arg: str | None) -> Decision:
+           readonly: tuple[Path, ...], forbidden: tuple[Path, ...], command_arg: str | None,
+           allow_sandboxed_shell: bool = False) -> Decision:
     command = command_arg is not None
     file_tool = bool(kind and kind.startswith("file_system."))
     write = bool(kind and kind.rsplit(".", 1)[-1] in {"write_file", "edit_file", "create_directory"})
@@ -68,6 +71,8 @@ def decide(settings: Settings, name: str, kind: str | None, args: dict, *, root:
         return result("allow", "工作目录内普通文件操作")
     if name in INTERNAL:
         return result("allow", "框架问答、发现与会话记忆工具")
+    if allow_sandboxed_shell and name == "shell" and command and settings.sandbox and settings.mode == "auto":
+        return Decision("allow", "Shell 沙箱内执行", subject, command=True, sandbox_only=True)
     if settings.mode == "full":
         return result("allow", "full 模式；硬限制仍生效")
     return result("ask", "命令、外部工具或未分类操作默认询问", True)

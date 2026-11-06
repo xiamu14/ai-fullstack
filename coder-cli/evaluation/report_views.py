@@ -55,7 +55,7 @@ def config_key(manifest):
     source = manifest.get("source", {})
     files = source.get("files", {})
     agent = source.get("agent_sha256") or fingerprint({k: v for k, v in files.items() if k in {
-        "evaluation/gaia.py", "tools/web_tools.py", "integrations/provider.py", "provider.json", "uv.lock"}})
+        "evaluation/gaia.py", "tools/web_tools.py", "integrations/provider.py", "provider.json", "provider.jsonc", "uv.lock"}})
     return fingerprint({"agent": agent, **{k: manifest.get(k) for k in (
         "model", "instructions", "provider_endpoint_sha256", "versions", "timeout_seconds", "request_limit", "tool_calls_limit")}})
 

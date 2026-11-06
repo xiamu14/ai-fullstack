@@ -46,6 +46,8 @@ class RestrictedBackend(LocalWorkspaceBackend):
         self.temporary.cleanup()
 
     def check(self, path: str, *, write=False):
+        if write and getattr(self.policy, "role_read_only", False):
+            raise PermissionError("当前角色只读，不能修改工作区")
         target = Path(path).resolve()
         if any(target == denied or target.is_relative_to(denied) for denied in self.policy.forbidden):
             raise PermissionError("工具不能访问权限配置、凭据目录或运行存储")
@@ -125,6 +127,11 @@ class RestrictedBackend(LocalWorkspaceBackend):
                 Path(sys.prefix), Path.home() / ".local/share/uv", self.root, self.scratch, *self.policy.readonly]
         if git_write:
             read.extend(["/Applications/Xcode.app/Contents/Developer", Path.home() / ".gitconfig", Path.home() / ".config/git"])
+            from storage.worktrees import git
+            common = self.root / ".git"
+            if common.is_file():
+                common = Path(git(self.root, "rev-parse", "--path-format=absolute", "--git-common-dir"))
+            read.append(common)
         read_filters = " ".join(subpath(path) for path in [*read, "/dev"])
         lines = [
             "(version 1)", "(allow default)",
@@ -132,6 +139,8 @@ class RestrictedBackend(LocalWorkspaceBackend):
             f'(deny file-write* (require-not (require-any {subpath(self.root)} {subpath(self.scratch)} (literal "/dev/null"))))',
             "(deny network-outbound (remote unix-socket))" if network else "(deny network*)",
         ]
+        if git_write:
+            lines.append(f'(allow file-write* {subpath(common)})')
         for path in self.policy.forbidden:
             lines.append(f"(deny file-read-data file-write* {subpath(path)})")
         # Apply the same configured protected globs to child processes.
@@ -149,18 +158,24 @@ class RestrictedBackend(LocalWorkspaceBackend):
         return "\n".join(lines)
 
     async def run(self, command, *, shell=False, env=None, timeout=None):
+        if getattr(self.policy, "role_read_only", False):
+            raise PermissionError("当前角色不能执行命令")
         if isinstance(command, str) and not shell:
             raise TypeError("字符串命令必须指定 shell=True")
         if not isinstance(command, str) and shell:
             raise TypeError("argv 命令不能指定 shell=True")
         settings, _ = self.policy_settings()
+        grant = CURRENT_GRANT.get()
+        sandbox_only = bool(grant and grant.sandbox_only)
         if not settings.sandbox:
+            if sandbox_only:
+                raise PermissionError("默认验证必须在沙箱内执行")
             return await super().run(command, shell=shell, env=env, timeout=timeout)
         if sys.platform != "darwin" or shutil.which("sandbox-exec") is None:
             raise OSError("本机执行隔离不可用；拒绝执行。请配置可用的隔离后端。")
-        grant = CURRENT_GRANT.get()
+        elevated_command = bool(grant and grant.command and not sandbox_only)
         try:
-            words = shlex.split(grant.subject) if grant and grant.command else []
+            words = shlex.split(grant.subject) if grant and elevated_command else []
         except ValueError:
             words = []
         git_write = bool(words and Path(words[0]).name == "git")
@@ -172,7 +187,7 @@ class RestrictedBackend(LocalWorkspaceBackend):
             git_bin = Path(located.stdout.strip()).parent
             env = {**(env or {}), "PATH": f"{git_bin}:{os.environ.get('PATH', os.defpath)}"}
         argv = ["/bin/sh", "-c", command] if isinstance(command, str) else list(command)
-        invocation = ["/usr/bin/sandbox-exec", "-p", self.profile(network=bool(grant and grant.command), git_write=git_write), *argv]
+        invocation = ["/usr/bin/sandbox-exec", "-p", self.profile(network=elevated_command, git_write=git_write), *argv]
         return await super().run(invocation, env=env, timeout=timeout)
 
 

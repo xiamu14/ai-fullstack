@@ -9,6 +9,13 @@ class ExecutionBusyError(RuntimeError):
     pass
 
 
+def delegation_lease(database: Path, conversation_id: str):
+    return _lease(
+        database.resolve().parent / "execution-locks", "delegations:" + conversation_id,
+        shared=False, message="该 Super 会话已有打开的交互外壳，请先关闭后再操作。",
+    )
+
+
 @contextmanager
 def _lease(directory: Path, key: str, *, shared: bool, message: str):
     if os.name != "posix":

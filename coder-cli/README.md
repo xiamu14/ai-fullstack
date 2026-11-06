@@ -4,12 +4,13 @@
 
 执行期间仍可按 Enter 发送补充消息，消息在当前工具结束后的模型请求中生效。Agent 提问或等待授权时，直接在输入框填写选项编号、名称或文字回答；Ctrl+C 停止当前运行。收到授权反馈后，Agent 还需验证实际登录状态。
 
-默认启用严格规划。选择“本次允许”后才能执行，shell 等工具仍按原权限审批。每轮重新审批，步骤范围变更或运行中补充反馈也会撤销批准。流程见[课程 3.1](../docs/05-harness.md#31-planning任务计划与执行阶段)。
+计划用于记录进度。工作区内普通文件读写按默认权限放行，shell 等工具按权限策略处理。
 
 ```bash
 uv sync --locked
 cp -n .env.example .env
-# 在 .env 填写 OPENAI_BASE_URL、OPENAI_API_KEY、MODEL_NAME、TAVILY_API_KEY。
+# 在 .env 填写 OPENAI_BASE_URL、OPENAI_API_KEY、TAVILY_API_KEY。
+# 在 provider.jsonc 选择 default_model 并定义模型的 provider。
 ```
 
 MCP 是可选配置，默认不连接外部服务。要使用天气示例，先在另一个终端启动服务：
@@ -46,7 +47,7 @@ uv run python main.py --sessions
 
 新会话默认以执行命令时的当前目录作为工作目录；相对 `--path` 也基于该目录解析，支持 `~`。只要传入 `--sessionId`，就忽略 `--path`：已有会话沿用保存的目录，未知 ID 使用当前目录。目录不存在或不是目录时明确报错。`--sessions` 始终查看固定数据库中的所有会话。
 
-不接受位置参数 prompt、`--session` 或 `--sesionId`。需要交互终端，不能通过管道输入。模型名使用 `MODEL_NAME`。模型须支持工具调用和流式响应。
+不接受位置参数 prompt、`--session` 或 `--sesionId`。需要交互终端，不能通过管道输入。默认模型由 `provider.jsonc` 的 `default_model` 指定。模型须支持工具调用和流式响应。
 
 在输入区输入任务，例如：
 
@@ -74,7 +75,8 @@ Harness 已升级至 0.65.0，Pydantic AI 为 2.65.0。工具统一经过原生 
 | 权限配置、运行存储、`~/.ssh`、`~/.aws` | 拒绝，普通批准不能覆盖 |
 | 项目普通文件、已安装技能包的只读资源 | 允许；真实路径仍需通过边界检查 |
 | `.env*`、`.git`、密钥文件、目录外文件 | 逐次询问；目录外文件用文件工具精确授权 |
-| shell、MCP 调用和未分类工具 | 默认询问；命中明确放行规则才自动执行 |
+| Super / Executor 的 shell | `auto` 模式下默认在沙箱内运行，关闭沙箱后默认询问 |
+| MCP 调用和未分类工具 | 默认询问；命中明确放行规则才自动执行 |
 | 本地 stdio MCP | 工具发现前先询问，再启动隔离进程；服务工具调用另行判定 |
 
 审批显示完整参数和工作目录，凭据脱敏；“本次允许”才批准，自由文本、拒绝、5 分钟无回答或没有交互回调均不批准。Ctrl+C 取消等待并清理未执行的批准。工具串行执行；批准后重新检查参数、实际目标状态、权限配置和 MCP 配置，变化则拒绝旧批准。失败或重启恢复时只修复未完成调用，不复用旧批准、不自动重放；需要重新发起调用并批准。
@@ -152,11 +154,98 @@ Logfire 终端输出已关闭，避免干扰 TUI。设置 `.env` 中的 `LOGFIRE
 
 右侧 `Context ◑ 50%` 显示上下文窗口已用比例，圆形字符按占用变化。使用 Pydantic AI 原生 `context_window_used`，以最近一次响应的输入（含缓存）与输出 token 除以模型窗口容量；执行中定期刷新，恢复会话时也从已有响应读取。这是下次请求占用的估计，新增工具结果与上下文压缩会改变实际大小，不是整轮累计 token。窗口容量由模型 profile 与框架模型数据解析；容量或用量未知时显示 `--%`，不假定为 0%。
 
-部署的模型窗口容量在程序目录的 `provider.json` 管理，`models` 的键必须与 `.env` 的 `MODEL_NAME` 完全一致。当前 `GLM-5.3-Flash-Event` 配置为 `1,048,576` token。启动时读取为 Pydantic AI 原生 `profile.context_window`，覆盖框架自动解析值；未配置的模型继续使用框架数据，配置损坏或容量不是正整数则明确报错。修改后重启生效。
+模型配置统一在程序目录的 `provider.jsonc` 管理，支持 `//`、`/* ... */` 注释和尾随逗号。`models` 的键是本地配置引用，`default_model` 引用其中一个键。可用 `model_name` 显式指定发给服务端的模型 ID，省略时使用配置键。OpenRouter 的模型 ID 应填写完整的上游 ID，例如 `openai/gpt-6.1-sol`。`provider` 指定服务接入方式，`protocol` 指定 API 协议。OpenRouter 必须显式指定协议；直接 OpenAI/Anthropic 接入可省略并沿用对应协议。`context_window` 和 `timeout`（秒，默认 30）可选。例如：
+
+```json
+{
+  "default_model": "GLM-5.3-Flash-Event",
+  "models": {
+    "GLM-5.3-Flash-Event": {
+      "provider": "openai",
+      "context_window": 1048576
+    },
+    "claude-sonnet-4-6": {
+      "provider": "anthropic"
+    },
+    "anthropic/claude-sonnet-4.6": {
+      "provider": "openrouter",
+      "protocol": "anthropic"
+    }
+  }
+}
+```
+
+服务地址和凭据统一读取 `{PROVIDER}_BASE_URL` 与 `{PROVIDER}_API_KEY`，其中 PROVIDER 为 provider 的大写。缺少任一变量会明确报错。`provider: openai` 使用 OpenAIChatModel，适用于 GLM 等 OpenAI-compatible 服务；`provider: anthropic` 使用 AnthropicModel，读取 ANTHROPIC_BASE_URL 和 ANTHROPIC_API_KEY。模型名不会用于猜测服务或协议。
+
+OpenRouter 的两种协议都读取 OPENROUTER_BASE_URL 和 OPENROUTER_API_KEY，例如地址填写 `https://openrouter.ai/api/v1`。`protocol: openai` 使用原生 OpenRouterModel / OpenRouterProvider，注入带配置地址的 OpenAI SDK client；`protocol: anthropic` 使用原生 AnthropicModel / AnthropicProvider 和 Anthropic SDK 的 Bearer token。Anthropic SDK 会自行添加 `/v1/messages`，因此适配时移除配置地址末尾的 `/v1`，同一地址可用于两种协议。Anthropic 直连按相同规则处理地址。角色通过档位引用本地模型配置键。
+
+`context_window` 写入 Pydantic AI 原生 profile，省略时使用框架模型数据。配置损坏、未知协议、OpenRouter 缺少协议、直接服务与协议不匹配、默认模型不存在或无效容量、超时会明确报错。修改后重启生效。
 
 ## 外部 MCP
 
 可直接要求 Agent 配置 MCP；它会按需加载内置 [mcp-config Skill](skills/mcp-config/SKILL.md)，使用 MCP 能力统一提供的有效配置路径。
+
+## Multi-agent
+
+默认与 **Super** 对话。内置角色使用 Pydantic AI Harness 的原生委派任务，结果回到
+同一对话。输入以下固定角色请求可以在 Super 工作期间启动独立任务。
+
+```text
+/reviewer 审核会话恢复逻辑，给出证据与风险
+/architect 设计取消和恢复的接口及验收条件
+/executor 实施已批准的接口变更并运行受影响测试
+```
+
+Reviewer 和 Architect 可以直接读取和搜索普通项目文件，也可以查看 Git diff。
+直接指派 Executor 时，默认可读写工作区内的普通文件。引用交付物执行仍需确认，
+Executor 的计划用于跟踪进度。默认 `auto` 模式下，Super 和 Executor 的 Shell 命令在沙箱内直接运行，
+适用于本地测试和验证。默认放行的命令没有网络访问和额外的 Git 元数据写权限。
+显式询问或拒绝规则优先。关闭沙箱时，`auto` 模式恢复逐条询问。
+受保护路径和用户配置的权限规则照常生效。
+Super 和 Executor 都使用相同的工具权限规则。
+角色内部可以根据任务难度与时长创建同角色分身。只读分身共享父工作区并行调查，
+写入角色分身在父工作区串行执行。
+
+从 Git 仓库根目录启动时，独立角色任务默认从 HEAD 创建 detached worktree，
+读取已提交的代码。普通目录和仓库子目录直接使用当前工作目录，沿用工作区执行锁。
+Super 在共享目录中发起的委派以前台方式执行；用户直接发起的共享目录任务在工作区空闲时运行。
+各任务拥有原生任务 ID、独立消息历史和 run_id。交付会显示角色、任务 ID、
+run_id、工作目录和报告。后台任务成功、失败或取消后，Super 在当前运行结束后为该结果
+启动独立的 run；前台委派仍在发起它的运行中直接返回结果。
+
+可以引用已交付任务启动下一角色，`@` 后填写报告中的原生任务 ID。
+
+```text
+/executor @原生任务ID 按审核结论修复第1项，第2项暂缓
+/reviewer @原生任务ID 审核 Executor 的实现
+```
+
+引用的来源必须已完成。来源使用 worktree 时，代码变更须先提交为明确检查点，
+新角色基于该提交执行。来源使用共享目录时，新角色读取该目录的当前状态。
+用户确认时展示对应 run_id 和完整交付内容。报告本身
+不构成执行授权。Super 根据报告实施前也会请求确认。授权在重启后失效。
+
+用户可以让 Super 查询后台任务、补充要求、继续中断任务或取消指定任务，
+使用的是原生 list_tasks/message_task/delegate_task(resume=...)/cancel_task。
+Ctrl+C 停止当前 Super 运行，独立后台任务继续；退出应用会取消并等待所有任务。
+后台提问和审批显示在同一对话里，输入答案返回对应请求。
+
+任务记录保存在固定数据库旁的 delegations 目录，运行快照继续保存在 sessions.db。
+恢复 Super 会话时同时恢复原生任务记录。进程退出时未完成的任务标记中断，
+继续前应检查已发生的副作用。worktree 缺失或基线不匹配时明确报错。
+数据库位于原项目内部时，worktree 放在 ~/.cache/coder-cli/worktrees 下，避免
+主工作区的执行锁阻塞独立任务；其他情况下保存在数据库旁的 worktrees 目录。
+保留未整合的 worktree，删除会话也保留代码目录。需要整合时，明确要求 Super
+审查并合入来源提交，现有计划与工具权限继续生效。
+
+角色通过 `Role.model_tier` 选择 `ModelTier` 枚举中的档位。Super 和 Reviewer 使用 Medium，
+Architect 使用 High，Executor 使用 Low。实际模型由 `provider.jsonc` 的 `model_tiers`
+映射到 `models` 中的模型键。评测等直接调用模型工厂的入口使用 `default_model`。模型的协议、窗口
+和超时统一从 provider.jsonc 读取。专业角色的模型在首次请求时解析，未使用的
+provider 不要求凭据。.env 负责凭据和服务地址，旧 MODEL_NAME 值会被忽略。
+专业角色默认无 Skills，可在内置 Role.skills 中指定仓库内技能目录；文件工具由
+Role.file_tools 指定，还可用 Role.allowed_tools 限定整个角色的工具白名单。
+Super 继续使用下述 Skills 来源。
 
 ## Skills
 

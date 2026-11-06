@@ -122,7 +122,7 @@ class Prompt(VerticalGroup):
                 yield Label("❯", id="prompt", markup=False)
                 yield PromptTextArea()
         with HorizontalGroup(id="info-container"):
-            yield AgentInfo("coder-cli", markup=False)
+            yield AgentInfo("Super", markup=False)
             home = Path.home()
             display_path = "~" if self.workspace == home else f"~/{self.workspace.relative_to(home)}" if self.workspace.is_relative_to(home) else str(self.workspace)
             yield CondensedPath(display_path, markup=False)

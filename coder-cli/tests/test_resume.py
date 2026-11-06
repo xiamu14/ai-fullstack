@@ -34,7 +34,7 @@ def prompts(messages):
 def runtime_model(model):
     env = {"MODEL_NAME": "test", "OPENAI_BASE_URL": "https://example.invalid/v1", "OPENAI_API_KEY": "test-key"}
     with patch.dict(os.environ, env), patch("agent.runtime.load_dotenv"), \
-         patch("agent.runtime.OpenAIChatModel", return_value=model), \
+         patch("agent.runtime.build_model", return_value=model), \
          patch("integrations.mcp.MCPRegistry.read", return_value=Config()), \
          patch("agent.runtime.logfire.configure"), patch("agent.runtime.logfire.instrument_pydantic_ai"), \
          patch("storage.sessions.SESSION_DATABASE", Path("workspace/sessions.db").resolve()):

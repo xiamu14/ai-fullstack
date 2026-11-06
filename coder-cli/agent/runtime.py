@@ -1,14 +1,12 @@
-import os
-from functools import partial
+from functools import partial, cache
 from pathlib import Path
 
 import logfire
 from dotenv import load_dotenv
-from pydantic_ai import Agent
-from pydantic_ai.capabilities import HandleDeferredToolCalls, WebFetch
+from pydantic_ai import Agent, UsageLimits
+from pydantic_ai.capabilities import HandleDeferredToolCalls, WebFetch, DynamicCapability, SelectModel
 from pydantic_ai.conversation import Conversation as NativeConversation
 from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai_harness import (
     AskUser,
     ConversationSearch,
@@ -26,12 +24,16 @@ from pydantic_ai_harness.step_persistence import SqliteStepStore
 
 from agent.conversation import Conversation
 from agent.interaction import Interaction
-from agent.planning import GUIDANCE, StrictPlanning
 from agent.permissions.policy import ExecutionPermissions
 from agent.permissions.workspace import RestrictedWorkspace
 from context.project import ProjectContext
 from integrations.mcp import MCPRegistry
-from integrations.provider import model_profile
+from integrations.provider import build_model, load_provider_config
+from agent.roles import ROLES
+from agent.delegation import Delegations, DelegationPolicy
+from agent.role_services import RoleServices
+from pydantic_ai_harness import FileSystem
+from pydantic_ai_harness.subagents import SubAgent, SubAgents, TaskControl, DelegationTasks
 from storage.execution_lock import execution_lock
 from storage.sessions import (
     load_session_history,
@@ -42,14 +44,17 @@ from storage.sessions import (
 from tools.external_hooks import external_result_hooks, hook_config_path, load_hook_settings
 from tools.output_hooks import output_hooks
 from tools.web_tools import web_search
+from tools.review import review_diff
 
 
 async def create_agent(session_id: str | None = None, path: str | None = None) -> Conversation:
     hook_path = hook_config_path()
     hook_settings = load_hook_settings(hook_path)
     load_dotenv()
-    if not all((os.getenv("MODEL_NAME"), os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))):
-        raise ValueError("请在 .env 配置 OPENAI_BASE_URL、OPENAI_API_KEY 和 MODEL_NAME。")
+    config = load_provider_config()
+    model_names = {name: config.model_for_tier(role.model_tier) for name, role in ROLES.items()}
+    super_model = model_names["super"]
+    model = build_model(super_model, openai_model=OpenAIChatModel)
     logfire.configure(service_name="coder-cli", send_to_logfire="if-token-present", console=False)
     logfire.instrument_pydantic_ai()
     database = session_database()
@@ -74,38 +79,73 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     ])
     interaction = Interaction()
     permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
+    permissions.allow_sandboxed_shell = True
     if hook_path is not None:
         permissions.forbidden += (hook_path,)
     plan_store = SqlitePlanStore(str(database), session=session_id)
-    planning = StrictPlanning(plan_store, interaction)
-    permissions.planning = planning
-    mcp.allow_stdio = lambda: planning.approved is not None
     mcp.authorize_stdio = permissions.authorize_stdio
-    model = OpenAIChatModel(
-        model_name=os.environ['MODEL_NAME'],
-        profile=model_profile(os.environ["MODEL_NAME"]),
-        provider=OpenAIProvider(
-            base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"]
-        ),
-    )
+    runtime = Delegations(database, workspace, session_id)
+    runtime.mcp_path = mcp.path
+    permissions.review_gate = runtime.check_deliverables
+    permissions.interaction = runtime.broker
+    root_services = [
+        AskUser(answerer=runtime.broker.ask), permissions,
+        Planning(tools=["write_plan"], store=plan_store),
+        HandleDeferredToolCalls(handler=permissions.handle),
+    ]
+    delegates = []
+    for name in ("reviewer", "executor", "architect"):
+        role = ROLES[name]
+        capabilities = [
+            DynamicCapability(RoleServices(runtime, name).for_run, id="role_services"),
+            DelegationPolicy(runtime, name), output_hooks,
+            SummarizingCompaction(max_messages=60, keep_messages=20),
+            SubAgents(include_self=True, max_depth=3,
+                      task_control=TaskControl(max_running_tasks=4)),
+        ]
+        if role.skills:
+            capabilities.append(Skills([Path(__file__).resolve().parents[1] / path for path in role.skills]))
+        @cache
+        def role_model(key=model_names[name]):
+            return build_model(key, openai_model=OpenAIChatModel)
+
+        capabilities.append(SelectModel(lambda ctx, resolve=role_model: resolve()))
+        if role.read_only:
+            capabilities.append(FileSystem(read_only=True, tools=role.file_tools))
+        else:
+            capabilities.append(Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False))
+        child = Agent(
+            model, name=name,
+            description=role.description, instructions=role.instructions,
+            capabilities=capabilities,
+            model_settings={"timeout": config.models[model_names[name]].timeout},
+            tools=[review_diff] if role.read_only else [],
+        )
+        delegate = SubAgent(child, name=name, description=role.description, read_only=role.read_only,
+                            usage_limits=UsageLimits(request_limit=50))
+        runtime.agents[name] = delegate
+        delegates.append(delegate)
     agent = Agent(
-        model,
+        model, name="super",
+        model_settings={"timeout": config.models[super_model].timeout},
         capabilities=[
-            AskUser(answerer=interaction.ask),
+            DynamicCapability(RoleServices(runtime, "super", root_services).for_run, id="role_services"),
+            DelegationPolicy(runtime, "super"),
+            SubAgents(agents=delegates, include_self=True, max_depth=3,
+                      workspace_resolver=runtime.resolve_workspace,
+                      task_control=TaskControl(max_running_tasks=4)),
             RestrictedWorkspace(workspace, permissions),
             Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
-            permissions,
             # Local execution keeps fetches inside the tool permission and hook pipeline.
             WebFetch(native=False, local=True),
             output_hooks,
             external_result_hooks(
-                hook_settings, interaction, database=database, workspace=workspace, config_path=hook_path,
+                hook_settings, runtime.broker, database=database, workspace=workspace, config_path=hook_path,
             ),
-            Planning(tools=["write_plan"], store=plan_store, guidance=GUIDANCE),
-            HandleDeferredToolCalls(handler=permissions.handle),
             skills,
             mcp,
-            StepPersistence(store=store, metadata={"workspace": str(workspace)}, capture_frontier=True),
+            DynamicCapability(lambda ctx: None if DelegationTasks.child_id() else StepPersistence(
+                store=store, metadata={"workspace": str(workspace)}, capture_frontier=True), id="root_persistence"),
             ConversationSearch(SnapshotHistorySource(store), scope="conversation", max_matches=3),
             SummarizingCompaction(max_messages=60, keep_messages=20),
             Memory(
@@ -114,12 +154,12 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
             ),
         ],
         tools=[web_search],
-        instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8"),
+        instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8") + ROLES["super"].instructions,
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)
     return Conversation(
         agent, session_id, history=history, workspace=workspace, mcp=mcp, skills=skills, interaction=interaction,
         history_loader=partial(load_session_history, database),
         execution_lock=partial(execution_lock, database, session_id, workspace),
-        planning=planning,
+        delegations=runtime, store=store, permissions=permissions,
     )

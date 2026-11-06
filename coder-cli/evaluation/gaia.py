@@ -17,7 +17,6 @@ from pydantic_ai import Agent, UsageLimits
 from pydantic_ai.capabilities import WebFetch
 from pydantic_ai.conversation import Conversation
 from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_evals import Dataset
 
 from agent.permissions.config import redact
@@ -26,7 +25,7 @@ from evaluation.gaia_data import DATASET, REVISION, SUBSET, GaiaInput, add_filte
 from evaluation.report import render_run
 from evaluation.report_views import run_title
 from evaluation.gaia_score import GaiaCorrect
-from integrations.provider import model_profile
+from integrations.provider import build_model
 from tools.web_tools import web_search
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,14 +44,11 @@ class Answer(BaseModel):
 
 
 def build_agent():
-    required = ("MODEL_NAME", "OPENAI_BASE_URL", "OPENAI_API_KEY", "TAVILY_API_KEY")
+    required = ("TAVILY_API_KEY",)
     missing = [key for key in required if not os.getenv(key)]
     if missing:
         raise ValueError("缺少配置：" + ", ".join(missing))
-    model = OpenAIChatModel(
-        os.environ["MODEL_NAME"], profile=model_profile(os.environ["MODEL_NAME"]),
-        provider=OpenAIProvider(base_url=os.environ["OPENAI_BASE_URL"], api_key=os.environ["OPENAI_API_KEY"]),
-    )
+    model = build_model(openai_model=OpenAIChatModel)
     return Agent(
         model, output_type=Answer, instructions=INSTRUCTIONS,
         capabilities=[WebFetch(native=False, local=True)], tools=[web_search],
@@ -181,9 +177,9 @@ async def main():
         "level": args.level, "subset": SUBSET["version"] if args.subset == "text" else "all",
         "selection": {"attachment": args.attachment, "limit": args.limit}, "source": source,
         "agent": "web-only Pydantic AI baseline, not full coder-cli Harness",
-        "model": os.environ["MODEL_NAME"], "timeout_seconds": args.timeout,
+        "model": agent.model.model_name, "timeout_seconds": args.timeout,
         "request_limit": args.request_limit, "tool_calls_limit": 30, "instructions": INSTRUCTIONS,
-        "provider_endpoint_sha256": fingerprint(os.environ["OPENAI_BASE_URL"]),
+        "provider_endpoint_sha256": fingerprint(agent.model.base_url),
         "versions": {name: version(name) for name in ("pydantic-ai", "pydantic-evals", "tavily-python")},
         "scorer": "gaia-benchmark/leaderboard@9f133d7/scorer.py",
     })

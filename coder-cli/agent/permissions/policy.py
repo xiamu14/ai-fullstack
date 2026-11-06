@@ -35,7 +35,6 @@ class ExecutionPermissions(Permissions):
         self.path = config_path()
         self.settings, _ = load_settings(self.path)
         self.mcp_path = mcp_path
-        self.planning = None
         self.libraries = (Path(__file__).resolve().parents[2] / "skills", Path.home() / ".agents/skills")
         self.refresh_readonly()
         self.forbidden = tuple(path.resolve() for path in (
@@ -51,6 +50,9 @@ class ExecutionPermissions(Permissions):
         self.grants: set[tuple[str, str]] = set()
         self.lock = asyncio.Lock()
         self.audit_path = database.parent / "permissions.jsonl"
+        self.role_read_only = False
+        self.allow_sandboxed_shell = False
+        self.review_gate = None
 
     def refresh_readonly(self):
         roots = [path.resolve() for path in self.libraries]
@@ -60,11 +62,20 @@ class ExecutionPermissions(Permissions):
         self.readonly = tuple(roots)
 
     def evaluate(self, name, tool_def, args):
+        if self.role_read_only and tool_def.tool_kind not in {
+            "file_system.read_file", "file_system.list_files", "file_system.grep",
+        } and name not in {"delegate_task", "list_tasks", "message_task", "answer_task", "cancel_task",
+                           "ask_parent", "ask_user_question", "review_diff", "load_capability"}:
+            return Decision("deny", "角色只读边界", name, forced=True), digest(["role-read-only", name])
         settings, version = load_settings(self.path)
         metadata = tool_def.metadata or {}
         command_arg = metadata.get("code_arg_name") if metadata.get("code_arg_language") == "shell" else None
         decision = decide(settings, name, tool_def.tool_kind, args, root=self.root, readonly=self.readonly,
-                          forbidden=self.forbidden, command_arg=command_arg)
+                          forbidden=self.forbidden, command_arg=command_arg,
+                          allow_sandboxed_shell=self.allow_sandboxed_shell)
+        if self.role_read_only and decision.target is not None and not decision.target.is_relative_to(self.root):
+            if not any(decision.target.is_relative_to(path) for path in self.readonly):
+                return Decision("deny", "只读角色不能离开分配的工作区", name, forced=True), digest(["role-root", name])
         try:
             mcp_version = digest(self.mcp_path.read_bytes().hex())
         except FileNotFoundError:
@@ -93,8 +104,10 @@ class ExecutionPermissions(Permissions):
             file.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
     async def before_tool_execute(self, ctx, *, call, tool_def, args):
-        if self.planning is not None:
-            await self.planning.check(call.tool_name, tool_def)
+        if self.review_gate is not None and (
+                tool_def.tool_kind in {"file_system.write_file", "file_system.edit_file", "file_system.create_directory"}
+                or (tool_def.metadata or {}).get("code_arg_language") == "shell"):
+            await self.review_gate()
         decision, fingerprint = self.evaluate(call.tool_name, tool_def, args)
         key = (ctx.run_id, call.tool_call_id)
         if decision.action == "deny":
@@ -157,8 +170,6 @@ class ExecutionPermissions(Permissions):
         return requests.build_results(approvals=approvals)
 
     async def authorize_stdio(self, name, server, cwd, stack):
-        if self.planning is not None and self.planning.approved is None:
-            raise PermissionError("严格规划阶段禁止启动本地 MCP")
         from fnmatch import fnmatchcase
         from agent.permissions.workspace import RestrictedBackend
         settings, version = load_settings(self.path)
@@ -206,12 +217,10 @@ class ExecutionPermissions(Permissions):
         }
 
     async def wrap_tool_execute(self, ctx, *, call, tool_def, args, handler):
+        if call.tool_name in {"delegate_task", "list_tasks", "message_task", "answer_task", "cancel_task", "ask_parent"}:
+            return await handler(args)
         # Serial execution makes approval and target rechecks precede every side effect.
         async with self.lock:
-            if self.planning is not None:
-                await self.planning.check(call.tool_name, tool_def)
-                if call.tool_name == "write_plan":
-                    return await self.planning.write(args, handler)
             decision, _ = self.evaluate(call.tool_name, tool_def, args)
             token = CURRENT_GRANT.set(decision)
             try:

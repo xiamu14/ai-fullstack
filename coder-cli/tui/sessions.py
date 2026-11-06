@@ -11,6 +11,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Button, DataTable, Markdown
 
 from storage.sessions import SessionInfo, delete_session, session_database
+from storage.execution_lock import ExecutionBusyError
 
 
 class SessionResumeModal(ModalScreen):
@@ -70,7 +71,7 @@ class SessionResumeModal(ModalScreen):
         self.deleting = True
         try:
             await delete_session(session_database(), session.session_id)
-        except (OSError, sqlite3.Error, ValueError) as exc:
+        except (OSError, sqlite3.Error, ValueError, ExecutionBusyError) as exc:
             self.notify(f"删除失败：{exc}", severity="error")
         else:
             self.sessions.pop(index)

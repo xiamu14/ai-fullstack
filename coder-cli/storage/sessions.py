@@ -8,6 +8,8 @@ import sqlite3
 from pydantic_ai.messages import ModelMessage, UserPromptPart, repair_messages
 from pydantic_ai_harness.conversation_search import SnapshotHistorySource
 from pydantic_ai_harness.step_persistence import SqliteStepStore
+from storage.delegations import saved_tasks, delegation_directory
+from storage.execution_lock import delegation_lease
 
 SESSION_DATABASE = Path(__file__).resolve().parents[1] / "workspace" / "sessions.db"
 
@@ -99,6 +101,8 @@ async def list_sessions(database: Path) -> list[SessionInfo]:
         session_id = run.conversation_id
         if not session_id or run.parent_run_id is not None:
             continue
+        if run.agent_name in {"reviewer", "architect", "executor"} and session_id not in registered_workspaces:
+            continue
         title = session_title(run.metadata.get("title", ""))
         previous = sessions.get(session_id)
         workspace = registered_workspaces.get(
@@ -171,26 +175,30 @@ def _latest_history_run(database: Path, session_id: str) -> str | None:
 async def delete_session(database: Path, session_id: str) -> None:
     if not database.exists():
         return
-    await asyncio.to_thread(_delete_session, database, session_id)
+    with delegation_lease(database, session_id):
+        await asyncio.to_thread(_delete_session, database, session_id)
 
 
 def _delete_session(database: Path, session_id: str) -> None:
+    delegates = saved_tasks(database, session_id)
     with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=rw", uri=True)) as connection:
         with connection:
             connection.execute("BEGIN IMMEDIATE")
             tables = {row[0] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
             if "runs" in tables:
+                conversation_ids = [session_id, *(record.id for record in delegates)]
+                placeholders = ",".join("?" for _ in conversation_ids)
                 connection.execute(
-                    """
+                    f"""
                     CREATE TEMP TABLE deleting_runs AS
                     WITH RECURSIVE selected(run_id) AS (
-                        SELECT run_id FROM runs WHERE conversation_id = ?
+                        SELECT run_id FROM runs WHERE conversation_id IN ({placeholders})
                         UNION
                         SELECT r.run_id FROM runs AS r JOIN selected AS s ON r.parent_run_id = s.run_id
                     )
                     SELECT run_id FROM selected
                     """,
-                    (session_id,),
+                    conversation_ids,
                 )
                 # Snapshot deletion triggers release message references and unshared message bodies.
                 for table in ("events", "snapshots", "snapshot_idempotency_keys", "tool_effects", "runs"):
@@ -199,3 +207,8 @@ def _delete_session(database: Path, session_id: str) -> None:
                 connection.execute("DELETE FROM sessions WHERE conversation_id = ?", (session_id,))
             if "plan_items" in tables:
                 connection.execute("DELETE FROM plan_items WHERE session = ?", (session_id,))
+                if "runs" in tables:
+                    connection.execute("DELETE FROM plan_items WHERE session IN (SELECT run_id FROM deleting_runs)")
+    directory = delegation_directory(database, session_id)
+    for record in delegates:
+        (directory / f"{record.id}.json").unlink(missing_ok=True)

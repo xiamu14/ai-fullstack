@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from pydantic_ai import Agent
@@ -19,6 +20,26 @@ from agent.permissions.workspace import RestrictedWorkspace
 
 
 class PermissionTests(unittest.IsolatedAsyncioTestCase):
+    def test_executor_default_shell_grant_respects_explicit_policy(self):
+        tool = SimpleNamespace(tool_kind="shell", metadata={
+            "code_arg_language": "shell", "code_arg_name": "command",
+        })
+        args = {"command": "python -c 'assert 1 + 1 == 2'"}
+        self.assertEqual(self.policy.evaluate("shell", tool, args)[0].action, "ask")
+        self.policy.allow_sandboxed_shell = True
+        grant, _ = self.policy.evaluate("shell", tool, args)
+        self.assertEqual(grant.action, "allow")
+        self.assertTrue(grant.sandbox_only)
+        for settings, action in (
+            ({"sandbox": False}, "ask"),
+            ({"mode": "read-only"}, "ask"),
+            ({"rules": [{"tool": "shell", "action": "ask"}]}, "ask"),
+            ({"rules": [{"tool": "shell", "action": "deny"}]}, "deny"),
+        ):
+            with self.subTest(settings=settings):
+                self.configure(**settings)
+                self.assertEqual(self.policy.evaluate("shell", tool, args)[0].action, action)
+
     def setUp(self):
         self.root = Path(self.enterContext(TemporaryDirectory())).resolve()
         self.project = self.root / "project"

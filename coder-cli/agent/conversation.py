@@ -2,6 +2,7 @@ import os
 from collections.abc import Awaitable, Callable
 from contextlib import AbstractContextManager, AsyncExitStack, nullcontext
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 from pydantic_ai import Agent, RunContext, UsageLimits
@@ -10,15 +11,18 @@ from pydantic_ai.usage import RunUsage
 from pydantic_ai.workspaces import LocalWorkspaceBackend
 from pydantic_ai_harness import Skills
 from pydantic_ai_harness.skills import SkillCatalog
+from pydantic_ai_harness.subagents import is_task_report
 from pydantic_ai.messages import (
     FunctionToolCallEvent,
     FunctionToolResultEvent,
     ModelMessage,
+    ModelRequest,
     ModelResponse,
     PartDeltaEvent,
     PartStartEvent,
     TextPart,
     TextPartDelta,
+    TextContent,
 )
 
 from agent.interaction import Interaction
@@ -27,6 +31,25 @@ from integrations.mcp import MCPRegistry
 
 class SkillInvocationError(ValueError):
     pass
+
+
+def _super_history(history: list[ModelMessage]) -> list[ModelMessage]:
+    messages = []
+    for message in history:
+        if isinstance(message, ModelRequest):
+            parts = [
+                part for part in message.parts
+                if not (is_task_report(part) and not isinstance(part.content, str) and any(
+                    isinstance(item, TextContent)
+                    and item.content.startswith("<task_output ")
+                    for item in part.content
+                ))
+            ]
+            if not parts and message.parts and not message.instructions:
+                continue
+            message = replace(message, parts=parts)
+        messages.append(message)
+    return messages
 
 
 class Conversation:
@@ -38,7 +61,7 @@ class Conversation:
         interaction: Interaction | None = None,
         history_loader: Callable[[str], Awaitable[list[ModelMessage]]] | None = None,
         execution_lock: Callable[[], AbstractContextManager] = nullcontext,
-        planning=None,
+        delegations=None, store=None, permissions=None,
     ) -> None:
         self.agent = agent
         self.session_id = session_id
@@ -49,11 +72,33 @@ class Conversation:
         self.interaction = interaction or Interaction()
         self.history_loader = history_loader
         self.execution_lock = execution_lock
-        self.planning = planning
+        self.delegations = delegations
+        self.store = store
+        self.permissions = permissions
+
+    async def open(self, *, on_task=None, on_question=None):
+        if self.delegations is not None:
+            await self.delegations.open(self.store, observer=on_task, on_question=on_question)
+
+    async def close(self):
+        if self.delegations is not None:
+            await self.delegations.close()
+
+    async def delegate(self, text, *, source_id=None):
+        from agent.roles import role_request
+        request = role_request(text)
+        if request is None:
+            raise ValueError("需要 /reviewer、/executor 或 /architect 任务")
+        await self.open()
+        from pydantic_ai import ModelRetry
+        try:
+            return await self.delegations.start_role(self, *request, source_id=source_id)
+        except ModelRetry as exc:
+            raise ValueError(str(exc)) from exc
 
     def feedback(self, text: str) -> bool:
-        if self.planning is not None and self.interaction.waiting is None:
-            self.planning.invalidate()
+        if self.delegations is not None and self.delegations.broker.waiting is not None:
+            return self.delegations.broker.feedback(text)
         return self.interaction.feedback(text)
 
     @property
@@ -81,9 +126,27 @@ class Conversation:
         *, on_tool: Callable[[FunctionToolCallEvent | FunctionToolResultEvent], Awaitable[None]] | None = None,
         on_question: Callable[[str], Awaitable[None]] | None = None,
         skill_name: str | None = None,
+        task_report: tuple[str, str] | None = None,
     ):
+        await self.open(on_question=on_question)
         with self.execution_lock():
-            return await self._send(prompt, on_text, on_tool=on_tool, on_question=on_question, skill_name=skill_name)
+            if self.delegations is None:
+                return await self._send(prompt, on_text, on_tool=on_tool, on_question=on_question, skill_name=skill_name)
+            with self.delegations.owner.bind():
+                if task_report is None:
+                    return await self._send(prompt, on_text, on_tool=on_tool, on_question=on_question, skill_name=skill_name)
+                owner = self.delegations.owner
+                record = next((item for item in owner.super_reports(self.session_id)
+                               if (item.id, item.run_id) == task_report), None)
+                if record is None:
+                    raise ValueError("该后台任务结果已回复或已更新。")
+                report = record.report().content
+                result = await self._send([prompt, *report], on_text, on_tool=on_tool,
+                                          on_question=on_question, skill_name=None)
+                if record.run_id == task_report[1]:
+                    record.delivered = True
+                    await owner.save(record)
+                return result
 
     async def _send(self, prompt, on_text, *, on_tool, on_question, skill_name):
         if skill_name is not None:
@@ -94,7 +157,7 @@ class Conversation:
             if not skill.user_invocable:
                 raise SkillInvocationError(f"技能不允许主动调用：{skill_name}")
             prompt = skill.render(prompt)
-        if not prompt.strip():
+        if isinstance(prompt, str) and not prompt.strip():
             raise ValueError("消息不能为空")
 
         async def handle_events(ctx, events):
@@ -109,8 +172,6 @@ class Conversation:
                     await on_text(event.delta.content_delta)
 
         self.interaction.open(on_question)
-        if self.planning is not None:
-            self.planning.invalidate()
         try:
             if self.history_loader is not None and self.session_id is not None:
                 self.history = await self.history_loader(self.session_id)
@@ -119,10 +180,13 @@ class Conversation:
                 result = await self.agent.run(
                     prompt,
                     conversation_id=self.session_id,
-                    message_history=deepcopy(self.history),
-                    toolsets=toolsets, capabilities=[self.interaction],
+                    message_history=deepcopy(_super_history(self.history) if self.delegations else self.history),
+                    toolsets=toolsets, capabilities=[self.interaction] + (
+                        [self.delegations.reports()] if self.delegations and (
+                            on_text or on_tool or self.delegations.owner.records
+                        ) else []
+                    ),
                     usage_limits=UsageLimits(request_limit=50),
-                    model_settings={"timeout": 30},
                     event_stream_handler=handle_events if on_text or on_tool else None,
                 )
         finally:
@@ -137,7 +201,7 @@ def error_message(exc: Exception) -> str:
     if isinstance(exc, ExceptionGroup):
         return "\n".join(error_message(error) for error in exc.exceptions)
     message = f"任务未完成（{type(exc).__name__}）：{exc}"
-    for name in ("OPENAI_API_KEY", "LOGFIRE_TOKEN"):
+    for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "LOGFIRE_TOKEN"):
         if token := os.getenv(name):
             message = message.replace(token, "***")
     return message

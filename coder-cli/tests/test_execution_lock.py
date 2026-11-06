@@ -108,7 +108,7 @@ class RuntimeLockTests(unittest.IsolatedAsyncioTestCase):
     def runtime(self, model):
         env = {"MODEL_NAME": "test", "OPENAI_BASE_URL": "https://example.invalid/v1", "OPENAI_API_KEY": "test"}
         with patch.dict(os.environ, env), patch("agent.runtime.load_dotenv"), \
-             patch("agent.runtime.OpenAIChatModel", return_value=FunctionModel(model)), \
+             patch("agent.runtime.build_model", return_value=FunctionModel(model)), \
              patch("integrations.mcp.MCPRegistry.read", return_value=Config()), \
              patch("agent.runtime.logfire.configure"), patch("agent.runtime.logfire.instrument_pydantic_ai"), \
              patch("storage.sessions.SESSION_DATABASE", self.database):

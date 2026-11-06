@@ -39,7 +39,7 @@ class SlashComplete(VerticalGroup):
         yield OptionList()
 
     def show_skills(self, skills: list[tuple[str, str]]) -> None:
-        self.skills = sorted(skills)
+        self.skills = list(skills)
         self.query_one(Input).value = ""
         self.filter_skills("")
         self.query_one(Input).focus()

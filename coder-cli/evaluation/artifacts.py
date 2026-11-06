@@ -32,13 +32,13 @@ def fingerprint(value) -> str:
 
 def source_version(root: Path) -> dict:
     paths = [*sorted((root / "evaluation").glob("*.py")), root / "evaluation/gaia_text_subset.json",
-             root / "tools/web_tools.py", root / "integrations/provider.py", root / "provider.json", root / "uv.lock"]
+             root / "tools/web_tools.py", root / "integrations/provider.py", root / "provider.jsonc", root / "uv.lock"]
     hashes = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     git = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, text=True, capture_output=True, check=False)
     dirty = subprocess.run(["git", "status", "--porcelain", "--", *hashes], cwd=root,
                            text=True, capture_output=True, check=False)
     agent_files = {key: value for key, value in hashes.items() if key in {
-        "evaluation/gaia.py", "tools/web_tools.py", "integrations/provider.py", "provider.json", "uv.lock"}}
+        "evaluation/gaia.py", "tools/web_tools.py", "integrations/provider.py", "provider.jsonc", "uv.lock"}}
     return {"agent_sha256": fingerprint(agent_files), "dirty": bool(dirty.stdout.strip()) if dirty.returncode == 0 else None,
             "git_commit": git.stdout.strip() if git.returncode == 0 else None,
             "source_sha256": fingerprint(hashes), "files": hashes}
