@@ -1,5 +1,6 @@
 """Native Permissions with project-wide checks and exact-call approval tickets."""
 import asyncio
+from contextlib import nullcontext
 from contextvars import ContextVar
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -7,12 +8,13 @@ import json
 import os
 from pathlib import Path
 
-from pydantic_ai.exceptions import ApprovalRequired, SkipToolExecution
+from pydantic_ai.exceptions import ApprovalRequired, SkipToolExecution, ToolFailed
 from pydantic_ai.tools import ToolApproved, ToolDenied
 from pydantic_ai_harness.permissions import Permissions
 
 from agent.permissions.config import config_path, digest, load_settings, redact
 from agent.permissions.rules import Decision, decide
+from storage.execution_lock import ExecutionBusyError, workspace_lease
 
 
 CURRENT_GRANT: ContextVar[Decision | None] = ContextVar("coder_execution_grant", default=None)
@@ -31,6 +33,7 @@ class ExecutionPermissions(Permissions):
     def __init__(self, root: Path, interaction, database: Path, mcp_path: Path):
         super().__init__("read-only")
         self.root = root.resolve()
+        self.database = database
         self.interaction = interaction
         self.path = config_path()
         self.settings, _ = load_settings(self.path)
@@ -222,11 +225,22 @@ class ExecutionPermissions(Permissions):
         # Serial execution makes approval and target rechecks precede every side effect.
         async with self.lock:
             decision, _ = self.evaluate(call.tool_name, tool_def, args)
-            token = CURRENT_GRANT.set(decision)
+            name = call.tool_name
+            file_tool = (tool_def.tool_kind or "").startswith("file_system.")
+            memory_tool = name in {"read_memory", "search_memory", "write_memory", "delete_memory"}
+            lease = nullcontext()
+            if file_tool or memory_tool or decision.command or name == "review_diff":
+                shared = not (decision.write or decision.command or name in {"write_memory", "delete_memory"})
+                lease = workspace_lease(self.database, self.root, shared=shared)
             try:
-                return await handler(args)
-            finally:
-                CURRENT_GRANT.reset(token)
+                with lease:
+                    token = CURRENT_GRANT.set(decision)
+                    try:
+                        return await handler(args)
+                    finally:
+                        CURRENT_GRANT.reset(token)
+            except ExecutionBusyError as exc:
+                raise ToolFailed(f"工作区操作暂不可用：{exc}") from exc
 
     async def wrap_run(self, ctx, *, handler):
         try:

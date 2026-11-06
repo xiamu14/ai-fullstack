@@ -37,15 +37,11 @@ def _lease(directory: Path, key: str, *, shared: bool, message: str):
 
 
 @contextmanager
-def execution_lock(database: Path, session_id: str, workspace: Path):
-    """One run per conversation and per overlapping workspace; siblings remain independent."""
+def workspace_lease(database: Path, workspace: Path, *, shared: bool = False):
+    """Lock overlapping workspace access without reserving a conversation."""
     directory = database.resolve().parent / "execution-locks"
     workspace = workspace.resolve(strict=True)
     with ExitStack() as stack:
-        stack.enter_context(_lease(
-            directory, "session:" + session_id, shared=False,
-            message="该会话已有运行中的请求，请等待结束后重试。",
-        ))
         # Shared ancestor leases let sibling directories run, but exclude a parent writer.
         for parent in reversed(workspace.parents):
             stack.enter_context(_lease(
@@ -53,7 +49,14 @@ def execution_lock(database: Path, session_id: str, workspace: Path):
                 message="上级工作目录正在执行任务，请使用独立目录或等待结束。",
             ))
         stack.enter_context(_lease(
-            directory, "workspace:" + str(workspace), shared=False,
+            directory, "workspace:" + str(workspace), shared=shared,
             message="该工作目录或其子目录正在执行任务，请使用独立目录或等待结束。",
         ))
         yield
+
+
+def session_lease(database: Path, conversation_id: str):
+    return _lease(
+        database.resolve().parent / "execution-locks", "session:" + conversation_id,
+        shared=False, message="该会话已有运行中的请求，请等待结束后重试。",
+    )

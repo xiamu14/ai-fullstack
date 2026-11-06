@@ -1,10 +1,10 @@
-# 07 基准测试：GAIA
+## 1 基准测试：GAIA
 
 [上一章](./06-evaluation.md) 用自建任务比较 Agent 配置。本章使用 [GAIA](https://huggingface.co/papers/2311.12983) 验证通用助手的能力组合：推理、信息检索、多模态理解与工具使用。先跑通网页问答，再扩展附件与计算能力。
 
 **Pydantic AI 执行解题，Pydantic Evals 组织实验，GAIA 的答案匹配规则负责评分。** 本章不需要额外的任务运行框架。
 
-## 7.1 明确被测对象
+## 1.1 明确被测对象
 
 首轮采用只包含网页搜索与读取的 Pydantic AI Agent：
 
@@ -16,7 +16,7 @@
 
 `WebFetch` 不会执行网页 JavaScript。媒体内容能否被理解仍取决于模型与 provider，不能因为存在 URL 抓取工具就认为所有 GAIA 题都可解。[WebFetch 官方文档](https://pydantic.dev/docs/ai/capabilities/web-fetch/)、[Tavily SDK](https://docs.tavily.com/sdk/python/reference)
 
-## 7.2 把验证集转为 Case
+## 1.2 把验证集转为 Case
 
 GAIA 的 validation 有公开答案，可在本地评分；test 答案不公开，只能生成预测后按官方渠道提交。数据按三个难度等级组织；目前采用 Parquet，并用相对路径关联附件。下载需要接受数据访问条件。[官方数据卡](https://huggingface.co/datasets/gaia-benchmark/GAIA)
 
@@ -33,7 +33,7 @@ GAIA 的 validation 有公开答案，可在本地评分；test 答案不公开�
 
 取题脚本默认读取指定 revision 的整个 validation。难度、附件状态和数量可以组合筛选。选择纯文本子集时按固定题单顺序取题，其余按 ID 排序。带附件的实验将文本或二进制内容作为模型输入，格式支持取决于模型，加载或调用异常计入报告。
 
-## 7.3 解题与评分分离
+## 1.3 解题与评分分离
 
 执行链路为：
 
@@ -54,7 +54,7 @@ GAIA 使用规范化后的近似精确匹配：数字、按顺序排列的列表
 
 Evals 自定义评估器只读取模型输出与标准答案，不能调用模型修改答案或重新解题。接口见[Pydantic Evals 自定义评估器](https://pydantic.dev/docs/ai/evals/evaluators/custom/)。
 
-## 7.4 GAIA 测试集合
+## 1.4 GAIA 测试集合
 
 先在 GAIA 数据页接受访问条件并配置 Hugging Face 凭据。在 `coder-cli/.env` 配置模型和 Tavily 后，从 `coder-cli` 目录执行实验：
 

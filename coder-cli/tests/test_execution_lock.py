@@ -15,16 +15,22 @@ from pydantic_ai.models.function import FunctionModel
 
 from agent.runtime import create_agent
 from integrations.mcp import Config
-from storage.execution_lock import ExecutionBusyError, execution_lock
+from storage.execution_lock import ExecutionBusyError, session_lease, workspace_lease
 from storage.sessions import save_session
+
+
+@contextmanager
+def execution_lock(database, session, workspace):
+    with session_lease(database, session), workspace_lease(database, workspace):
+        yield
 
 
 PROBE = '''
 from pathlib import Path
 import sys
-from storage.execution_lock import ExecutionBusyError, execution_lock
+from storage.execution_lock import ExecutionBusyError, session_lease, workspace_lease
 try:
-    with execution_lock(Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])):
+    with session_lease(Path(sys.argv[1]), sys.argv[2]), workspace_lease(Path(sys.argv[1]), Path(sys.argv[3])):
         print("READY", flush=True)
         if len(sys.argv) > 4:
             sys.stdin.read()
@@ -140,11 +146,12 @@ class RuntimeLockTests(unittest.IsolatedAsyncioTestCase):
             await first.send("third")
         self.assertEqual(observed, [["first"], ["first", "second"], ["first", "second", "third"]])
 
-    async def test_workspace_busy_has_no_request_and_cancel_releases_it(self):
+    async def test_session_busy_blocks_only_the_same_conversation(self):
         started, release = asyncio.Event(), asyncio.Event()
         calls = []
         async def model(messages, info):
-            prompt = next(p.content for p in reversed(messages[-1].parts) if isinstance(p, UserPromptPart))
+            prompt = next(p.content for message in reversed(messages) for p in reversed(message.parts)
+                          if isinstance(p, UserPromptPart) and isinstance(p.content, str))
             calls.append(prompt)
             if prompt == "hold":
                 started.set()
@@ -152,7 +159,7 @@ class RuntimeLockTests(unittest.IsolatedAsyncioTestCase):
             return ModelResponse(parts=[TextPart("done")])
         with self.runtime(model):
             first = await create_agent(path=str(self.project))
-            contender = await create_agent(path=str(self.project))
+            contender = await create_agent(first.session_id)
             independent = await create_agent(path=str(self.other))
             task = asyncio.create_task(first.send("hold"))
             try:
@@ -187,7 +194,8 @@ class RuntimeLockTests(unittest.IsolatedAsyncioTestCase):
                     task.cancel()
                     await asyncio.sleep(0)
                     with self.assertRaises(ExecutionBusyError):
-                        await second.send("too early")
+                        with workspace_lease(self.database, self.project, shared=True):
+                            self.fail("file write still running")
                 finally:
                     release.set()
                     with self.assertRaises(asyncio.CancelledError):

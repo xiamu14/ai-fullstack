@@ -3,7 +3,6 @@ import asyncio
 import json
 import time
 from contextlib import AsyncExitStack
-from contextvars import ContextVar
 from pathlib import Path
 from hashlib import sha256
 from dataclasses import replace
@@ -24,9 +23,6 @@ from agent.roles import ROLES
 from storage.worktrees import Worktrees, git
 from storage.delegations import delegation_directory
 from storage.execution_lock import delegation_lease
-
-
-BORROWED_WORKSPACE_LEASE = ContextVar("borrowed_workspace_lease", default=False)
 
 
 class RoleTaskOwner(DelegationTasks):
@@ -199,8 +195,6 @@ class DelegationPolicy(AbstractCapability):
     async def prepare_tools(self, ctx, tool_defs):
         allowed = ROLES[self.role].allowed_tools
         tools = tool_defs if allowed is None else [tool for tool in tool_defs if tool.name in allowed]
-        if BORROWED_WORKSPACE_LEASE.get():
-            tools = [tool for tool in tools if tool.name != "ask_parent"]
         if self.role == "super" and DelegationTasks.child_id() is None:
             tools = [replace(tool, sequential=True) if tool.name == "delegate_task" else tool for tool in tools]
         if self.role == "super" and DelegationTasks.child_id() is not None:
@@ -262,13 +256,6 @@ class DelegationPolicy(AbstractCapability):
         record = self.runtime.owner.records.get(child_id)
         clone = record is not None and record.agent_name == "self"
         directory = await ctx.workspace.working_dir()
-        if (call.tool_name == "delegate_task" and self.role == "super" and record is None
-                and args.get("working_directory") == str(self.runtime.workspace)):
-            token = BORROWED_WORKSPACE_LEASE.set(True)
-            try:
-                return await handler(args)
-            finally:
-                BORROWED_WORKSPACE_LEASE.reset(token)
         if call.tool_name == "delegate_task" and args.get("agent_name") == "self" and not ROLES[self.role].read_only:
             if clone:
                 raise SkipToolExecution("写入分身首版不再嵌套委派。")

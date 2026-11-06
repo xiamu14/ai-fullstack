@@ -6,12 +6,14 @@ import os
 import stat
 import subprocess
 import tempfile
+from contextlib import nullcontext
 from hashlib import sha256
 from html import escape
 from itertools import islice
 from pathlib import Path
 
 from context.sources import DOCUMENTS, MANIFESTS, summarize, visible_name
+from storage.execution_lock import ExecutionBusyError, workspace_lease
 
 MAX_ENTRIES = 100
 MAX_FILE_BYTES = 32 * 1024
@@ -21,22 +23,32 @@ CACHE_VERSION = 2
 
 
 class ProjectContext:
-    def __init__(self, workspace: Path, cache_directory: Path) -> None:
+    def __init__(self, workspace: Path, cache_directory: Path, *, database: Path | None = None) -> None:
         self.workspace = workspace.resolve()
         key = sha256(os.fsencode(self.workspace)).hexdigest()
         self.cache_file = cache_directory / f"{key}.json"
         self._state = None
         self._run_id = None
         self._context = ""
+        self.database = database
 
     async def refresh(self) -> str:
-        self._context = await asyncio.to_thread(self._refresh)
+        def refresh():
+            lease = workspace_lease(self.database, self.workspace, shared=True) if self.database else nullcontext()
+            with lease:
+                return self._refresh()
+
+        try:
+            self._context = await asyncio.to_thread(refresh)
+        except ExecutionBusyError:
+            return "工作区正在执行操作，本次暂不刷新项目概览。\n" + self._context
         return self._context
 
     async def instructions(self, ctx) -> str:
         if ctx.run_id != self._run_id or not self._context:
-            await self.refresh()
+            context = await self.refresh()
             self._run_id = ctx.run_id
+            return context
         return self._context
 
     def _git(self, *args: str, input: str | None = None) -> str | None:

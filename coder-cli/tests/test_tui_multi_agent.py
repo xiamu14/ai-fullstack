@@ -1,8 +1,11 @@
 """The user stays in Super while independent role reports appear inline."""
 import asyncio
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
-from pydantic_ai.messages import ModelResponse, TextPart
+from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart
+from agent.permissions.workspace import RestrictedBackend
 
 from tests import test_multi_agent as fixtures
 from tui.messages import MessageHistory
@@ -14,6 +17,47 @@ class TuiMultiAgentTests(unittest.IsolatedAsyncioTestCase):
     asyncSetUp = fixtures.MultiAgentTests.asyncSetUp
     build = fixtures.MultiAgentTests.build
     settle = fixtures.MultiAgentTests.settle
+
+    async def test_super_handles_unrelated_input_during_executor_file_write(self):
+        entered, release = asyncio.Event(), asyncio.Event()
+        workspace = self.root / "plain"
+        workspace.mkdir()
+        write_bytes = RestrictedBackend.write_bytes
+
+        async def pause_write(backend, path, data):
+            if Path(path).name == "probe.txt":
+                entered.set()
+                await release.wait()
+            return await write_bytes(backend, path, data)
+
+        steps = iter([ToolCallPart("write_file", {"path": "probe.txt", "content": "ok"}), TextPart("写入完成")])
+        executor = fixtures.simulated(lambda messages, info: ModelResponse(parts=[next(steps)]))
+        super_model = fixtures.simulated(lambda messages, info: ModelResponse(parts=[TextPart("Super 已回应")]))
+        conversation = await self.build([super_model, executor], workspace=workspace)
+        app = ChatShell(conversation)
+        with patch.object(RestrictedBackend, "write_bytes", pause_write):
+            async with app.run_test() as pilot:
+                prompt = app.query_one(PromptTextArea)
+                prompt.insert("/executor 写入 probe.txt")
+                await pilot.press("enter")
+                await asyncio.wait_for(entered.wait(), 5)
+                try:
+                    prompt.insert("今天的天气如何？")
+                    await pilot.press("enter")
+                    async with asyncio.timeout(5):
+                        await app.turn_worker.wait()
+                    self.assertFalse((workspace / "probe.txt").exists())
+                    history = app.query_one(MessageHistory)
+                    self.assertFalse(list(history.query(".error")))
+                    self.assertTrue(any(message.content == "Super 已回应" for message in history.query(".message")))
+                finally:
+                    release.set()
+                await self.settle(conversation)
+                record = next(iter(conversation.delegations.owner.records.values()))
+                async with asyncio.timeout(5):
+                    while not record.delivered:
+                        await pilot.pause(.05)
+                self.assertEqual((workspace / "probe.txt").read_text(), "ok")
 
     async def test_explicit_reviewer_runs_while_super_is_busy(self):
         started, release = asyncio.Event(), asyncio.Event()

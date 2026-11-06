@@ -10,7 +10,6 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai_harness import (
     AskUser,
     ConversationSearch,
-    Memory,
     Planning,
     Skills,
     StepPersistence,
@@ -31,10 +30,10 @@ from integrations.mcp import MCPRegistry
 from integrations.provider import build_model, load_provider_config
 from agent.roles import ROLES
 from agent.delegation import Delegations, DelegationPolicy
-from agent.role_services import RoleServices
+from agent.role_services import RoleServices, WorkspaceMemory
 from pydantic_ai_harness import FileSystem
 from pydantic_ai_harness.subagents import SubAgent, SubAgents, TaskControl, DelegationTasks
-from storage.execution_lock import execution_lock
+from storage.execution_lock import session_lease
 from storage.sessions import (
     load_session_history,
     save_session,
@@ -67,7 +66,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     await save_session(database, session_id, workspace)
     # Concurrent first-open attempts must all bind to the workspace that won registration.
     workspace = await session_workspace(database, session_id, None)
-    project = ProjectContext(workspace, database.parent / "project-context")
+    project = ProjectContext(workspace, database.parent / "project-context", database=database)
     await project.refresh()
     mcp = MCPRegistry()
     skills = Skills.combine([
@@ -148,8 +147,8 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
                 store=store, metadata={"workspace": str(workspace)}, capture_frontier=True), id="root_persistence"),
             ConversationSearch(SnapshotHistorySource(store), scope="conversation", max_matches=3),
             SummarizingCompaction(max_messages=60, keep_messages=20),
-            Memory(
-                FileStore(".agent-memory"), max_tokens=1000, max_search_results=3,
+            WorkspaceMemory(
+                FileStore(".agent-memory"), database=database, max_tokens=1000, max_search_results=3,
                 injection_errors="raise",
             ),
         ],
@@ -160,6 +159,6 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     return Conversation(
         agent, session_id, history=history, workspace=workspace, mcp=mcp, skills=skills, interaction=interaction,
         history_loader=partial(load_session_history, database),
-        execution_lock=partial(execution_lock, database, session_id, workspace),
+        execution_lock=partial(session_lease, database, session_id),
         delegations=runtime, store=store, permissions=permissions,
     )
