@@ -38,3 +38,5 @@ Thumbs.db
 
 # Private benchmark results, dashboard, and dataset cache.
 /benchmark/gaia/
+
+verspera/sketch-scripts
