@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from agent.runtime import create_agent
 from integrations.provider import ModelTier, model_profile, build_model, model_config, load_provider_config
@@ -118,7 +118,8 @@ class ProviderConfigTests(unittest.IsolatedAsyncioTestCase):
              patch("pydantic_ai.providers.anthropic.AnthropicProvider") as provider, \
              patch("pydantic_ai.models.anthropic.AnthropicModel") as factory:
             build_model()
-        provider.assert_called_once_with(api_key="test", base_url="https://anthropic.example.invalid")
+        provider.assert_called_once_with(api_key="test", base_url="https://anthropic.example.invalid", http_client=ANY)
+        self.addAsyncCleanup(provider.call_args.kwargs["http_client"].aclose)
         self.assertEqual(factory.call_args.args[0], "claude")
         self.assertEqual(factory.call_args.kwargs["profile"], {"context_window": 200000})
 
@@ -136,7 +137,8 @@ class ProviderConfigTests(unittest.IsolatedAsyncioTestCase):
              patch("pydantic_ai.providers.openrouter.OpenRouterProvider") as provider, \
              patch("pydantic_ai.models.openrouter.OpenRouterModel") as factory:
             build_model()
-        client.assert_called_once_with(api_key="router-key", base_url="https://router.example.invalid/api/v1")
+        client.assert_called_once_with(api_key="router-key", base_url="https://router.example.invalid/api/v1", http_client=ANY)
+        self.addAsyncCleanup(client.call_args.kwargs["http_client"].aclose)
         provider.assert_called_once_with(openai_client=client.return_value)
         self.assertEqual(factory.call_args.args[0], "anthropic/claude-sonnet-4.6")
         self.assertIs(factory.call_args.kwargs["provider"], provider.return_value)
@@ -155,7 +157,8 @@ class ProviderConfigTests(unittest.IsolatedAsyncioTestCase):
              patch("pydantic_ai.providers.anthropic.AnthropicProvider") as provider, \
              patch("pydantic_ai.models.anthropic.AnthropicModel") as factory:
             build_model()
-        client.assert_called_once_with(auth_token="router-key", base_url="https://router.example.invalid/api")
+        client.assert_called_once_with(auth_token="router-key", base_url="https://router.example.invalid/api", http_client=ANY)
+        self.addAsyncCleanup(client.call_args.kwargs["http_client"].aclose)
         provider.assert_called_once_with(anthropic_client=client.return_value)
         self.assertEqual(factory.call_args.args[0], "anthropic/claude-sonnet-4.6")
 

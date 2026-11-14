@@ -6,8 +6,6 @@ from pydantic_ai_harness import AskUser, Memory, Planning
 from pydantic_ai_harness.planning import SqlitePlanStore
 from pydantic_ai_harness.subagents import DelegationTasks
 
-from agent.permissions.policy import ExecutionPermissions
-from agent.roles import ROLES
 from context.project import ProjectContext
 from storage.execution_lock import ExecutionBusyError, session_lease, workspace_lease
 from integrations.mcp import MCPRegistry
@@ -36,19 +34,9 @@ class RoleServices(AbstractCapability):
 
     async def for_run(self, ctx):
         if DelegationTasks.child_id() is None and self.root_services is not None:
-            from functools import partial
-            from dataclasses import replace
-            policy = next(item for item in self.root_services if isinstance(item, ExecutionPermissions))
-            settled = [replace(record) for record in self.runtime.owner.records.values() if record.status == "finished"]
-            policy.review_gate = partial(self.runtime.check_deliverables, settled)
             return CombinedCapability(self.root_services)
         root = Path(await ctx.workspace.working_dir()).resolve()
-        policy = ExecutionPermissions(root, self.runtime.broker, self.runtime.database, self.runtime.mcp_path)
-        policy.role_read_only = ROLES[self.role].read_only
-        policy.allow_sandboxed_shell = self.role in {"super", "executor"}
-        if self.role != "super":
-            policy.libraries = tuple(Path(__file__).resolve().parents[1] / path for path in ROLES[self.role].skills)
-            policy.refresh_readonly()
+        policy = self.runtime.role_permissions(root, self.role)
         # Each child has its own plan. A clone cannot replace its parent's approved plan.
         store = SqlitePlanStore(str(self.runtime.database), session=ctx.run_id)
         project = ProjectContext(root, self.runtime.database.parent / "project-context", database=self.runtime.database)

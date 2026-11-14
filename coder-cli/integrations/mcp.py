@@ -1,10 +1,12 @@
 """Trusted MCP configuration, refreshed by the framework before each model request."""
 import asyncio
+import hashlib
 import json
 import os
 import re
 import tempfile
 from contextlib import AsyncExitStack, asynccontextmanager
+from dataclasses import replace
 from pathlib import Path
 
 import httpx2
@@ -14,7 +16,9 @@ from pydantic_ai.capabilities import AbstractCapability
 from pydantic_ai.mcp import MCPToolset
 from pydantic_ai.toolsets import AbstractToolset, CombinedToolset, DynamicToolset
 
-from integrations.network import NetworkPolicy, PolicyTransport
+from integrations.config_home import user_config
+from integrations.network import NetworkDenied, NetworkPolicy, PolicyTransport
+from integrations.network_data import check_data
 
 
 class MCPConfigError(OSError):
@@ -22,6 +26,20 @@ class MCPConfigError(OSError):
 
 
 class MCPConnection(MCPToolset):
+    classify_public_args = False
+    service_name = None
+    network_fingerprint = None
+    async def get_tools(self, ctx):
+        tools = await super().get_tools(ctx)
+        return {
+            name: replace(tool, tool_def=replace(tool.tool_def, metadata={**(tool.tool_def.metadata or {}),
+                                                                          "ani_mcp": True,
+                                                                          "ani_mcp_service": self.service_name,
+                                                                          "ani_mcp_policy": self.network_fingerprint,
+                                                                          "ani_mcp_public_classification": self.classify_public_args}))
+            for name, tool in tools.items()
+        }
+
     async def __aenter__(self):
         try:
             return await super().__aenter__()
@@ -43,6 +61,8 @@ class Server(BaseModel):
     headers: dict[str, str] = Field(default_factory=dict)
     allowed_tools: list[str] | None = None
     defer_loading: bool = True
+    classify_public_args: bool = False
+    """Opt in only when tool arguments may also be sent to the configured classifier."""
 
     @model_validator(mode="after")
     def transport_fields(self):
@@ -72,6 +92,11 @@ class Config(BaseModel):
     network: Network = Field(default_factory=Network)
 
 
+def network_fingerprint(server, network):
+    data = json.dumps([server.model_dump(), network.model_dump()], sort_keys=True).encode()
+    return hashlib.sha256(data).hexdigest()
+
+
 def expand_env(value: str) -> str:
     def replace(match: re.Match) -> str:
         name = match.group(1)
@@ -85,12 +110,18 @@ class MCPRegistry(AbstractCapability):
     id = "mcp"
 
     def __init__(self, path: Path | None = None) -> None:
-        self.path = (path or Path(os.getenv("CODER_MCP_CONFIG", "~/.config/coder-cli/mcp.json"))).expanduser().resolve()
+        self.path = path.expanduser().resolve() if path is not None else user_config("CODER_MCP_CONFIG", "mcp.json")
         self.authorize_stdio = None
         self.allow_stdio = lambda: True
 
     def get_instructions(self) -> str:
         return json.dumps({"mcp_config_path": str(self.path)}, ensure_ascii=False)
+
+    def check_service(self, name, expected):
+        config = self.read()
+        server = config.mcpServers.get(name)
+        if server is None or not server.enabled or network_fingerprint(server, config.network) != expected:
+            raise NetworkDenied("MCP 服务未登记或策略已变化，请重新加载工具")
 
     def read(self) -> Config:
         try:
@@ -141,6 +172,7 @@ class MCPRegistry(AbstractCapability):
             raise MCPConfigError("MCP 网络配置无效") from None
 
         async def call(ctx, call_tool, name, tool_args):
+            check_data(json.dumps(tool_args, ensure_ascii=False), destination="mcp", category="project")
             async with asyncio.timeout(network.call_timeout):
                 return await call_tool(name, tool_args)
 
@@ -151,11 +183,15 @@ class MCPRegistry(AbstractCapability):
             if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,63}", name):
                 raise MCPConfigError("MCP 名称须以字母开头，仅包含字母、数字、下划线和连字符")
             client: httpx2.AsyncClient | None = None
+            snapshot = network_fingerprint(server, network)
+            def validate(name=name, snapshot=snapshot):
+                self.check_service(name, snapshot)
             transport: str | StdioTransport
             if server.url is not None:
                 headers = {key: expand_env(value) for key, value in server.headers.items()}
                 client = await stack.enter_async_context(httpx2.AsyncClient(
-                    transport=PolicyTransport(policy, network.connect_retries, server.url), headers=headers,
+                    transport=PolicyTransport(policy, network.connect_retries, server.url, check_payload=True,
+                                              before_send=validate), headers=headers,
                     timeout=httpx2.Timeout(network.read_timeout, connect=network.connect_timeout),
                     trust_env=False, follow_redirects=False,
                 ))
@@ -182,6 +218,9 @@ class MCPRegistry(AbstractCapability):
                 read_timeout=network.read_timeout, process_tool_call=call,
                 include_instructions=False, max_retries=0, tool_error_behavior="failed",
             )
+            toolset.classify_public_args = server.classify_public_args
+            toolset.service_name = name
+            toolset.network_fingerprint = snapshot
             if server.allowed_tools is not None:
                 allowed = frozenset(server.allowed_tools)
                 toolset = toolset.filtered(lambda ctx, tool, allowed=allowed: tool.name in allowed)

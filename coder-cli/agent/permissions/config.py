@@ -9,6 +9,9 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from pydantic_core import to_jsonable_python
 
 
+from integrations.config_home import user_config
+
+
 class PermissionConfigError(ValueError):
     pass
 
@@ -27,13 +30,13 @@ class Settings(BaseModel):
     mode: Literal["auto", "read-only", "full"] = "auto"
     rules: list[Rule] = Field(default_factory=list)
     protected_paths: list[str] = Field(default_factory=lambda: [
-        ".git", ".git/**", ".env*", "**/.env*", "*.pem", "*.key", "**/credentials*",
+        ".git", ".git/**", ".env*", "**/.env*", "*.pem", "*.key", "credentials*", "**/credentials*",
     ])
     sandbox: bool = True
 
 
 def config_path() -> Path:
-    return Path(os.getenv("CODER_PERMISSION_CONFIG", "~/.config/coder-cli/permissions.json")).expanduser().resolve()
+    return user_config("CODER_PERMISSION_CONFIG", "permissions.json")
 
 
 def load_settings(path: Path) -> tuple[Settings, str]:

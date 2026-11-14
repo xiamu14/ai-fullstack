@@ -17,6 +17,7 @@ from pydantic import (
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.profiles import ModelProfile
 from pydantic_ai.providers.openai import OpenAIProvider
+from integrations.model_http import model_client
 
 
 _JSON_STRING = r'"(?:[^"\\]|\\.)*"'
@@ -34,13 +35,15 @@ class ModelConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     provider: Literal["openai", "anthropic", "openrouter"]
     model_name: str | None = Field(default=None, min_length=1, pattern=r"^\S+$")
-    protocol: Literal["openai", "anthropic"] | None = None
+    protocol: Literal["openai", "anthropic", "decisions"] | None = None
     context_window: PositiveInt | None = None
     timeout: PositiveFloat = 30
 
     @model_validator(mode="after")
     def supported_protocol(self):
         if self.provider == "openrouter":
+            if self.protocol == "decisions" and (not self.model_name or "/" not in self.model_name):
+                raise ValueError("Decisions 必须指定完整 model_name")
             if self.protocol is None:
                 raise ValueError("OpenRouter 必须指定 protocol")
         elif self.protocol is not None and self.protocol != self.provider:
@@ -66,6 +69,8 @@ class ProviderConfig(BaseModel):
             raise ValueError("模型名不能为空")
         if any(name not in self.models for name in self.model_tiers.values()):
             raise ValueError("model_tiers 必须引用 models 中的模型")
+        if any(self.models[name].protocol == "decisions" for name in (self.default_model, *self.model_tiers.values())):
+            raise ValueError("default_model 和 model_tiers 仅允许聊天模型")
         return self
 
     def model_for_tier(self, tier: ModelTier) -> str:
@@ -84,7 +89,7 @@ def load_provider_config() -> ProviderConfig:
     except (ValidationError, UnicodeError) as exc:
         raise ValueError(
             "provider.jsonc 无效：default_model 必须存在，provider 为 openai、anthropic 或 openrouter，"
-            "OpenRouter 必须指定 openai 或 anthropic 协议，context_window 和 timeout 必须为正数，"
+            "OpenRouter 必须指定 openai、anthropic 或 decisions 协议，context_window 和 timeout 必须为正数，"
             "model_tiers 必须使用 low、medium、high 并引用已定义模型，且不允许未知字段。"
         ) from exc
 
@@ -108,6 +113,8 @@ def build_model(model_name: str | None = None, *, openai_model=OpenAIChatModel):
     if name not in config.models:
         raise ValueError(f"provider.jsonc 未定义模型：{name}")
     model = config.models[name]
+    if model.protocol == "decisions":
+        raise ValueError("Decisions 模型只能用于分类请求")
     model_id = model.model_name or name
     if model.provider == "openrouter":
         upstream, _, slug = model_id.partition("/")
@@ -126,19 +133,20 @@ def build_model(model_name: str | None = None, *, openai_model=OpenAIChatModel):
             from openai import AsyncOpenAI
             from pydantic_ai.models.openrouter import OpenRouterModel
             from pydantic_ai.providers.openrouter import OpenRouterProvider
-            client = AsyncOpenAI(api_key=key, base_url=base_url)
+            client = AsyncOpenAI(api_key=key, base_url=base_url, http_client=model_client(base_url))
             return OpenRouterModel(model_id, profile=model.profile, provider=OpenRouterProvider(openai_client=client))
         from anthropic import AsyncAnthropic
         from pydantic_ai.models.anthropic import AnthropicModel
         from pydantic_ai.providers.anthropic import AnthropicProvider
-        client = AsyncAnthropic(auth_token=key, base_url=base_url.removesuffix("/v1"))
+        client = AsyncAnthropic(auth_token=key, base_url=base_url.removesuffix("/v1"),
+                                http_client=model_client(base_url))
         return AnthropicModel(model_id, profile=model.profile, provider=AnthropicProvider(anthropic_client=client))
     if model.provider == "openai":
         return openai_model(model_id, profile=model.profile, provider=OpenAIProvider(
-            base_url=base_url, api_key=key,
+            base_url=base_url, api_key=key, http_client=model_client(base_url),
         ))
     from pydantic_ai.models.anthropic import AnthropicModel
     from pydantic_ai.providers.anthropic import AnthropicProvider
     return AnthropicModel(model_id, profile=model.profile, provider=AnthropicProvider(
-        api_key=key, base_url=base_url.removesuffix("/v1"),
+        api_key=key, base_url=base_url.removesuffix("/v1"), http_client=model_client(base_url),
     ))

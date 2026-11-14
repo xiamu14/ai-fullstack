@@ -163,18 +163,20 @@ class MultiAgentTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual({record.agent_name for record in records}, {"reviewer", "self"})
         self.assertTrue(all(record.outcome == "ok" for record in records), str(records))
 
-    async def test_executor_handoff_requires_actual_user_approval(self):
+    async def test_explicit_executor_handoff_uses_existing_user_authorization(self):
         simple = simulated(lambda messages, info: ModelResponse(parts=[TextPart("done")]))
         conversation = await self.build([simple] * 4)
         await conversation.delegate("/architect 设计修复")
         await self.settle(conversation)
         source_id = next(iter(conversation.delegations.owner.records))
-        async def refuse(text):
-            conversation.feedback("拒绝")
-        await conversation.open(on_question=refuse)
-        receipt = await conversation.delegate("/executor 修复 sample.py", source_id=source_id)
-        self.assertIn("未批准", receipt)
-        self.assertEqual(list(conversation.delegations.owner.records), [source_id])
+        async def unexpected_question(text):
+            self.fail(text)
+        await conversation.open(on_question=unexpected_question)
+        await conversation.delegate("/executor 修复 sample.py", source_id=source_id)
+        await self.settle(conversation)
+        records = list(conversation.delegations.owner.records.values())
+        self.assertEqual([record.agent_name for record in records], ["architect", "executor"])
+        self.assertEqual(records[-1].outcome, "ok", records[-1].output)
 
     async def test_reviewer_can_run_in_a_non_git_workspace(self):
         directory = self.root / "plain"
@@ -233,7 +235,9 @@ class MultiAgentTests(unittest.IsolatedAsyncioTestCase):
         if sys.platform != "darwin":
             self.skipTest("需要 macOS sandbox-exec")
         steps = iter([
-            ToolCallPart("shell", {"command": f'"{sys.executable}" -c "assert 1 + 1 == 2; print(42)"'}),
+            ToolCallPart("shell", {"command": '"printf" 42'}),
+            ToolCallPart("write_file", {"path": "sample.py", "content": "VALUE = 2\n"}),
+            ToolCallPart("shell", {"command": "git add sample.py && git commit --no-gpg-sign -m executor-check"}),
             TextPart("验证完成"),
         ])
 
@@ -241,7 +245,7 @@ class MultiAgentTests(unittest.IsolatedAsyncioTestCase):
             returns = [part for message in messages for part in message.parts
                        if isinstance(part, ToolReturnPart) and part.tool_name == "shell"]
             if returns:
-                self.assertIn("42", str(returns[-1].content))
+                self.assertIn("42", str(returns[0].content))
                 self.assertEqual(returns[-1].outcome, "success")
             return ModelResponse(parts=[next(steps)])
 
@@ -256,6 +260,7 @@ class MultiAgentTests(unittest.IsolatedAsyncioTestCase):
         await self.settle(conversation)
         record = next(iter(conversation.delegations.owner.records.values()))
         self.assertEqual(record.outcome, "ok", record.output)
+        self.assertEqual(git(Path(record.working_directory), "log", "-1", "--format=%s"), "executor-check")
 
     async def test_native_records_restore_and_delete_with_super_session(self):
         simple = simulated(lambda messages, info: ModelResponse(parts=[TextPart("审核结果")]))
@@ -292,22 +297,21 @@ class MultiAgentTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0].output, "保持审核角色")
 
-    async def test_super_waits_for_user_before_executing_reviewed_result(self):
+    async def test_explicitly_requested_super_write_needs_no_handoff_approval(self):
         responses = iter([
             ToolCallPart("write_file", {"path": "sample.py", "content": "VALUE = 99\n"}),
-            TextPart("等待授权"),
+            TextPart("已执行"),
         ])
-        root_model = simulated(lambda messages, info: ModelResponse(parts=[next(responses, TextPart("等待授权"))]))
+        root_model = simulated(lambda messages, info: ModelResponse(parts=[next(responses, TextPart("已执行"))]))
         reviewer = simulated(lambda messages, info: ModelResponse(parts=[TextPart("第1项需要修复")]))
         conversation = await self.build([root_model, reviewer])
-        async def refuse(text):
-            conversation.feedback("拒绝")
-        await conversation.open(on_question=refuse)
+        async def unexpected_question(text):
+            self.fail(text)
+        await conversation.open(on_question=unexpected_question)
         await conversation.delegate("/reviewer 检查")
         await self.settle(conversation)
-        await conversation.send("执行修复", on_question=refuse)
-        self.assertEqual((self.repo / "sample.py").read_text(), "VALUE = 1\n")
-        self.assertFalse(conversation.delegations.approved_runs)
+        await conversation.send("直接修复 sample.py，把 VALUE 改成 99", on_question=unexpected_question)
+        self.assertEqual((self.repo / "sample.py").read_text(), "VALUE = 99\n")
 
     async def test_anthropic_binding_uses_native_adapter(self):
         config = '{"default_model":"claude-sonnet-4-6","models":{"claude-sonnet-4-6":{"provider":"anthropic"}}}'

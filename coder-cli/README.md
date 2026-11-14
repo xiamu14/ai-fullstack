@@ -75,19 +75,19 @@ Harness 已升级至 0.65.0，Pydantic AI 为 2.65.0。工具统一经过原生 
 | 权限配置、运行存储、`~/.ssh`、`~/.aws` | 拒绝，普通批准不能覆盖 |
 | 项目普通文件、已安装技能包的只读资源 | 允许；真实路径仍需通过边界检查 |
 | `.env*`、`.git`、密钥文件、目录外文件 | 逐次询问；目录外文件用文件工具精确授权 |
-| Super / Executor 的 shell | `auto` 模式下默认在沙箱内运行，关闭沙箱后默认询问 |
+| Super / Executor 的 shell | `auto` 模式仅自动放行可识别的本地读取和本地 Git。范围不明的删除硬拒绝，其他命令按目标及副作用判定 |
 | MCP 调用和未分类工具 | 默认询问；命中明确放行规则才自动执行 |
 | 本地 stdio MCP | 工具发现前先询问，再启动隔离进程；服务工具调用另行判定 |
 
 审批显示完整参数和工作目录，凭据脱敏；“本次允许”才批准，自由文本、拒绝、5 分钟无回答或没有交互回调均不批准。Ctrl+C 取消等待并清理未执行的批准。工具串行执行；批准后重新检查参数、实际目标状态、权限配置和 MCP 配置，变化则拒绝旧批准。失败或重启恢复时只修复未完成调用，不复用旧批准、不自动重放；需要重新发起调用并批准。
 
-权限配置默认读取 `~/.config/coder-cli/permissions.json`，不存在时使用上述默认规则；也可在启动前设置 `CODER_PERMISSION_CONFIG`。配置只从用户指定位置读取，不加载项目内权限文件。参照 [permissions.example.json](permissions.example.json) 手动配置；配置损坏、超限或包含未知字段时明确报错。
+权限配置默认读取 `~/.config/.ani bot/permissions.json`，不存在时使用上述默认规则；也可在启动前设置 `CODER_PERMISSION_CONFIG`。配置只从用户指定位置读取，不加载项目内权限文件。参照 [permissions.example.json](permissions.example.json) 手动配置；配置损坏、超限或包含未知字段时明确报错。
 
 规则字段为 `tool`、`pattern`、`action`（`deny / ask / allow`），工具名与资源使用 glob 匹配；文件资源是规范化绝对路径，shell 资源是完整命令，其他工具默认使用工具名。可用 `argument` 指定外部工具参数，例如 `{"tool":"docs_search","argument":"query","pattern":"public:*","action":"allow"}`。优先级固定为硬限制 → deny → 受保护路径 → ask → 模式与 allow → 默认询问，不受数组排列影响。`auto` 放行普通项目文件；`read-only` 额外询问写入和所有命令；`full` 取消普通调用询问，但不覆盖硬拒绝与受保护资源。
 
 只有可信配置中的 `ask` 规则显式设置 `remember: true` 时，适合的外部调用才提供“本会话允许相同调用”。记忆绑定会话、工作目录、工具、完整参数与配置版本，只保留在进程内；shell、写入与受保护资源不提供记忆。审批记录追加到会话数据库旁的 `permissions.jsonl`，包含原生会话/运行/工具调用 ID、时间、原因与调用指纹，不记录参数正文；执行结果由原生运行记录追踪。
 
-默认 `sandbox: true`，目前实现并验证 macOS 后端；缺少 `sandbox-exec` 或启动失败时不退回无限制执行。子进程只能写工作目录和私有临时目录，只读必要系统运行库和技能资源；无法直接读写权限配置、凭据目录或 `.env`。普通 shell 不能直接改 `.git`，以 `git` 启动的已允许命令可更新当前项目的 Git 元数据。批准的 shell/MCP 启动可使用 TCP 网络，Unix socket 连接仍禁止；HTTP MCP 的 origin、DNS 和云元数据检查继续独立执行，并不覆盖已批准命令的全部 TCP 目的地。其他平台应接入适用的隔离后端；可信用户可手动设 `sandbox: false` 关闭子进程隔离，关闭后不可将审批宣称为沙箱。
+默认 `sandbox: true`。模型发起的 Shell 在 macOS 沙箱内运行，禁止联网。写入限运行临时文件、明确审批目标及受规则约束的本地 Git 元数据。关闭隔离或隔离不可用时，模型 Shell 拒绝启动。本地 stdio MCP 单独判定启动权限，HTTP MCP 继续执行 origin、DNS 与云元数据检查。
 
 当前关闭 Coder 的任务委派，避免出现未接入同一审批交互的子运行；保留已有 Pydantic AI 执行框架。升级不删除或迁移会话数据库，已验证旧版快照在新版继续运行；回退依赖需同时恢复 `pyproject.toml` 与 `uv.lock`。
 
@@ -148,7 +148,7 @@ uv run python -m unittest discover -s tests -v
 
 离线测试不请求真实模型 API；验证真实 Coder 文件操作、记忆、SQLite 历史检索、多轮流式工具调用，以及 Textual 无界面模式下的输入、失败恢复、取消和滚动行为。
 
-Logfire 终端输出已关闭，避免干扰 TUI。设置 `.env` 中的 `LOGFIRE_TOKEN` 后，可在项目 Live 页面查看追踪；未配置时不发送。追踪包含任务、模型回复、工具参数及结果。
+Logfire 终端输出已关闭，避免干扰 TUI。设置 `.env` 中的 `LOGFIRE_TOKEN` 后，可在项目 Live 页面查看追踪。追踪包含运行、模型请求、工具调用的类别、白名单内的内置工具名、数值用量和耗时。任务正文、模型回复、工具参数、结果和异常详情留在本地。
 
 底部信息栏显示会话 ID，执行时显示忙碌状态；悬停可查看本轮逐请求和累计缓存统计。读取量大于 0 表示服务商报告命中，写入量不代表命中；读写已包含在输入 token 内，0 也可能是兼容接口没有返回统计。费用仅在模型定价可识别时显示，以服务商账单为准。
 
@@ -197,9 +197,10 @@ OpenRouter 的两种协议都读取 OPENROUTER_BASE_URL 和 OPENROUTER_API_KEY�
 ```
 
 Reviewer 和 Architect 可以直接读取和搜索普通项目文件，也可以查看 Git diff。
-直接指派 Executor 时，默认可读写工作区内的普通文件。引用交付物执行仍需确认，
-Executor 的计划用于跟踪进度。默认 `auto` 模式下，Super 和 Executor 的 Shell 命令在沙箱内直接运行，
-适用于本地测试和验证。默认放行的命令没有网络访问和额外的 Git 元数据写权限。
+直接指派 Executor 时，默认可读写工作区内的普通文件。Super 从对话判断交接授权和范围，
+信息明确时直接指派，有疑问时向用户澄清。Executor 的计划用于跟踪进度。
+默认 `auto` 模式下，Super 和 Executor 的 Shell 命令在沙箱内运行。
+默认放行的命令没有网络访问，Git 元数据写权限按命令规则授予。
 显式询问或拒绝规则优先。关闭沙箱时，`auto` 模式恢复逐条询问。
 受保护路径和用户配置的权限规则照常生效。
 Super 和 Executor 都使用相同的工具权限规则。
@@ -270,7 +271,7 @@ npx skills update
 
 ## 外部 Hook
 
-通过启动进程的环境变量 `CODER_HOOK_CONFIG` 指定 JSON 配置的绝对路径。工作目录和项目 `.env` 不自动加载 Hook。省略变量时仅使用内置 Hook。
+通过启动进程的环境变量 `CODER_HOOK_CONFIG` 指定 JSON 配置的绝对路径。工作目录和项目 `.env` 不自动加载 Hook。省略变量时读取默认目录的 `hooks.json`，缺失时仅使用内置 Hook。
 
 ```json
 {

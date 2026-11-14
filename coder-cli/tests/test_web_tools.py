@@ -31,7 +31,9 @@ class WebToolsTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await web_search("query"), [
                 {"title": "Source", "url": "https://example.com", "content": "Evidence"},
             ])
-        factory.assert_called_once_with(api_key="secret-test-key")
+        factory.assert_called_once()
+        self.assertEqual(factory.call_args.kwargs["api_key"], "secret-test-key")
+        self.assertTrue(factory.call_args.kwargs["client"].is_closed)
         client.search.assert_awaited_once_with(
             "query", search_depth="basic", max_results=5,
             include_answer=False, include_raw_content=False, timeout=30,

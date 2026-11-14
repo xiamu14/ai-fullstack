@@ -100,7 +100,7 @@ class Interaction(AbstractCapability):
 
     async def approve(
         self, details: str, *, rememberable: bool, header: str = "工具审批",
-        prompt: str = "是否允许以上完整调用？只有选择允许才会执行。",
+        prompt: str = "允许此次调用？",
         remember_label: str = "本会话允许相同调用",
     ) -> tuple[bool, bool]:
         if self.on_question is None:

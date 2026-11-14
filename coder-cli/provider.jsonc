@@ -7,6 +7,12 @@
     "high": "claude-opus-5.5"
   },
   "models": {
+    "jev": {
+      "provider": "openrouter",
+      "protocol": "decisions",
+      "model_name": "typesafe/jev-1.13",
+      "timeout": 10
+    },
     "glm-5.3-flash-event": { // Low
       "provider": "openai",
       "model_name":"GLM-5.3-Flash-Event",

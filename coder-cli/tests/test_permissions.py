@@ -6,7 +6,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from pydantic_ai import Agent
+from pydantic_ai import Agent, Tool
 from pydantic_ai.capabilities import HandleDeferredToolCalls, LocalWorkspace
 from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
 from pydantic_ai.models.function import FunctionModel
@@ -24,7 +24,7 @@ class PermissionTests(unittest.IsolatedAsyncioTestCase):
         tool = SimpleNamespace(tool_kind="shell", metadata={
             "code_arg_language": "shell", "code_arg_name": "command",
         })
-        args = {"command": "python -c 'assert 1 + 1 == 2'"}
+        args = {"command": "pwd"}
         self.assertEqual(self.policy.evaluate("shell", tool, args)[0].action, "ask")
         self.policy.allow_sandboxed_shell = True
         grant, _ = self.policy.evaluate("shell", tool, args)
@@ -39,6 +39,58 @@ class PermissionTests(unittest.IsolatedAsyncioTestCase):
             with self.subTest(settings=settings):
                 self.configure(**settings)
                 self.assertEqual(self.policy.evaluate("shell", tool, args)[0].action, action)
+
+    def test_desktop_recoverable_git_writes_are_automatic(self):
+        tool = SimpleNamespace(tool_kind="shell", metadata={
+            "code_arg_language": "shell", "code_arg_name": "command",
+        })
+        self.policy.allow_sandboxed_shell = True
+        for command in ("git add .", "git commit -m fix", "cd . && git add .",
+                        "git status && git add .", "/usr/bin/git -C . add file"):
+            with self.subTest(command=command):
+                decision, _ = self.policy.evaluate("shell", tool, {"command": command})
+                self.assertEqual(decision.action, "allow")
+                self.assertTrue(decision.sandbox_only)
+        for command in ("git reset --hard", "git push --force", "git checkout -- file"):
+            with self.subTest(command=command):
+                decision, _ = self.policy.evaluate("shell", tool, {"command": command})
+                self.assertEqual(decision.action, "ask")
+        for command in ("git status --short", "git diff", "git log -1", "ls"):
+            with self.subTest(command=command):
+                decision, _ = self.policy.evaluate("shell", tool, {"command": command})
+                self.assertEqual(decision.action, "allow")
+                self.assertTrue(decision.sandbox_only)
+
+    def test_destructive_shell_rules_precede_modes_and_allow(self):
+        tool = SimpleNamespace(tool_kind="shell", metadata={
+            "code_arg_language": "shell", "code_arg_name": "command",
+        })
+        self.policy.allow_sandboxed_shell = True
+        for settings in ({}, {"mode": "full", "rules": [{"tool": "shell", "action": "allow"}]}):
+            self.configure(**settings)
+            for command in ("rm -rf *", "rm -rf ./*", "/bin/rm -fr ./*", "cd . && rm -rf *",
+                            "rm -rf .", "rm -rf ~", "find . -delete", "git clean -fd",
+                            "echo before > before.txt && rm -rf *"):
+                with self.subTest(command=command, settings=settings):
+                    self.assertEqual(self.policy.evaluate("shell", tool, {"command": command})[0].action, "deny")
+            for command in ("rm -rf build/cache", "rm obsolete.txt", "> data.csv",
+                            "cp -f a b", "git restore -- file", "python -c 'print(1)'"):
+                with self.subTest(command=command, settings=settings):
+                    self.assertEqual(self.policy.evaluate("shell", tool, {"command": command})[0].action, "ask")
+
+    async def test_denied_compound_shell_does_not_run_earlier_segment(self):
+        self.configure(mode="full", rules=[{"tool": "shell", "action": "allow"}])
+        keep = self.project / "keep.txt"
+        keep.write_text("keep")
+        for command in ("echo before > before.txt && rm -rf *", "echo before > before.txt | head; rm -rf *"):
+            with self.subTest(command=command):
+                conversation = self.conversation([
+                    ToolCallPart("shell", {"command": command}), TextPart("done"),
+                ], coder=True, sandbox=True)
+                await conversation.send("check denial")
+                self.assertTrue(keep.exists())
+                self.assertFalse((self.project / "before.txt").exists())
+                self.assertIn("权限拒绝", str(self.observed[-1]))
 
     def setUp(self):
         self.root = Path(self.enterContext(TemporaryDirectory())).resolve()
@@ -66,7 +118,12 @@ class PermissionTests(unittest.IsolatedAsyncioTestCase):
         capabilities = [workspace, self.policy, HandleDeferredToolCalls(handler=self.policy.handle)]
         if coder:
             capabilities.append(Coder(repo_context=False, sub_agents=False, unrestricted_filesystem=True))
-        return Conversation(Agent(FunctionModel(model), tools=tools, capabilities=capabilities),
+        registered = []
+        for tool in tools:
+            tool = tool if isinstance(tool, Tool) else Tool(tool)
+            tool.metadata = {**(tool.metadata or {}), "ani_network": "local"}
+            registered.append(tool)
+        return Conversation(Agent(FunctionModel(model), tools=registered, capabilities=capabilities),
                             "session", interaction=self.interaction)
 
     def external(self, value: str) -> str:
@@ -76,6 +133,10 @@ class PermissionTests(unittest.IsolatedAsyncioTestCase):
     async def answer(self, conversation, choice="本次允许"):
         async def on_question(text):
             self.assertIn("工具审批", text)
+            self.assertRegex(text, r'```json\n\{\n  "value": "(?:probe|native)"\n\}\n```')
+            self.assertIn("允许此次调用？", text)
+            self.assertNotIn("工作目录：", text)
+            self.assertNotIn("参数：", text)
             self.assertFalse(self.calls)
             conversation.feedback(choice)
         return on_question
@@ -103,6 +164,25 @@ class PermissionTests(unittest.IsolatedAsyncioTestCase):
                                          tools=[self.external])
         await conversation.send("do it")
         self.assertFalse(self.calls)
+
+    async def test_denied_shell_context_preserves_command_and_denial_scope(self):
+        command = "git -C sub add ."
+        call = ToolCallPart("shell", {"command": command})
+        conversation = self.conversation([call, TextPart("无法暂存")], coder=True, sandbox=True)
+
+        async def reject(text):
+            self.assertIn(command, text)
+            conversation.feedback("拒绝")
+
+        await conversation.send("暂存修改", on_question=reject)
+        parts = [part for message in self.observed[-1] for part in message.parts]
+        original = next(part for part in parts if isinstance(part, ToolCallPart)
+                        and part.tool_call_id == call.tool_call_id)
+        denied = next(part for part in parts if isinstance(part, ToolReturnPart)
+                      and part.tool_call_id == call.tool_call_id)
+        self.assertEqual(original.args_as_dict()["command"], command)
+        self.assertEqual(denied.outcome, "denied")
+        self.assertIn("不要通过更换目录、路径、参数或工具来重试同一操作", str(denied.content))
 
     async def test_policy_change_after_approval_invalidates_ticket(self):
         conversation = self.conversation([ToolCallPart("external", {"value": "probe"}), TextPart("done")],

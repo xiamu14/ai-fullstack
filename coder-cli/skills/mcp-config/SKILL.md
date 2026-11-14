@@ -7,7 +7,7 @@ description: 配置、注册、修改、禁用或删除 coder-cli 的外部 MCP 
 
 ## 配置入口
 
-使用运行时提供的 `mcp_config_path`，不要猜测路径，也不要改写当前项目的同名文件。该路径已考虑 `CODER_MCP_CONFIG`；默认是 `~/.config/coder-cli/mcp.json`。通过已有文件工具或 shell 修改，不新增注册工具或 slash 指令。
+使用运行时提供的 `mcp_config_path`，不要猜测路径，也不要改写当前项目的同名文件。该路径已考虑 `CODER_MCP_CONFIG`；默认是 `~/.config/.ani bot/mcp.json`。通过已有文件工具或 shell 修改，不新增注册工具或 slash 指令。
 
 支持 HTTP MCP（Streamable HTTP 或 `/sse` 端点）和本地 stdio MCP。每个服务必须且只能配置 `url` 或 `command`。
 

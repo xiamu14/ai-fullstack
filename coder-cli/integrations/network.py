@@ -63,15 +63,32 @@ class NetworkPolicy:
 
 
 class PolicyTransport(httpx2.AsyncBaseTransport):
-    def __init__(self, policy: NetworkPolicy, retries: int, endpoint: str) -> None:
+    def __init__(self, policy: NetworkPolicy, retries: int, endpoint: str, *, reject_redirects=True, check_payload=False,
+                 before_send=None) -> None:
         self.policy = policy
         self.origin = origin(endpoint)
+        self.reject_redirects = reject_redirects
+        self.check_payload = check_payload
+        self.before_send = before_send
         # Only connection establishment is retried; requests already sent are never replayed here.
         self.transport: httpx2.AsyncBaseTransport = httpx2.AsyncHTTPTransport(retries=retries, trust_env=False)
 
     async def handle_async_request(self, request: httpx2.Request) -> httpx2.Response:
+        if self.before_send is not None:
+            self.before_send()
         if origin(str(request.url)) != self.origin:
             raise NetworkDenied("MCP 服务不能将请求转向另一个 origin")
+        if self.check_payload:
+            from integrations.network_privacy import MAX_PAYLOAD, check_content
+            check_content(str(request.url))
+            body = bytearray()
+            async for chunk in request.stream:
+                if len(body) + len(chunk) > MAX_PAYLOAD:
+                    raise NetworkDenied("请求超出外发检查预算")
+                body.extend(chunk)
+            check_content(bytes(body))
+            request = httpx2.Request(request.method, request.url, headers=request.headers,
+                                     content=bytes(body), extensions=request.extensions)
         async with asyncio.timeout(request.extensions.get("timeout", {}).get("connect", 5)):
             ip = await self.policy.resolve(request.url)
         headers = request.headers.copy()
@@ -80,8 +97,10 @@ class PolicyTransport(httpx2.AsyncBaseTransport):
             request.method, request.url.copy_with(host=ip), headers=headers, stream=request.stream,
             extensions={**request.extensions, "sni_hostname": request.url.host},
         )
+        if self.before_send is not None:
+            self.before_send()
         response = await self.transport.handle_async_request(pinned)
-        if 300 <= response.status_code < 400:
+        if self.reject_redirects and 300 <= response.status_code < 400:
             await response.aclose()
             raise NetworkDenied("MCP 不允许 HTTP 重定向")
         return response

@@ -6,7 +6,6 @@ import re
 import os
 from pathlib import Path
 import shutil
-import shlex
 import stat
 import sys
 import tempfile
@@ -16,6 +15,7 @@ from pydantic_ai.capabilities import LocalWorkspace
 from pydantic_ai.workspaces import LocalWorkspaceBackend
 
 from agent.permissions.policy import CURRENT_GRANT
+from agent.permissions.rules import git_access
 
 
 async def _finish_mutation(operation):
@@ -120,12 +120,13 @@ class RestrictedBackend(LocalWorkspaceBackend):
         self.check(path)
         return await super().exists(path)
 
-    def profile(self, *, network=False, git_write=False):
+    def profile(self, *, git_write=False, write_targets=None):
         def subpath(path):
             return f"(subpath {json.dumps(str(Path(path).resolve()))})"
         read = ["/System", "/usr", "/bin", "/sbin", "/opt/homebrew", "/Library", "/private/etc",
                 Path(sys.prefix), Path.home() / ".local/share/uv", self.root, self.scratch, *self.policy.readonly]
-        if git_write:
+        git_read = git_write or self.policy.allow_sandboxed_shell
+        if git_read:
             read.extend(["/Applications/Xcode.app/Contents/Developer", Path.home() / ".gitconfig", Path.home() / ".config/git"])
             from storage.worktrees import git
             common = self.root / ".git"
@@ -133,11 +134,17 @@ class RestrictedBackend(LocalWorkspaceBackend):
                 common = Path(git(self.root, "rev-parse", "--path-format=absolute", "--git-common-dir"))
             read.append(common)
         read_filters = " ".join(subpath(path) for path in [*read, "/dev"])
+        jobs = self.root / ".pydantic-ai-harness" / "shell"
+        if write_targets is not None and jobs.resolve() != jobs:
+            raise PermissionError("Shell 运行目录包含符号链接")
+        writable = [self.root] if write_targets is None else [jobs, *write_targets]
+        write_filters = " ".join(f"(subpath {json.dumps(str(path))})" for path in [*writable, self.scratch])
         lines = [
             "(version 1)", "(allow default)",
             f'(deny file-read-data (require-not (require-any (literal "/") {read_filters})))',
-            f'(deny file-write* (require-not (require-any {subpath(self.root)} {subpath(self.scratch)} (literal "/dev/null"))))',
-            "(deny network-outbound (remote unix-socket))" if network else "(deny network*)",
+            f'(deny file-write* (require-not (require-any {write_filters} (literal "/dev/null"))))',
+            "(deny network*)",
+            "(deny appleevent-send)", "(deny lsopen)",
         ]
         if git_write:
             lines.append(f'(allow file-write* {subpath(common)})')
@@ -154,7 +161,8 @@ class RestrictedBackend(LocalWorkspaceBackend):
                 prefix += "(.*/)?"
             expression = prefix + "(" + expression + ")(/|$)"
             expression = expression.replace('"', chr(92) + '"')
-            lines.append(f'(deny file-read-data file-write* (regex #"{expression}"))')
+            operations = "file-write*" if git_read and pattern in {".git", ".git/**"} else "file-read-data file-write*"
+            lines.append(f'(deny {operations} (regex #"{expression}"))')
         return "\n".join(lines)
 
     async def run(self, command, *, shell=False, env=None, timeout=None):
@@ -167,27 +175,38 @@ class RestrictedBackend(LocalWorkspaceBackend):
         settings, _ = self.policy_settings()
         grant = CURRENT_GRANT.get()
         sandbox_only = bool(grant and grant.sandbox_only)
+        operation = grant.shell_operation if grant else None
+        if operation is not None and not operation.supported:
+            raise PermissionError(operation.reason)
         if not settings.sandbox:
-            if sandbox_only:
-                raise PermissionError("默认验证必须在沙箱内执行")
-            return await super().run(command, shell=shell, env=env, timeout=timeout)
+            raise PermissionError("命令需要可执行的沙箱约束")
         if sys.platform != "darwin" or shutil.which("sandbox-exec") is None:
             raise OSError("本机执行隔离不可用；拒绝执行。请配置可用的隔离后端。")
         elevated_command = bool(grant and grant.command and not sandbox_only)
-        try:
-            words = shlex.split(grant.subject) if grant and elevated_command else []
-        except ValueError:
-            words = []
-        git_write = bool(words and Path(words[0]).name == "git")
-        if git_write:
+        access = git_access(grant.subject) if grant and grant.command else None
+        git_write = bool((elevated_command and access is not None)
+                         or (self.policy.allow_sandboxed_shell and sandbox_only and access == "write"))
+        write_targets = None
+        if operation is not None:
+            git_write = operation.git_write
+            elevated_command = False
+            write_targets = operation.targets if operation.action == "ask" else ()
+            if git_write:
+                env = {**(env or {}), "GIT_CONFIG_COUNT": "3",
+                       "GIT_CONFIG_KEY_0": "core.hooksPath", "GIT_CONFIG_VALUE_0": "/dev/null",
+                       "GIT_CONFIG_KEY_1": "commit.gpgSign", "GIT_CONFIG_VALUE_1": "false",
+                       "GIT_CONFIG_KEY_2": "core.fsmonitor", "GIT_CONFIG_VALUE_2": "false"}
+        if git_write or self.policy.allow_sandboxed_shell:
             # Resolve Apple's launcher before sandboxing; its SDK cache ignores TMPDIR.
             located = await super().run(["/usr/bin/xcrun", "--find", "git"], timeout=5)
             if located.exit_code != 0:
                 raise OSError("无法定位系统 Git，拒绝运行")
             git_bin = Path(located.stdout.strip()).parent
-            env = {**(env or {}), "PATH": f"{git_bin}:{os.environ.get('PATH', os.defpath)}"}
+            search_path = os.defpath if operation is not None and git_write else os.environ.get("PATH", os.defpath)
+            env = {**(env or {}), "PATH": f"{git_bin}:{search_path}"}
         argv = ["/bin/sh", "-c", command] if isinstance(command, str) else list(command)
-        invocation = ["/usr/bin/sandbox-exec", "-p", self.profile(network=elevated_command, git_write=git_write), *argv]
+        invocation = ["/usr/bin/sandbox-exec", "-p", self.profile(git_write=git_write,
+                                                                   write_targets=write_targets), *argv]
         return await super().run(invocation, env=env, timeout=timeout)
 
 

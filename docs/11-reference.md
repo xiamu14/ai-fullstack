@@ -25,3 +25,24 @@
 [Full-Stack AI Engineering - Complete Beginner Course](https://www.youtube.com/watch?v=XzjSx7u9mGw)
 [Customer support automation](https://learn.datalumina.com/docs/customer-support-automation)
 ![intro](./images/010.png?sw=966&sh=784)
+
+[SkillEvaluator](https://github.com/NVIDIA/SkillEvaluator)
+![intro](https://raw.githubusercontent.com/NVIDIA/SkillEvaluator/ad2815fe78c045db91d230681d32863698da08cf/docs/assets/three-tier-overview.svg)
+
+[Prompting Guide](https://www.promptingguide.ai/zh)
+![intro](./images/019.png?sw=1302&sh=604)
+
+[Jev 工程学](https://github.com/yibie/jev-engineering-zh)
+![intro](./images/020.png?sw=1724&sh=782)
+
+[Context Mode](https://github.com/mksglu/context-mode)
+![intro](./images/021.png?sw=1510&sh=754)
+
+[Lody Automation](https://x.com/wibus_wee/status/2120716116733706749)
+![intro](./images/022.png?sw=1156&sh=656)
+
+[7*24 在线 Agent](https://x.com/shao__meng/status/2121427594260398327)
+![intro](./images/023.png?sw=1148&sh=476)
+
+[AI评估体系实战: 面向工程师与产品经理](https://www.bilibili.com/video/BV1hT4e6SENE/?trackid=web_pegasus_0.router-web-pegasus-2479516-f6fct.1794626256725.395&spm_id_from=333.1007.tianma.2-2-5.click&vd_source=68fd98cf373bcd193d855f8ffcd2bfba)
+![intro](./images/024.png?sw=1120&sh=400)

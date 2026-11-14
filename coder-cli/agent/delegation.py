@@ -23,6 +23,7 @@ from agent.roles import ROLES
 from storage.worktrees import Worktrees, git
 from storage.delegations import delegation_directory
 from storage.execution_lock import delegation_lease
+from tools.external_hooks import hook_config_path
 
 
 class RoleTaskOwner(DelegationTasks):
@@ -51,7 +52,6 @@ class Delegations:
         self.broker = Interaction()
         self.agents = {}
         self.backends = []
-        self.approved_runs = set()
         self.write_locks = {}
 
     async def open(self, store, *, observer=None, on_question=None):
@@ -89,11 +89,22 @@ class Delegations:
         for backend in self.backends:
             backend.close()
         self.backends.clear()
-        self.approved_runs.clear()
         self.broker.close()
 
     def write_lock(self, directory):
         return self.write_locks.setdefault(directory, asyncio.Lock())
+
+    def role_permissions(self, directory, name):
+        role = ROLES[name]
+        policy = ExecutionPermissions(directory, self.broker, self.database, self.mcp_path,
+                                      policy_id=role.policy_id)
+        if name != "super":
+            policy.libraries = tuple(Path(__file__).resolve().parents[1] / path for path in role.skills)
+            policy.refresh_readonly()
+        hook_path = hook_config_path()
+        if hook_path is not None:
+            policy.forbidden += (hook_path,)
+        return policy
 
     async def resolve_workspace(self, ctx, request):
         if request.directory == str(self.workspace):
@@ -101,40 +112,10 @@ class Delegations:
         else:
             record = await asyncio.to_thread(self.worktrees.validate, request.directory)
             directory = Path(record.path)
-        policy = ExecutionPermissions(directory, self.broker, self.database, self.mcp_path)
-        policy.role_read_only = request.agent_name in {"reviewer", "architect"}
-        policy.libraries = tuple(Path(__file__).resolve().parents[1] / path for path in ROLES[request.agent_name].skills)
-        policy.refresh_readonly()
+        policy = self.role_permissions(directory, request.agent_name)
         backend = RestrictedBackend(directory, policy)
         self.backends.append(backend)
         return Workspace(backend)
-
-    async def approve_execution(self, source=None, *, task=""):
-        details = "批准执行当前请求。具体工具调用仍按权限策略处理。"
-        if task:
-            details += f"\n\n本次执行范围\n{task}"
-        reviewed_run = source.run_id if source is not None else None
-        reviewed_output = source.output if source is not None else None
-        if source is not None:
-            if source.status != "finished" or source.outcome != "ok":
-                raise ValueError("只能批准已成功交付的结果。")
-            details += f"\n任务 {source.id}\n来源 run_id {source.run_id}\n\n{source.output}"
-        allowed, _ = await self.broker.approve(details, rememberable=False, header="执行交接确认")
-        if allowed and source is not None:
-            current = self.owner.records.get(source.id)
-            if (current is None or current.status != "finished" or current.run_id != reviewed_run
-                    or current.output != reviewed_output):
-                raise ValueError("审核期间交付版本发生变化，需要重新确认。")
-            self.approved_runs.add(reviewed_run)
-        return allowed
-
-    async def check_deliverables(self, records=None):
-        for record in records if records is not None else list(self.owner.records.values()):
-            if (record.parent_id is None and record.agent_name in {"reviewer", "architect"}
-                    and record.status == "finished" and record.outcome == "ok"
-                    and record.run_id not in self.approved_runs):
-                if not await self.approve_execution(record):
-                    raise SkipToolExecution("交付结果尚未获得用户执行授权。")
 
     async def start_role(self, conversation, role, task, *, source_id=None):
         if self.owner is None:
@@ -144,8 +125,6 @@ class Delegations:
             raise ValueError("找不到指定的原生任务 ID。")
         if source is not None and (source.status != "finished" or source.outcome != "ok"):
             raise ValueError("来源任务尚未成功交付。")
-        if role == "executor" and source is not None and not await self.approve_execution(source, task=task):
-            return "用户未批准执行，未启动 Executor。"
         if source is not None:
             task += f"\n\n来源任务 {source.id}，run_id {source.run_id}\n{source.output}"
         revision = "HEAD"
@@ -238,11 +217,6 @@ class DelegationPolicy(AbstractCapability):
             raise ModelRetry("未知内置角色")
         owner = self.runtime.owner
         previous = owner.records.get(args.get("resume"))
-        if name == "executor":
-            await self.runtime.check_deliverables()
-            allowed = await self.runtime.approve_execution(task=args.get("task", ""))
-            if not allowed:
-                raise SkipToolExecution("用户未批准 Executor 执行。")
         args["working_directory"], args["task"] = await self.runtime.role_workspace(
             f"{ctx.run_id}:{call.tool_call_id}", args["task"],
             previous=previous.working_directory if previous else None,

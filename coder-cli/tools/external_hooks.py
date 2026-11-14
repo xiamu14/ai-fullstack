@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from pydantic_ai.capabilities import Hooks
 
 from agent.permissions.config import digest, redact
+from integrations.config_home import config_home
 
 PREVIEW = 4096
 EXTRA_LIMIT = 4096
@@ -33,7 +34,8 @@ class HookSettings(BaseModel):
 def hook_config_path():
     configured = os.getenv("CODER_HOOK_CONFIG")
     if configured is None:
-        return None
+        default = config_home() / "hooks.json"
+        return default.resolve() if default.exists() else None
     path = Path(configured).expanduser()
     if not path.is_absolute():
         raise ValueError("Hook 配置必须使用绝对路径")

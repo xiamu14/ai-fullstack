@@ -2,9 +2,10 @@ from functools import partial, cache
 from pathlib import Path
 
 import logfire
+from integrations.telemetry import instrumentation
 from dotenv import load_dotenv
 from pydantic_ai import Agent, UsageLimits
-from pydantic_ai.capabilities import HandleDeferredToolCalls, WebFetch, DynamicCapability, SelectModel
+from pydantic_ai.capabilities import HandleDeferredToolCalls, DynamicCapability, SelectModel
 from pydantic_ai.conversation import Conversation as NativeConversation
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai_harness import (
@@ -42,7 +43,7 @@ from storage.sessions import (
 )
 from tools.external_hooks import external_result_hooks, hook_config_path, load_hook_settings
 from tools.output_hooks import output_hooks
-from tools.web_tools import web_search
+from tools.web_tools import web_fetch, web_search
 from tools.review import review_diff
 
 
@@ -54,8 +55,8 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
     model_names = {name: config.model_for_tier(role.model_tier) for name, role in ROLES.items()}
     super_model = model_names["super"]
     model = build_model(super_model, openai_model=OpenAIChatModel)
-    logfire.configure(service_name="coder-cli", send_to_logfire="if-token-present", console=False)
-    logfire.instrument_pydantic_ai()
+    logfire.configure(service_name="coder-cli", send_to_logfire=False, metrics=False, console=False)
+    logfire.instrument_pydantic_ai(**instrumentation())
     database = session_database()
     workspace = await session_workspace(database, session_id, path)
     database.parent.mkdir(parents=True, exist_ok=True)
@@ -77,15 +78,14 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
         ),
     ])
     interaction = Interaction()
-    permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
-    permissions.allow_sandboxed_shell = True
+    permissions = ExecutionPermissions(workspace, interaction, database, mcp.path,
+                                       policy_id=ROLES["super"].policy_id)
     if hook_path is not None:
         permissions.forbidden += (hook_path,)
     plan_store = SqlitePlanStore(str(database), session=session_id)
     mcp.authorize_stdio = permissions.authorize_stdio
     runtime = Delegations(database, workspace, session_id)
     runtime.mcp_path = mcp.path
-    permissions.review_gate = runtime.check_deliverables
     permissions.interaction = runtime.broker
     root_services = [
         AskUser(answerer=runtime.broker.ask), permissions,
@@ -136,7 +136,6 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
             RestrictedWorkspace(workspace, permissions),
             Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
             # Local execution keeps fetches inside the tool permission and hook pipeline.
-            WebFetch(native=False, local=True),
             output_hooks,
             external_result_hooks(
                 hook_settings, runtime.broker, database=database, workspace=workspace, config_path=hook_path,
@@ -152,7 +151,7 @@ async def create_agent(session_id: str | None = None, path: str | None = None) -
                 injection_errors="raise",
             ),
         ],
-        tools=[web_search],
+        tools=[web_fetch, web_search],
         instructions=(Path(__file__).resolve().parents[1] / "prompts" / "system.md").read_text(encoding="utf-8") + ROLES["super"].instructions,
     )
     agent.instructions(name="project-context", on_change="rewrite")(project.instructions)
