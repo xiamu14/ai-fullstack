@@ -27,6 +27,9 @@
 ## Backend File Structure
 Develop backend feature must follow [Backend File Structure](./spec/backend_structure.md) 
 
+## Git
+All git operations and `git subtree` workflows must follow [Git Guide](./skills/git.md).
+
 ## FIX Bug
 Fix a bug at its cause, reasoning from first principles and established best practice. Do not patch over the symptom
 
