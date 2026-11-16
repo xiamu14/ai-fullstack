@@ -4,9 +4,9 @@
 
 @custom-variant dark {
   @media (prefers-color-scheme: dark) {
-    &:where(:root:not(.light), :root:not(.light) *) { @slot; }
+    &:where(:root:not(.light):not(.figma-light), :root:not(.light):not(.figma-light) *) { @slot; }
   }
-  &:where(.dark, .dark *) { @slot; }
+  &:where(.dark, .dark *, .figma-dark, .figma-dark *) { @slot; }
 }
 
 @theme {
@@ -336,12 +336,12 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not(.light) { @apply theme-dark; }
+  :root:not(.light):not(.figma-light) { @apply theme-dark; }
 }
 
-.dark {
+.dark, :root.figma-dark {
   color-scheme: dark;
   @apply theme-dark;
 }
 
-:root.light { color-scheme: light; }
+:root.light, :root.figma-light { color-scheme: light; }

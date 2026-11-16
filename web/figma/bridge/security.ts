@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { BRIDGE_PROTOCOL } from "../protocol/messages.ts";
+import { BRIDGE_PROTOCOL, PAIRING_CODE_PATTERN } from "../protocol/messages.ts";
 
 export { BRIDGE_PROTOCOL };
 
@@ -22,13 +22,20 @@ export function authorizeBridgeRequest(
     return new Response("Invalid origin", { status: 403 });
   }
 
-  const protocols = request.headers.get("sec-websocket-protocol")?.split(",").map((value) => value.trim());
+  const protocols = request.headers
+    .get("sec-websocket-protocol")
+    ?.split(",")
+    .map((value) => value.trim());
   const supplied = isSocket
-    ? protocols?.[0] === BRIDGE_PROTOCOL ? protocols[1] : undefined
-    : request.headers.get("authorization")?.match(/^Bearer ([a-f0-9]{64})$/)?.[1];
+    ? protocols?.[0] === BRIDGE_PROTOCOL
+      ? protocols[1]
+      : undefined
+    : request.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
+
   if (
     !supplied ||
-    !/^[a-f0-9]{64}$/.test(supplied) ||
+    !PAIRING_CODE_PATTERN.test(supplied) ||
+    supplied.length !== token.length ||
     !timingSafeEqual(Buffer.from(supplied), Buffer.from(token))
   ) {
     return new Response("Pairing required", { status: 401 });

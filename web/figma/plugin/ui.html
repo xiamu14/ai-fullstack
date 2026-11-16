@@ -16,7 +16,7 @@
       <form id="pairing" class="flex flex-col gap-1.5">
         <label for="token">配对码</label>
         <div class="flex gap-2">
-          <input id="token" name="token" type="password" autocomplete="off" spellcheck="false" required pattern="[a-f0-9]{64}" aria-describedby="pairing-help" class="min-w-0 flex-1 rounded border border-current/40 px-2 py-1 text-xs focus-visible:outline-2 focus-visible:outline-offset-2">
+          <input id="token" name="token" type="text" maxlength="6" autocomplete="off" spellcheck="false" required pattern="[A-Za-z0-9]{6}" aria-describedby="pairing-help" class="min-w-0 flex-1 rounded border border-current/40 px-2 py-1 text-xs focus-visible:outline-2 focus-visible:outline-offset-2">
           <button type="submit" class="min-h-6 rounded border border-current/40 px-2 py-1 focus-visible:outline-2 focus-visible:outline-offset-2">连接</button>
         </div>
         <p id="pairing-help" class="text-[0.6875rem]">运行 <code>bun figma/cli.ts pair</code> 获取</p>

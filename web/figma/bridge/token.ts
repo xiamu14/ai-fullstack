@@ -1,7 +1,15 @@
-import { randomBytes } from "node:crypto";
 import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { customAlphabet } from "nanoid";
+import { PAIRING_CODE_PATTERN } from "../protocol/messages.ts";
+
+const generatePairingCode = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  6
+);
+
+export { PAIRING_CODE_PATTERN } from "../protocol/messages.ts";
 
 export function loadBridgeToken(port: number): string {
   if (!Number.isInteger(port) || port < 1 || port > 65_535) {
@@ -11,17 +19,19 @@ export function loadBridgeToken(port: number): string {
   mkdirSync(directory, { recursive: true, mode: 0o700 });
   chmodSync(directory, 0o700);
   const path = join(directory, `${port}.token`);
+
   try {
-    writeFileSync(path, randomBytes(32).toString("hex"), { flag: "wx", mode: 0o600 });
-  } catch (error) {
-    if (!(error instanceof Error) || !("code" in error) || error.code !== "EEXIST") {
-      throw error;
+    const existing = readFileSync(path, "utf8").trim();
+    if (PAIRING_CODE_PATTERN.test(existing)) {
+      chmodSync(path, 0o600);
+      return existing;
     }
+  } catch {
+    // Token file does not exist yet
   }
+
+  const token = generatePairingCode();
+  writeFileSync(path, token, { mode: 0o600 });
   chmodSync(path, 0o600);
-  const token = readFileSync(path, "utf8").trim();
-  if (!/^[a-f0-9]{64}$/.test(token)) {
-    throw new Error(`桥接配对码文件格式错误：${path}`);
-  }
   return token;
 }

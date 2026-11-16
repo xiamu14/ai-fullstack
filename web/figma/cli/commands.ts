@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { ensureDaemonRunning } from "../bridge/client.ts";
 import { DEFAULT_BRIDGE_HOST, DEFAULT_BRIDGE_PORT, startBridgeServer } from "../bridge/server.ts";
 import { loadBridgeToken } from "../bridge/token.ts";
 import type { ExportFormat } from "../protocol/types.ts";
@@ -144,7 +145,9 @@ export async function runExportCommand(flags: CliFlags): Promise<void> {
 }
 
 export async function runPairCommand(flags: CliFlags): Promise<void> {
-  process.stdout.write(`${loadBridgeToken(flags.port ?? DEFAULT_BRIDGE_PORT)}\n`);
+  const port = flags.port ?? DEFAULT_BRIDGE_PORT;
+  await ensureDaemonRunning(port);
+  process.stdout.write(`${loadBridgeToken(port)}\n`);
 }
 
 export async function runServeCommand(flags: CliFlags): Promise<void> {

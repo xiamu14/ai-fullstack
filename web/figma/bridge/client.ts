@@ -28,7 +28,7 @@ async function isDaemonAlive(port: number): Promise<boolean> {
   return true;
 }
 
-async function ensureDaemonRunning(port: number): Promise<void> {
+export async function ensureDaemonRunning(port: number): Promise<void> {
   if (await isDaemonAlive(port)) {
     return;
   }
@@ -50,6 +50,7 @@ async function ensureDaemonRunning(port: number): Promise<void> {
       return;
     }
   }
+  throw new Error("本机桥接未能启动，请运行 bun figma/cli.ts serve 查看原因。");
 }
 
 export async function queryFigma<

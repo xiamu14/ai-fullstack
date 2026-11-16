@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { authorizeBridgeRequest, BRIDGE_PROTOCOL } from "../../figma/bridge/security.ts";
 import { isBridgeQuery, isBridgeRequest, readParentResponse } from "../../figma/protocol/messages.ts";
 
-const token = "a".repeat(64);
+const token = "Ab3xY9";
 const port = 38450;
 function request(path = "/query", headers: Record<string, string> = {}) {
   return new Request(`http://127.0.0.1:${port}${path}`, {
@@ -20,7 +20,7 @@ describe("local bridge access", () => {
   it("rejects browser-origin HTTP requests", () => {
     expect(authorizeBridgeRequest(request("/query", { origin: "https://attacker.example" }), port, token)?.status).toBe(403);
   });
-  it.each(["", "Bearer invalid", `Bearer ${"b".repeat(64)}`, token, `Bearer ${"é".repeat(64)}`])("rejects invalid credentials without throwing", (authorization) => {
+  it.each(["", "Bearer invalid", "Bearer Bb3xY9", `Bearer ${"b".repeat(64)}`, token, `Bearer ${"é".repeat(6)}`])("rejects invalid credentials without throwing", (authorization) => {
     expect(authorizeBridgeRequest(request("/query", { authorization }), port, token)?.status).toBe(401);
   });
   it("requires a token even for an opaque Figma WebSocket origin", () => {
@@ -42,6 +42,10 @@ describe("bridge messages", () => {
     expect(isBridgeRequest({ requestId: "1", action: "node", payload: {} })).toBe(false);
     expect(isBridgeQuery({ action: "document", payload: {}, timeoutMs: -1 })).toBe(false);
     expect(isBridgeRequest({ requestId: "1", action: "node", payload: { id: "1:2" } })).toBe(true);
+  });
+  it("rejects non-string export formats", () => {
+    expect(isBridgeQuery({ action: "export", payload: { format: ["SVG"] } })).toBe(false);
+    expect(isBridgeQuery({ action: "export", payload: { format: "SVG" } })).toBe(true);
   });
   it("accepts responses only from the expected parent window", () => {
     const parent = {} as Window;

@@ -23,7 +23,8 @@ web/figma/
 │   └── component-node-compact.ts      # Variant 属性解析、插槽标注 (slot)、INSTANCE 剪枝与 Token 提炼
 ├── plugin/                            # 【Figma 插件端】运行于 Figma Desktop 沙箱内的桥接插件
 │   ├── manifest.json                  # Figma Desktop 本地开发插件配置
-│   ├── ui.html                        # 插件 UI 桥接层（Web Worker 驱动自动重连 ws://localhost:38450/ws）
+│   ├── ui.html                        # 插件界面（Tailwind 样式与配对表单）
+│   ├── ui.ts                          # 配对、消息校验与自动重连 ws://localhost:38450/ws
 │   ├── code.ts                        # 插件沙箱主入口（只读指令分发）
 │   ├── code.js                        # 由 Bun 打包生成的插件运行产物
 │   └── readers/
@@ -56,7 +57,7 @@ bun figma/cli.ts build-plugin
 bun figma/cli.ts pair
 ```
 
-配对码仅保存在插件当前运行期间的内存中，不放入 URL。运行读取命令时桥接服务会自动启动；也可先运行 `bun figma/cli.ts serve`。当前插件 UI 连接默认端口 `38450`。
+配对码仅保存在插件当前运行期间的内存中，不放入 URL。`pair` 与读取命令都会自动启动桥接服务；也可先运行 `bun figma/cli.ts serve`。当前插件 UI 连接默认端口 `38450`。
 
 旧版常驻服务不支持鉴权，需要先停止旧进程再运行新版；客户端会识别旧服务并提示，不会继续向旧服务发送读取请求。
 

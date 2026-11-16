@@ -4,7 +4,7 @@
     {
       "name": "web-guidance-preview",
       "runtimeExecutable": "bun",
-      "runtimeArgs": ["run", "dev", "--port", "5185"],
+      "runtimeArgs": ["run", "--cwd", "/Users/ben/Workspace/Project/ai-fullstack/backend-course/web", "dev", "--port", "5185"],
       "port": 5185
     }
   ]

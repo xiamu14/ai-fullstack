@@ -1,6 +1,6 @@
-import { BRIDGE_PROTOCOL, isBridgeRequest, readParentResponse } from "../protocol/messages.ts";
+import { BRIDGE_PROTOCOL, isBridgeRequest, PAIRING_CODE_PATTERN, readParentResponse } from "../protocol/messages.ts";
 
-const WS_URL = "ws://127.0.0.1:38450/ws";
+const WS_URL = "ws://localhost:38450/ws";
 const form = document.querySelector<HTMLFormElement>("#pairing")!;
 const tokenInput = document.querySelector<HTMLInputElement>("#token")!;
 const dot = document.querySelector<HTMLElement>("#dot")!;
@@ -10,6 +10,7 @@ const announcements = document.querySelector<HTMLElement>("#announcements")!;
 const pending = new Set<string>();
 let socket: WebSocket | null = null;
 let token = "";
+let paired = false;
 
 function setStatus(connected: boolean, text: string, detail: string, announce = true) {
   dot.classList.toggle("bg-success-500", connected);
@@ -29,10 +30,9 @@ function connect() {
     return;
   }
   socket = current;
-  let connected = false;
   current.onopen = () => {
     if (socket !== current) return;
-    connected = true;
+    paired = true;
     form.hidden = true;
     tokenInput.value = "";
     setStatus(true, "已连接", "仅连接本机，只读访问");
@@ -55,7 +55,7 @@ function connect() {
     socket = null;
     pending.clear();
     form.hidden = false;
-    if (!connected) {
+    if (!paired) {
       token = "";
       setStatus(false, "连接失败", "请检查配对码与本机服务");
       return;
@@ -67,8 +67,10 @@ function connect() {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  token = tokenInput.value.trim();
-  if (!/^[a-f0-9]{64}$/.test(token)) return;
+  const nextToken = tokenInput.value.trim();
+  if (!PAIRING_CODE_PATTERN.test(nextToken)) return;
+  token = nextToken;
+  paired = false;
   const previous = socket;
   socket = null;
   previous?.close();
@@ -82,7 +84,7 @@ window.addEventListener("message", (event) => {
   if (!response || !pending.has(response.requestId) || socket?.readyState !== WebSocket.OPEN) return;
   pending.delete(response.requestId);
   socket.send(JSON.stringify(response));
-  setStatus(true, pending.size ? "读取中" : "已连接", `已完成 ${response.requestId}`, false);
+  setStatus(true, response.ok ? pending.size ? "读取中" : "已连接" : "读取失败", response.ok ? `已完成 ${response.requestId}` : response.error, !response.ok);
 });
 
 try {
