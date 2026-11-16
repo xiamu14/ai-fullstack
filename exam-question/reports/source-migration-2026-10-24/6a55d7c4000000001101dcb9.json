@@ -1,0 +1,35 @@
+{
+  "id": "6a55d7c4000000001101dcb9",
+  "fileHash": "8079d7846e01c641f1ec458f4a23a5db2691419198a74fbdba0945b24cce0af5",
+  "bodyHash": "74d93bfcb924492366d0334d51eac74a0c0c22386a3531efcdaa5cdf455485bc",
+  "decision": "include",
+  "reason": "正文详细说明广播、好友授权及跨 Agent 反馈澄清流程",
+  "label": "knowledge",
+  "confidence": 0.48,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.61,
+          "questions": 0,
+          "media": 0,
+          "off_topic": 0.39
+        },
+        "confidence": 0.48
+      }
+    },
+    "usage": {
+      "input_tokens": 1544,
+      "output_tokens": 46,
+      "cost": 6.4848e-05
+    },
+    "id": "gen-dec-1792822614-uAePVlkcxgLYB8JsDu73",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

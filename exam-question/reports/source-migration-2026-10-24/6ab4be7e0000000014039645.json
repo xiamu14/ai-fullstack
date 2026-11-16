@@ -1,0 +1,35 @@
+{
+  "id": "6ab4be7e0000000014039645",
+  "fileHash": "e6e1dc5b3618f7a28c75dbd3d58309e06291d7409c4da9eea45516007fefc2ab",
+  "bodyHash": "b4195a6d606bd6d1db6735bd110ece86cc5ebfaa12a2d2dc898ccf55ca974157",
+  "decision": "include",
+  "reason": "视频正文完整给出任务步骤、状态和收起展示规则",
+  "label": "knowledge",
+  "confidence": 0.47,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.6,
+          "questions": 0,
+          "media": 0.04,
+          "off_topic": 0.36
+        },
+        "confidence": 0.47
+      }
+    },
+    "usage": {
+      "input_tokens": 1053,
+      "output_tokens": 46,
+      "cost": 4.4226e-05
+    },
+    "id": "gen-dec-1792822627-mK0DcDyNctK5JqLY9wWr",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

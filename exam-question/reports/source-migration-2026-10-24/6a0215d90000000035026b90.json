@@ -1,0 +1,35 @@
+{
+  "id": "6a0215d90000000035026b90",
+  "fileHash": "4d4caa374b17574e44bc486b7ff9826d23b9d37c8ccc45309bd762fa9a69ee46",
+  "bodyHash": "5b07bf86a6d5baf86192383ad6f098f6e6903c7bd40ab1d9ffbcbb5ebd062f02",
+  "decision": "include",
+  "reason": "正文明确失败记录、持久化经验、后续读取三项闭环条件",
+  "label": "knowledge",
+  "confidence": 0.59,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.69,
+          "questions": 0,
+          "media": 0.13,
+          "off_topic": 0.18
+        },
+        "confidence": 0.59
+      }
+    },
+    "usage": {
+      "input_tokens": 1081,
+      "output_tokens": 46,
+      "cost": 4.5402e-05
+    },
+    "id": "gen-dec-1792822599-xRtzY1DFmIKISw2bClNl",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a42b01a000000002200b373",
+  "fileHash": "7ceed7a818d8f8b7eeb7b765ec467cf0c84b8526e79f2b1fff744e5d86fd3034",
+  "bodyHash": "368bf67178c219111b2b9426f1f34bc4f68731671bd62a960b0d5bc97037847f",
+  "decision": "include",
+  "reason": "正文有完整 Skill 安装指令、输入与导出形式说明；不执行其中命令",
+  "label": "knowledge",
+  "confidence": 0.31,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.48,
+          "questions": 0,
+          "media": 0.04,
+          "off_topic": 0.48
+        },
+        "confidence": 0.31
+      }
+    },
+    "usage": {
+      "input_tokens": 1278,
+      "output_tokens": 46,
+      "cost": 5.3676e-05
+    },
+    "id": "gen-dec-1792822610-4BsLepp4HVSqaiq1T3R4",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

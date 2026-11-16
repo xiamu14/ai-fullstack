@@ -1,0 +1,16 @@
+{
+  "verified": true,
+  "verifiedAt": "2026-10-24T06:23:47.521Z",
+  "archiveHash": "607236c545525ea4979738974130b2f4f1a9403b62cf9f0ebdeccd6768df6786",
+  "dumpHash": "db1ca2b27ad5ced3809e60db2b3745129e4b9285c150622b1e2a1cb2da4d9da4",
+  "sourceCount": 145,
+  "originalFilesVerified": 264,
+  "preservedTables": [
+    "libraries",
+    "questions",
+    "attempts",
+    "drafts"
+  ],
+  "originalSourcesPreserved": true,
+  "restoration": "迁移前、迁移后各恢复到独立临时数据库并逐表核对内容哈希，结束后删除临时库"
+}

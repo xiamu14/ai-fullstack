@@ -1,0 +1,9 @@
+{
+  "batches": [
+    "question-completion-a",
+    "question-completion-b",
+    "question-completion-c",
+    "question-completion-d"
+  ],
+  "note": "145 篇有效正文全量逐篇覆盖；四批共 111 道新题、555 份答题样本。原有 52 道题保留，重复主题映射已有题目，不重跑正文判定。"
+}

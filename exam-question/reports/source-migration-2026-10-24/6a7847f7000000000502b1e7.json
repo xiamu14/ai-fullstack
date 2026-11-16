@@ -1,0 +1,35 @@
+{
+  "id": "6a7847f7000000000502b1e7",
+  "fileHash": "c0577d37327be6e46b1a08efb02f8fc5d10bd54feacacee93bc291289315195b",
+  "bodyHash": "09265420a6af7bf13545605145a6e965f702def942ca7a8cefaea041d68e6186",
+  "decision": "include",
+  "reason": "视频正文独立说明可编程上下文与跨会话持久技能状态",
+  "label": "knowledge",
+  "confidence": 0.24,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.43,
+          "questions": 0,
+          "media": 0.29,
+          "off_topic": 0.28
+        },
+        "confidence": 0.24
+      }
+    },
+    "usage": {
+      "input_tokens": 879,
+      "output_tokens": 46,
+      "cost": 3.6918e-05
+    },
+    "id": "gen-dec-1792822620-pr2Dp7rWVZ9ZgdP2bO54",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

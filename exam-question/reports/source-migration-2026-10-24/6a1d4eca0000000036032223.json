@@ -1,0 +1,35 @@
+{
+  "id": "6a1d4eca0000000036032223",
+  "fileHash": "6ce422b4266e5bfc84b2b583c278ba7c9066529c007ff4fb1af941b8378beca7",
+  "bodyHash": "37540d9f36ac356534201c7f922bc3499f69d2d071cd4f32c4a901fe7251e40b",
+  "decision": "include",
+  "reason": "正文明确 Trace、Eval、Memory/Skill 的执行反馈闭环",
+  "label": "knowledge",
+  "confidence": 0.45,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.59,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.39
+        },
+        "confidence": 0.45
+      }
+    },
+    "usage": {
+      "input_tokens": 1196,
+      "output_tokens": 46,
+      "cost": 5.0232e-05
+    },
+    "id": "gen-dec-1792822606-iO8ijAkERsbDnkAErPmX",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,50 @@
+{
+  "questionId": "hook-quality-gate",
+  "split": "development",
+  "cases": [
+    {
+      "id": "hook-quality-gate-correct",
+      "kind": "correct",
+      "answer": "完成门应依据本次修改对应的测试状态。\n\n状态记录：工具调用后运行相关测试；保存命令和退出状态；把结果关联当前修改版本。\n\n完成拦截：Stop 阶段读取质量状态；失败或缺失结果禁止报告完成；不能复用旧版本通过结果。\n\n职责边界：错误反馈给执行流程修复；CI 再独立验证；人工评估测试未覆盖的业务判断。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "hook-quality-gate-partial",
+      "kind": "partial",
+      "answer": "工具调用后运行相关测试；保存命令和退出状态；把结果关联当前修改版本。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "hook-quality-gate-critical",
+      "kind": "critical",
+      "answer": "曾经有一次测试通过就可以忽略最新修改后的测试失败。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "hook-quality-gate-concise",
+      "kind": "concise",
+      "answer": "每次改动后的相关测试记命令、退出码与版本。停止时查本版本结果，失败或没跑不能报完成；反馈修复，CI 另验，测试外业务还需人判断。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

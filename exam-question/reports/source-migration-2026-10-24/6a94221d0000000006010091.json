@@ -1,0 +1,35 @@
+{
+  "id": "6a94221d0000000006010091",
+  "fileHash": "5b6d5e3a06a5ebc89071678d47a1d03427755f07f086dec8287dd112bf4f9dfe",
+  "bodyHash": "414dbdfeba56199a5b54acf298fe93f1af0807870e36705ba921082f941a8427",
+  "decision": "include",
+  "reason": "正文独立说明 Agent Loop、工具、记忆和沙箱的运行时职责",
+  "label": "knowledge",
+  "confidence": 0.61,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.71,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.26
+        },
+        "confidence": 0.61
+      }
+    },
+    "usage": {
+      "input_tokens": 993,
+      "output_tokens": 46,
+      "cost": 4.1706e-05
+    },
+    "id": "gen-dec-1792822622-8zurJBqvEInmIbhn7AE6",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

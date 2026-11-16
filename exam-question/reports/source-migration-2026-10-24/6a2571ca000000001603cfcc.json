@@ -1,0 +1,35 @@
+{
+  "id": "6a2571ca000000001603cfcc",
+  "fileHash": "9e33ff2324bd5645d3f77188e00125f033b1e852de98298318950cb124823d7f",
+  "bodyHash": "0b37566bc941e4fbffbb68636d9b2c185f1ed9eac249d5a4faa6274358c06cd5",
+  "decision": "include",
+  "reason": "正文虽有项目推广，仍列出可独立阅读的 Agent 工程问题；仅作为题目来源",
+  "label": "media",
+  "confidence": 0.31,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "media",
+        "probabilities": {
+          "knowledge": 0.06,
+          "questions": 0.12,
+          "media": 0.48,
+          "off_topic": 0.34
+        },
+        "confidence": 0.31
+      }
+    },
+    "usage": {
+      "input_tokens": 1310,
+      "output_tokens": 46,
+      "cost": 5.502e-05
+    },
+    "id": "gen-dec-1792822607-fPa0JsZKNd6toBza83fc",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

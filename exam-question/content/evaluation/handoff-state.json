@@ -1,0 +1,50 @@
+{
+  "questionId": "handoff-state",
+  "split": "holdout",
+  "cases": [
+    {
+      "id": "handoff-state-correct",
+      "kind": "correct",
+      "answer": "交接保存可恢复的任务状态及证据。\n\n目标进度：保存目标与约束；区分已完成和未完成工作；标明当前执行阶段。\n\n阻塞证据：保存阻塞原因和待确认事项；关联可核验证据；保留关键决策依据。\n\n恢复计划：列出可执行下一步；恢复时检查状态是否过期；避免重复已完成副作用。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "handoff-state-partial",
+      "kind": "partial",
+      "answer": "保存目标与约束；区分已完成和未完成工作；标明当前执行阶段。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "handoff-state-critical",
+      "kind": "critical",
+      "answer": "只保存一句继续任务就足以可靠恢复所有执行状态。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "handoff-state-concise",
+      "kind": "concise",
+      "answer": "目标约束、做完和未做的阶段都记下。阻塞与待问点带证据和决策依据；写清下一步，恢复先核新旧状态，不重做已落地的写操作。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a590f3600000000110044e8",
+  "fileHash": "e8ae77ce8676531d7451a74a89ee8377ab384aab7dd5d508dfd0ef09d56b175e",
+  "bodyHash": "8a31a59d4f81e574682d245b3fbd3b07945276d63c985004adc168edfecb5f9d",
+  "decision": "include",
+  "reason": "正文独立比较 GUI/终端 Agent 工作台及集成方式的取舍",
+  "label": "knowledge",
+  "confidence": 0.64,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.73,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.25
+        },
+        "confidence": 0.64
+      }
+    },
+    "usage": {
+      "input_tokens": 1413,
+      "output_tokens": 46,
+      "cost": 5.9346e-05
+    },
+    "id": "gen-dec-1792822614-eQwJ7hy2uadi9uWpj4k1",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,34 @@
+{
+  "id": "6a15a4710000000036033bc1",
+  "fileHash": "a0a1e3543822d8975aadefa2819b8577c922b5893161b9c7280b176687e4a9a2",
+  "bodyHash": "6705b80a5125eb77c24c0728b4b33bb0b32a0c80cad6b2a4cf0ac01423ade9ce",
+  "decision": "exclude",
+  "reason": "正文实质内容依赖媒体或仅为目录导语",
+  "label": "media",
+  "confidence": 0.91,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "jev",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "media",
+        "probabilities": {
+          "knowledge": 0.01,
+          "questions": 0,
+          "media": 0.93,
+          "off_topic": 0.05
+        },
+        "confidence": 0.91
+      }
+    },
+    "usage": {
+      "input_tokens": 1056,
+      "output_tokens": 46,
+      "cost": 0.000044352
+    },
+    "id": "gen-dec-1792822605-x5IcYN6QqT4rDP7UH1wD",
+    "provider": "TypeSafe"
+  }
+}

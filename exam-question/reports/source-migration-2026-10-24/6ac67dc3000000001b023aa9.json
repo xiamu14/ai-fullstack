@@ -1,0 +1,35 @@
+{
+  "id": "6ac67dc3000000001b023aa9",
+  "fileHash": "6e4ab69fe62513a171571f451b782ddfd433de11cdbb95cf8153181a0e8fe6d2",
+  "bodyHash": "e59c068696785ca953c7a4a6678fb16642b438fecc44f477925f7c4e10a7bf3c",
+  "decision": "include",
+  "reason": "正文独立定义 Agent 评测目标、条件和证据范围",
+  "label": "knowledge",
+  "confidence": 0.71,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.78,
+          "questions": 0,
+          "media": 0.11,
+          "off_topic": 0.11
+        },
+        "confidence": 0.71
+      }
+    },
+    "usage": {
+      "input_tokens": 1143,
+      "output_tokens": 46,
+      "cost": 4.8006e-05
+    },
+    "id": "gen-dec-1792822629-NwHWOtAvHFmBMrWmIR6K",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

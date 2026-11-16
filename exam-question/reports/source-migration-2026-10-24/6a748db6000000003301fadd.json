@@ -1,0 +1,35 @@
+{
+  "id": "6a748db6000000003301fadd",
+  "fileHash": "44b7bf1503a4efd74c570d8f3a54b43d16c46b3e012805a86a4ad2ccd1235e21",
+  "bodyHash": "0fa915b51cd61ea3cf08c9cd2edd4129e862bbdcdda51dd336f1ec332364f9b0",
+  "decision": "include",
+  "reason": "视频正文有流程节点、运行指标、人工审批与平台设计的独立文字说明",
+  "label": "knowledge",
+  "confidence": 0.68,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.76,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.22
+        },
+        "confidence": 0.68
+      }
+    },
+    "usage": {
+      "input_tokens": 1518,
+      "output_tokens": 46,
+      "cost": 6.3756e-05
+    },
+    "id": "gen-dec-1792822619-92NpSzHj1o5r4LAABhRB",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

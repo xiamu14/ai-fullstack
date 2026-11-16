@@ -1,0 +1,35 @@
+{
+  "id": "6a30132300000000150263da",
+  "fileHash": "d0394a5214398481fc07dc4a812712a30d1cc52e08ee9a70ccd8226a941ec5b7",
+  "bodyHash": "08a0ea55ec84f8d0e0236b33fc2964054263c5bfdab40182eb0c76af4b36fa57",
+  "decision": "include",
+  "reason": "正文独立说明代码作为推理媒介的结构化、状态和控制流特征",
+  "label": "knowledge",
+  "confidence": 0.28,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.46,
+          "questions": 0,
+          "media": 0.17,
+          "off_topic": 0.37
+        },
+        "confidence": 0.28
+      }
+    },
+    "usage": {
+      "input_tokens": 886,
+      "output_tokens": 46,
+      "cost": 3.7212e-05
+    },
+    "id": "gen-dec-1792822608-HJpNlC7Hl29t78G1S5Tb",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a9fa06c000000002a025eb1",
+  "fileHash": "2d92f3d879ab7936000f3cd0473860e380803976ad6003343c3ddc1c9566e672",
+  "bodyHash": "a4a318d6ada883872aa215f3ece3909b08bdcc199a070e31072b4f52bb89bd9f",
+  "decision": "include",
+  "reason": "正文独立说明持久状态、重启恢复与运行时复杂性的取舍",
+  "label": "knowledge",
+  "confidence": 0.44,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.58,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.4
+        },
+        "confidence": 0.44
+      }
+    },
+    "usage": {
+      "input_tokens": 845,
+      "output_tokens": 46,
+      "cost": 3.549e-05
+    },
+    "id": "gen-dec-1792822625-lycKLYTJufHh8xRvPk2u",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

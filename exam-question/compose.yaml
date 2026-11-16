@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: interview
+      POSTGRES_USER: interview
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 设置 POSTGRES_PASSWORD}
+    ports:
+      - '127.0.0.1:54339:5432'
+    volumes:
+      - interview-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U interview -d interview']
+      interval: 2s
+      timeout: 5s
+      retries: 20
+volumes:
+  interview-data:

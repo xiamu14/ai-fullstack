@@ -1,0 +1,50 @@
+{
+  "questionId": "approval-resume",
+  "split": "development",
+  "cases": [
+    {
+      "id": "approval-resume-correct",
+      "kind": "correct",
+      "answer": "把审批作为可持久化的暂停点。\n\n暂停保存：保存会话与执行标识；保存 checkpoint 和待审批调用参数；未批准前不执行副作用。\n\n审批校验：绑定审批者权限；核验请求仍在等待且未过期；拒绝重复或过期审批。\n\n恢复执行：加载原执行状态；把批准或拒绝写入该状态；幂等恢复且不重复执行已完成操作。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "approval-resume-partial",
+      "kind": "partial",
+      "answer": "保存会话与执行标识；保存 checkpoint 和待审批调用参数；未批准前不执行副作用。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "approval-resume-critical",
+      "kind": "critical",
+      "answer": "只把弹窗保存在浏览器内存中，服务重启后直接执行。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "approval-resume-concise",
+      "kind": "concise",
+      "answer": "会话、run、检查点和待批参数落库，先别执行。回应要验权限、状态、有效期并去重；加载原状态写入决定，恢复不能重复已完成动作。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "id": "runtime-storage-design",
+  "libraryId": "ai-agents",
+  "title": "运行数据如何选择存储",
+  "prompt": "Agent Runtime 需要存会话状态、事件、文件和缓存。为什么不宜全部塞进同一种 KV 存储？",
+  "module": "系统设计",
+  "difficulty": "L3",
+  "version": "2026-10-24.1",
+  "review": "reviewed",
+  "reference": "1. 数据要求：区分需要事务或顺序一致的状态与事件；区分大对象文件和可失效缓存的访问要求。\n\n2. 存储分工：根据查询一致性与体积选择数据库对象存储或缓存；明确每类数据的权威来源避免重复维护冲突副本。\n\n3. 故障验证：验证重启与并发更新时数据仍可正确恢复；测量实际访问成本与延迟而非只看存储单价。",
+  "supplement": "题目、答案与细则由整理者依据已保存正文补充，不是原作者的标准答案。原帖只提供问题或观点时，工程解法属于整理者补充；宣传数字、产品版本及性能承诺未作为已验证事实。",
+  "rubric": [
+    {
+      "id": "point_1",
+      "title": "数据要求",
+      "weight": 1,
+      "levels": [
+        "未涉及数据要求，或主张与本考点相反的做法",
+        "只泛泛提及数据要求，没有说明以下任何具体要点",
+        "清楚说明以下任一要点：区分需要事务或顺序一致的状态与事件；区分大对象文件和可失效缓存的访问要求",
+        "涉及以下两个要点，但其中一个说明不完整：区分需要事务或顺序一致的状态与事件；区分大对象文件和可失效缓存的访问要求",
+        "完整说明以下两个要点，允许同义表述及合理替代方案：区分需要事务或顺序一致的状态与事件；区分大对象文件和可失效缓存的访问要求"
+      ],
+      "missing": "请补充：区分需要事务或顺序一致的状态与事件；区分大对象文件和可失效缓存的访问要求。"
+    },
+    {
+      "id": "point_2",
+      "title": "存储分工",
+      "weight": 1,
+      "levels": [
+        "未涉及存储分工，或主张与本考点相反的做法",
+        "只泛泛提及存储分工，没有说明以下任何具体要点",
+        "清楚说明以下任一要点：根据查询一致性与体积选择数据库对象存储或缓存；明确每类数据的权威来源避免重复维护冲突副本",
+        "涉及以下两个要点，但其中一个说明不完整：根据查询一致性与体积选择数据库对象存储或缓存；明确每类数据的权威来源避免重复维护冲突副本",
+        "完整说明以下两个要点，允许同义表述及合理替代方案：根据查询一致性与体积选择数据库对象存储或缓存；明确每类数据的权威来源避免重复维护冲突副本"
+      ],
+      "missing": "请补充：根据查询一致性与体积选择数据库对象存储或缓存；明确每类数据的权威来源避免重复维护冲突副本。"
+    },
+    {
+      "id": "point_3",
+      "title": "故障验证",
+      "weight": 1,
+      "levels": [
+        "未涉及故障验证，或主张与本考点相反的做法",
+        "只泛泛提及故障验证，没有说明以下任何具体要点",
+        "清楚说明以下任一要点：验证重启与并发更新时数据仍可正确恢复；测量实际访问成本与延迟而非只看存储单价",
+        "涉及以下两个要点，但其中一个说明不完整：验证重启与并发更新时数据仍可正确恢复；测量实际访问成本与延迟而非只看存储单价",
+        "完整说明以下两个要点，允许同义表述及合理替代方案：验证重启与并发更新时数据仍可正确恢复；测量实际访问成本与延迟而非只看存储单价"
+      ],
+      "missing": "请补充：验证重启与并发更新时数据仍可正确恢复；测量实际访问成本与延迟而非只看存储单价。"
+    }
+  ],
+  "criticalError": "所有会话状态日志文件都适合无差别写入任意 KV，事务和恢复要求不影响选型。",
+  "sources": [
+    {
+      "id": "6a1da43e0000000035038b73",
+      "title": "在Cloudflare穷鬼套餐上跑通Managed Agents",
+      "author": "BoAI",
+      "url": "https://www.xiaohongshu.com/explore/6a1da43e0000000035038b73",
+      "published": "2026-06-01T15:24:46.000Z",
+      "evidence": "最近做了一个开源项目：openma - Claude Managed Agents API 的开源实现，接口形态尽量对齐官方的 /v1/agents、/v1/sessions、memory、tools、events stream。客户端如果已经在用官方 SDK，理论上只需要替换 base_url，就可以指向自己的部署。\n这次其实做了两件事。第一，是试着把 Managed Agents 这套抽象拆开，用 Cloudflare 的 Workers、Durable Objects、Containers、R2等技术栈跑通一遍。第二，是顺手验证了一套 vibe coding 的工作方式：spec-driven、test-driven、API / CLI first、每个 feature 一个 worktree 和 preview deploy，CI 跑真实 Cloudflare 资源。\n目前项目大概 6 周，70 个 merged PR，600+ commits，约 150k 行 TypeScript，147 个 test/spec 文件。代码基本都是 agent 写的，我主要负责 review、拆任务、看测试语义、改架构方向，以及在它跑偏的时候拉回来。\n最大的体感是：agent 写代码可以很快，但它不会自动有工程 taste。早期几乎什么都塞进 KV：sessions、event logs、files都进去过。后来才做 architecture review，把状态拆回 DO SQLite、R2、D1、KV。\n所以这次实验的结论不是“AI 能不能写代码”这么简单。更准确地说：Cloudflare 的低成本 primitives，足够拼出一套 open-source Managed Agents runtime；vibe coding 也确实能把 infra-heavy TypeScript 项目推得很快。但前提是：spec 要明确，测试要具体，开发流程要能被 CLI 驱动，架构判断要有人守着。\n项目开源：github.com/open-ma/open-managed-agents\n#vibecoding[话题]#  #Cloudflare[话题]#  #claude[话题]#   #AI编程[话题]#  #开源项目[话题]#  #TypeScript[话题]#  #独立开发[话题]#  #程序员日常[话题]#  #vibecoding大赏[话题]# #大模型[话题]#",
+      "scope": "仅正文"
+    }
+  ],
+  "archived": false
+}

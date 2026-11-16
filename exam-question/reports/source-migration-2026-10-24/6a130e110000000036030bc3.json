@@ -1,0 +1,8 @@
+{
+  "id": "6a130e110000000036030bc3",
+  "fileHash": "336f861e1c4bb22fc4eb9aa3f7f7a208981506c78df9262fc1e6b1427651d969",
+  "bodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "decision": "exclude",
+  "reason": "采集状态：unavailable",
+  "reviewer": "rules"
+}

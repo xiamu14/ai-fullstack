@@ -1,0 +1,35 @@
+{
+  "id": "6a39b8f7000000000f01e5e7",
+  "fileHash": "3806312fe525ee9fec4e947ea0bf9f08564fbe90d4ea5d333872544e98c2fd12",
+  "bodyHash": "10614529f1c2ae91a83d509dcecdd10d52b36598c9828b50a4033c038cf79655",
+  "decision": "include",
+  "reason": "正文独立列出 Prompt、RAG、Eval 与 Agent 架构面试考察内容",
+  "label": "knowledge",
+  "confidence": 0.52,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.64,
+          "questions": 0.26,
+          "media": 0,
+          "off_topic": 0.1
+        },
+        "confidence": 0.52
+      }
+    },
+    "usage": {
+      "input_tokens": 1400,
+      "output_tokens": 46,
+      "cost": 5.88e-05
+    },
+    "id": "gen-dec-1792822610-sWF8NyFEw0pUGJ7FzwC7",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a1bcce90000000035028be0",
+  "fileHash": "312c5f8cf58e5d23728b8d929eac00cc1c0edb85321769d3c47a467b55b1e096",
+  "bodyHash": "44c740620dd72178dbcff5f9038c8db3fbeada59baa07264062ae3c105c08409",
+  "decision": "include",
+  "reason": "正文给出字符串检索命中限制及结构化知识库的改进假设",
+  "label": "knowledge",
+  "confidence": 0.77,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.83,
+          "questions": 0.13,
+          "media": 0,
+          "off_topic": 0.04
+        },
+        "confidence": 0.77
+      }
+    },
+    "usage": {
+      "input_tokens": 947,
+      "output_tokens": 46,
+      "cost": 3.9774e-05
+    },
+    "id": "gen-dec-1792822605-jIIhlK0FvHCGhfBCT9jo",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

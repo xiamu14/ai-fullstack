@@ -1,0 +1,30 @@
+{
+  "questionIds": [
+    "task-progress-model",
+    "branching-conversation-context",
+    "companion-safety-evaluation",
+    "delegated-purchase-scope",
+    "durable-release-workflow",
+    "persistent-agent-workspace",
+    "prediction-agent-validation",
+    "loop-policy-separation",
+    "task-cancellation",
+    "information-sufficiency-gate",
+    "agent-as-delegated-tool",
+    "credential-redaction-path",
+    "filesystem-checkpoints",
+    "intent-entity-distinction",
+    "intent-classifier-choice",
+    "multi-intent-decomposition",
+    "intent-transition-management",
+    "intent-taxonomy-design",
+    "intent-fewshot-design",
+    "intent-evaluation-metrics",
+    "multilingual-intent-routing",
+    "intent-routing-latency",
+    "ambiguous-intent-clarification",
+    "reasoning-prompt-evaluation",
+    "intent-injection-resilience"
+  ],
+  "note": "全量有效正文整理分批；固定既有模型与阈值，答题样本每份仅一次，失败不重试。标签待独立人工复核。"
+}

@@ -1,0 +1,66 @@
+{
+  "id": "pass-at-k",
+  "libraryId": "ai-agents",
+  "title": "如何区分两种成功率",
+  "prompt": "请说明 pass@k 与 pass^k 的区别，以及为什么不能用多次尝试的最好结果代表稳定性。",
+  "module": "工程质量",
+  "difficulty": "L2",
+  "version": "2026-10-24.1",
+  "review": "reviewed",
+  "reference": "1. 至少一次成功：pass@k 关注 k 次尝试中是否至少一次成功；在独立同成功率 p 的假设下概率为 1-(1-p)^k。\n\n2. 连续全部成功：pass^k 关注 k 次尝试是否全部成功；在独立同成功率 p 的假设下概率为 p^k。\n\n3. 指标选择：最好一次体现尝试后的可达能力而非每次可靠性；稳定性评测需要保留所有尝试并明确重试预算。",
+  "supplement": "题目、参考答案和分级细则由整理者依据已保存正文补充，不是原作者原题或逐字答案；原帖中的宣传数字及产品实现描述不作为未经验证的事实。",
+  "rubric": [
+    {
+      "id": "point_1",
+      "title": "至少一次成功",
+      "weight": 1,
+      "levels": [
+        "未涉及至少一次成功，或主张与本考点相反的做法",
+        "只泛泛提及至少一次成功，没有说明以下任何具体要点",
+        "清楚说明以下任一要点：pass@k 关注 k 次尝试中是否至少一次成功；在独立同成功率 p 的假设下概率为 1-(1-p)^k",
+        "涉及以下两个要点，但其中一个说明不完整：pass@k 关注 k 次尝试中是否至少一次成功；在独立同成功率 p 的假设下概率为 1-(1-p)^k",
+        "完整说明以下两个要点，允许同义表述及合理替代方案：pass@k 关注 k 次尝试中是否至少一次成功；在独立同成功率 p 的假设下概率为 1-(1-p)^k"
+      ],
+      "missing": "请补充：pass@k 关注 k 次尝试中是否至少一次成功；在独立同成功率 p 的假设下概率为 1-(1-p)^k。"
+    },
+    {
+      "id": "point_2",
+      "title": "连续全部成功",
+      "weight": 1,
+      "levels": [
+        "未涉及连续全部成功，或主张与本考点相反的做法",
+        "只泛泛提及连续全部成功，没有说明以下任何具体要点",
+        "清楚说明以下任一要点：pass^k 关注 k 次尝试是否全部成功；在独立同成功率 p 的假设下概率为 p^k",
+        "涉及以下两个要点，但其中一个说明不完整：pass^k 关注 k 次尝试是否全部成功；在独立同成功率 p 的假设下概率为 p^k",
+        "完整说明以下两个要点，允许同义表述及合理替代方案：pass^k 关注 k 次尝试是否全部成功；在独立同成功率 p 的假设下概率为 p^k"
+      ],
+      "missing": "请补充：pass^k 关注 k 次尝试是否全部成功；在独立同成功率 p 的假设下概率为 p^k。"
+    },
+    {
+      "id": "point_3",
+      "title": "指标选择",
+      "weight": 1,
+      "levels": [
+        "未涉及指标选择，或主张与本考点相反的做法",
+        "只泛泛提及指标选择，没有说明以下任何具体要点",
+        "清楚说明以下任一要点：最好一次体现尝试后的可达能力而非每次可靠性；稳定性评测需要保留所有尝试并明确重试预算",
+        "涉及以下两个要点，但其中一个说明不完整：最好一次体现尝试后的可达能力而非每次可靠性；稳定性评测需要保留所有尝试并明确重试预算",
+        "完整说明以下两个要点，允许同义表述及合理替代方案：最好一次体现尝试后的可达能力而非每次可靠性；稳定性评测需要保留所有尝试并明确重试预算"
+      ],
+      "missing": "请补充：最好一次体现尝试后的可达能力而非每次可靠性；稳定性评测需要保留所有尝试并明确重试预算。"
+    }
+  ],
+  "criticalError": "pass@k 和 pass^k 完全相同，挑选最好的一次就能证明每次都稳定。",
+  "sources": [
+    {
+      "id": "6a9b53f300000000250372ca",
+      "title": "Stanford把Agent工程压成仨词",
+      "author": "geek007",
+      "url": "https://www.xiaohongshu.com/explore/6a9b53f300000000250372ca",
+      "published": "2026-09-04T23:27:47.000Z",
+      "evidence": "刷到 Stanford 新课 CS329Z: Engineering AI Agents 的讨论，原帖作者没复述课程介绍，去拆了 syllabus，拆出来的东西挺值得记。\n\t\n开篇课就把 Agent Engineering 的核心工程问题概括成三个词：Decomposition、Data、Evaluation。RAG、Tool Use、MCP、Agent Framework 这些都在前半程，定位是基础能力。后半程从 Agent Data、Trajectory、Memory、Optimization 讲到 Evaluation、Coding Agent、Long-running Agent、Reliability——重头戏在后面。\n\t\n作业设计也顺着这条线。作业①是从零搭一个 Agent，作业②直接改成 Evaluate an Agent，自己设计 benchmark、grader、LLM-as-Judge、做 error analysis。Evaluation 连着讲两周。\n\t\n一个细节：课里专门区分 pass@k 和 pass^k。前者是多试几次能不能成一次，后者是连续跑很多次能不能都成。对 Agent 这是两种可靠性，长任务要的是后者。\n\t\nMulti-Agent 那节讲得也克制，orchestration、handoff、collaboration 之外，专门讨论协调失败和错误传播，reading 里放了篇《Don't Sleep on Single-agent Systems》。课程没把「更多 Agent」默认成「更好的系统」。\n\t\n把这门课看成 Stanford 给 2026 年 Agent 技术栈拍的切片，挺准。工具调用那些正在变成底座，往后真正难的是数据怎么来、系统怎么评、能不能在长时间真实环境里稳定跑。这几问大概就是接下来一两年的主线。\n\t\n𝕏@Xudong07452910\n\t\n#AIAgent\n#Stanford\n#大模型\n#AI编程\n#程序员",
+      "scope": "仅正文"
+    }
+  ],
+  "archived": false
+}

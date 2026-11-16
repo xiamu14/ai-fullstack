@@ -1,0 +1,35 @@
+{
+  "id": "6ac069f8000000000202b660",
+  "fileHash": "57b8de1bcf6c9c3e9e14fbe474bb73e9b0feab55052928534d2441fb9eaae033",
+  "bodyHash": "0f5fec8fb744ae73ad6c8e808c694a88966a3a2a26ed94e6447aeb35843831cd",
+  "decision": "include",
+  "reason": "正文独立说明常驻环境、批准保存、人工接管及冲突保护",
+  "label": "knowledge",
+  "confidence": 0.45,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.59,
+          "questions": 0,
+          "media": 0.01,
+          "off_topic": 0.4
+        },
+        "confidence": 0.45
+      }
+    },
+    "usage": {
+      "input_tokens": 1176,
+      "output_tokens": 46,
+      "cost": 4.9392e-05
+    },
+    "id": "gen-dec-1792822628-kBzJSPsAlBZz2Kbe5SLM",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

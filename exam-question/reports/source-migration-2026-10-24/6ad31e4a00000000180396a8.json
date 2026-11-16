@@ -1,0 +1,35 @@
+{
+  "id": "6ad31e4a00000000180396a8",
+  "fileHash": "967df0d25b7c6568511d86c387c7c27cea0e7b17a9906dcfe9521ec21d07788d",
+  "bodyHash": "ec297f5dd0ec7f26c6670a20208b934a66c456d3dbdeb68af8115b44ea55108d",
+  "decision": "include",
+  "reason": "正文独立解释手机接入、把 Codex 暴露为工具与主动通知设计",
+  "label": "knowledge",
+  "confidence": 0.47,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.6,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.38
+        },
+        "confidence": 0.47
+      }
+    },
+    "usage": {
+      "input_tokens": 1052,
+      "output_tokens": 46,
+      "cost": 4.4184e-05
+    },
+    "id": "gen-dec-1792822632-5qk0OrHq4F9KQ344MTTn",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,40 @@
+{
+  "verifiedAt": "2026-10-24T07:13:10.782Z",
+  "sourceCount": 145,
+  "coveredSources": 145,
+  "uncoveredSources": [],
+  "questionCount": 163,
+  "newQuestions": 111,
+  "catalogCount": 163,
+  "intentTopics": 32,
+  "batches": [
+    {
+      "batch": "question-completion-a",
+      "questions": 30,
+      "samples": 150,
+      "scored": 149,
+      "mae": 2.0805369127516777
+    },
+    {
+      "batch": "question-completion-b",
+      "questions": 36,
+      "samples": 180,
+      "scored": 178,
+      "mae": 1.904494382022472
+    },
+    {
+      "batch": "question-completion-c",
+      "questions": 20,
+      "samples": 100,
+      "scored": 100,
+      "mae": 1.79
+    },
+    {
+      "batch": "question-completion-d",
+      "questions": 25,
+      "samples": 125,
+      "scored": 124,
+      "mae": 1.5483870967741935
+    }
+  ]
+}

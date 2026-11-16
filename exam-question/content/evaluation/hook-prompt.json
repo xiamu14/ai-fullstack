@@ -1,0 +1,50 @@
+{
+  "questionId": "hook-prompt",
+  "split": "holdout",
+  "cases": [
+    {
+      "id": "hook-prompt-correct",
+      "kind": "correct",
+      "answer": "概率性模型遵循指令不能替代确定性检查。\n\n职责划分：Prompt 引导方案与风格；必须执行的控制放程序生命周期；不能声称 Hook 使整个 Agent 确定。\n\n执行时机：工具调用前检查权限和保护路径；调用后运行校验并记录状态；完成前核验质量门。\n\n独立验证：Hook 失败须阻止受控动作；CI 保留独立验证；有判断归属的问题交人工审核。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "hook-prompt-partial",
+      "kind": "partial",
+      "answer": "Prompt 引导方案与风格；必须执行的控制放程序生命周期；不能声称 Hook 使整个 Agent 确定。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "hook-prompt-critical",
+      "kind": "critical",
+      "answer": "写了 Prompt 就能保证所有安全检查每次执行。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "hook-prompt-concise",
+      "kind": "concise",
+      "answer": "提示词管引导，必跑约束由生命周期代码执行，但模型仍有不确定性。调用前拦权限、调用后验结果、完成前查门禁；失败就阻止，CI 独立跑，判断归属交人。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

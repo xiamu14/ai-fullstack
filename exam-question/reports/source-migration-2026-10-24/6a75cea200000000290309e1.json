@@ -1,0 +1,34 @@
+{
+  "id": "6a75cea200000000290309e1",
+  "fileHash": "a49a2c3a17f4e8d23db3ebb1ccf186c73644111fb81588621bf2c4695add7d3b",
+  "bodyHash": "272afc734933a4c86e8933b2f48f693ca51284e6f6ffbebf563876640047243c",
+  "decision": "exclude",
+  "reason": "缺乏相关独立技术内容或属于招聘营销",
+  "label": "off_topic",
+  "confidence": 0.96,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "jev",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "off_topic",
+        "probabilities": {
+          "knowledge": 0.01,
+          "questions": 0,
+          "media": 0.02,
+          "off_topic": 0.97
+        },
+        "confidence": 0.96
+      }
+    },
+    "usage": {
+      "input_tokens": 1116,
+      "output_tokens": 47,
+      "cost": 0.000046872
+    },
+    "id": "gen-dec-1792822619-8HRJgXnQcAgIJwwzz9VX",
+    "provider": "TypeSafe"
+  }
+}

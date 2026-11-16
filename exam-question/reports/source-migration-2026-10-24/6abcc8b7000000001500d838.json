@@ -1,0 +1,35 @@
+{
+  "id": "6abcc8b7000000001500d838",
+  "fileHash": "bd245007d58fcb8a098b357ae8eaf46e4e61dd0679a9a4a5b7ae22c4ad1acba2",
+  "bodyHash": "805f783ebfa38c5f82206777f700fc46aea9edfece942b7c78618d086e54cc40",
+  "decision": "include",
+  "reason": "正文独立说明长程发布的状态持久化、模板约束和结果核验",
+  "label": "knowledge",
+  "confidence": 0.72,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.79,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.18
+        },
+        "confidence": 0.72
+      }
+    },
+    "usage": {
+      "input_tokens": 1291,
+      "output_tokens": 46,
+      "cost": 5.4222e-05
+    },
+    "id": "gen-dec-1792822627-JMDbX8Vea3TGF67jkQYZ",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

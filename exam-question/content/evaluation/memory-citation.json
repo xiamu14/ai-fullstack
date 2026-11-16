@@ -1,0 +1,50 @@
+{
+  "questionId": "memory-citation",
+  "split": "development",
+  "cases": [
+    {
+      "id": "memory-citation-correct",
+      "kind": "correct",
+      "answer": "可信记忆既要可核验，也要受上下文容量约束。\n\n证据关联：每条事实关联原始来源；记录来源位置或标识；能够回查并纠正错误。\n\n预算设计：Top-K 不能保证总长度；限制召回总 Token 或字节；为当前任务和系统内容预留空间。\n\n使用校验：优先相关且可信的记忆；检查事实冲突和过期；评测召回质量及上下文开销。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    },
+    {
+      "id": "memory-citation-partial",
+      "kind": "partial",
+      "answer": "每条事实关联原始来源；记录来源位置或标识；能够回查并纠正错误。",
+      "expected": [
+        4,
+        0,
+        0
+      ],
+      "critical": false
+    },
+    {
+      "id": "memory-citation-critical",
+      "kind": "critical",
+      "answer": "只限制条数就能保证任何长度的记忆不超上下文。这是我的方案。",
+      "expected": [
+        0,
+        0,
+        0
+      ],
+      "critical": true
+    },
+    {
+      "id": "memory-citation-concise",
+      "kind": "concise",
+      "answer": "事实带原始位置以便核对纠错；条数不等于长度，按 token 或字节控总量并留当前任务空间。选相关可信内容，处理冲突过期，测召回及开销。",
+      "expected": [
+        4,
+        4,
+        4
+      ],
+      "critical": false
+    }
+  ]
+}

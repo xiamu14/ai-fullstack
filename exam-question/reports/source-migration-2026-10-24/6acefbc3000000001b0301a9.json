@@ -1,0 +1,35 @@
+{
+  "id": "6acefbc3000000001b0301a9",
+  "fileHash": "f904e672255f45767af5accac624a37d0d63edfa56ef28bf0b5bef8271f81f66",
+  "bodyHash": "ee2f8e67ec0d963f14c7bf92b118b48687b61bb57d46a5b9c38a04880cf229f6",
+  "decision": "exclude",
+  "reason": "复核正文：仅有标签、导语、目录、招聘营销或领域外内容，缺少可独立整理的 Agent 技术内容；保留旧文件",
+  "label": "media",
+  "confidence": 0.49,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "media",
+        "probabilities": {
+          "knowledge": 0,
+          "questions": 0,
+          "media": 0.62,
+          "off_topic": 0.38
+        },
+        "confidence": 0.49
+      }
+    },
+    "usage": {
+      "input_tokens": 1070,
+      "output_tokens": 46,
+      "cost": 4.494e-05
+    },
+    "id": "gen-dec-1792822631-7xuBvyuArc1EHcCxtpvd",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

@@ -1,0 +1,35 @@
+{
+  "id": "6a1a9dc7000000003601bc13",
+  "fileHash": "81d1feabc3aa6b82e9a9524b6a73fc3cdb86539b48f684e923209fa63dc626bd",
+  "bodyHash": "ad09b34f609a62013e7aa195f3d8cf512862902686b89411aa06d06c7da42378",
+  "decision": "include",
+  "reason": "正文给出替换模型后外接搜索工具的场景和方案；不验证当前产品配额",
+  "label": "knowledge",
+  "confidence": 0.56,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.67,
+          "questions": 0,
+          "media": 0.03,
+          "off_topic": 0.3
+        },
+        "confidence": 0.56
+      }
+    },
+    "usage": {
+      "input_tokens": 934,
+      "output_tokens": 46,
+      "cost": 3.9228e-05
+    },
+    "id": "gen-dec-1792822605-xae4CSJsVinJYRFh05va",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

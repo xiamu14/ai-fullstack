@@ -1,0 +1,35 @@
+{
+  "id": "6a1bf5120000000038034591",
+  "fileHash": "4b2a5c65b7a2a1dc5b698ed499f25fac05cf1888a3c3ac30eb44c7ed991ea594",
+  "bodyHash": "708bb493a0ad9fd3ab7709dcb7b00bf615291ab84ac946f63567b4f480c284b6",
+  "decision": "include",
+  "reason": "仅采用正文中的节点级评测与成本归因经验；图中完整设计与细节不采用",
+  "label": "knowledge",
+  "confidence": 0.56,
+  "model": "typesafe/jev-1.14-20261014",
+  "reviewer": "manual",
+  "raw": {
+    "model": "typesafe/jev-1.14-20261014",
+    "answers": {
+      "content": {
+        "type": "choice",
+        "choice": "knowledge",
+        "probabilities": {
+          "knowledge": 0.67,
+          "questions": 0,
+          "media": 0.24,
+          "off_topic": 0.09
+        },
+        "confidence": 0.56
+      }
+    },
+    "usage": {
+      "input_tokens": 1139,
+      "output_tokens": 46,
+      "cost": 4.7838e-05
+    },
+    "id": "gen-dec-1792822606-SoxjBdYJGvgQ1b2VxYyT",
+    "provider": "TypeSafe"
+  },
+  "reviewedBy": "本次 Codex 代理逐篇复核；非用户独立人工审核"
+}

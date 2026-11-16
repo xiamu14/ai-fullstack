@@ -1,0 +1,25 @@
+{
+  "questionIds": [
+    "multidimensional-agent-evaluation",
+    "plugin-package-portability",
+    "programmable-context",
+    "research-evidence-clustering",
+    "task-launch-experience",
+    "proactive-attention-policy",
+    "memory-retain-recall-reflect",
+    "traceable-development-artifacts",
+    "verified-task-state",
+    "comparable-execution-traces",
+    "single-source-task-state",
+    "embedded-search-storage",
+    "memory-feedback-bias",
+    "blackbox-observability",
+    "commerce-state-authority",
+    "tool-driven-interface",
+    "failure-dependency-diagnosis",
+    "supervisor-executor-loop",
+    "email-draft-approval",
+    "knowledge-layer-boundaries"
+  ],
+  "note": "全量有效正文整理分批；固定既有模型与阈值，答题样本每份仅一次，失败不重试。标签待独立人工复核。"
+}
