@@ -38,6 +38,13 @@ Fix a bug at its cause, reasoning from first principles and established best pra
 - Use names that describe a feature or responsibility. Avoid project codenames and brand names for generic files, classes, variables, and log tags.
 
 ## UI
-Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
+- All styling must use Tailwind CSS; do not create component/page CSS or style files (keep only the single Tailwind entry stylesheet) and do not use inline `style` attributes.
+- Implement component style variants using `cva` (`class-variance-authority`) combined with `tailwind-merge` (`cn`).
+- Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
+
+## State Management
+- Use `@tanstack/react-store` for shared client state management; keep server state in TanStack Query and purely local UI state within the owning component.
+- Strictly prohibit prop drilling (passing props down through multiple intermediate React components).
+- Use state judiciously and minimize re-renders: derive values instead of duplicating state, keep state scoped as narrowly as possible, and always subscribe with fine-grained selectors in `useStore(store, (state) => ...)` rather than reading the entire store.
 
 Like a master of Apple-style copywriting. Following the principles of *Don’t Make Me Think* and *The Non-Designer’s Design Book*, rewrite all menu labels and feature copy in my admin dashboard. Make everything instantly understandable, use everyday language, and avoid jargon. Keep names to 2–4 Chinese characters and descriptions to no more than 20 Chinese characters. Don’t change any functionality. Ask me first if anything is unclear.

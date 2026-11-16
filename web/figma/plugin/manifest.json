@@ -1,0 +1,17 @@
+{
+  "name": "Local Figma Reader Bridge",
+  "id": "local-figma-reader-bridge",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma", "dev"],
+  "capabilities": ["inspect"],
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "devAllowedDomains": [
+      "http://localhost:38450",
+      "ws://localhost:38450"
+    ]
+  }
+}
