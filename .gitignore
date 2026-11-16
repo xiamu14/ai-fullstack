@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build & TypeScript cache
+dist/
+build/
+.output/
+.nitro/
+.vinxi/
+.tanstack/
+.vite/
+*.tsbuildinfo
+
+# Test & coverage
+coverage/
+.vitest/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Local data & logs
+.data/
+projects.local.json
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Non-Bun lockfiles (project enforces bun.lock)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

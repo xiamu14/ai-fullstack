@@ -1,0 +1,40 @@
+## Package management
+
+- Use Bun as the only package manager for JavaScript and TypeScript projects in this directory, including `backend` and `web`.
+- Install dependencies with `bun install`, add or remove packages with `bun add` / `bun remove`, and run package scripts with `bun run <script>`.
+- Use `bunx` for package executables. Run the configured test script with `bun run test`; do not use the built-in `bun test` runner unless the project explicitly adopts it.
+- Keep `bun.lock` as the dependency lockfile. Do not generate `package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`.
+
+## Backend commands
+
+- The `backend` package exposes only `dev`, `deploy`, `test`, and `db`. Implement branches and defaults in TypeScript scripts using `zx` and `@clack/prompts`, rather than adding package script aliases.
+- Every command and database subcommand supports `--help` / `-h` without executing application or database operations. Interactive prompts require `--interactive`.
+- `deploy` builds and runs in production mode on the local machine; `--build-only` only builds. `db` defaults to read-only status.
+
+## Verification
+
+- Only run the project's `bun run test` when changes touch or affect test cases; skip it for documentation, comments, or changes unrelated to test cases to avoid unnecessary test runs.
+- When running `bun run test`, fix any errors; for warnings and coverage results, report them to the user only without attempting unsolicited fixes.
+- All other AI Agent built-in automatic verification, testing, linters, formatters, or build checks are strictly prohibited unless explicitly requested by the user.
+
+## Code organization
+
+- Keep every code file under 500 lines. Aim for 200 lines or fewer; as a file approaches 200 lines, extract cohesive responsibilities into separate files and reuse them where appropriate.
+
+## API Spec
+[API Spec](./spec/api.md)
+
+## Backend File Structure
+Develop backend feature must follow [Backend File Structure](./spec/backend_structure.md) 
+
+## FIX Bug
+Fix a bug at its cause, reasoning from first principles and established best practice. Do not patch over the symptom
+
+## File Naming
+
+- Use names that describe a feature or responsibility. Avoid project codenames and brand names for generic files, classes, variables, and log tags.
+
+## UI
+Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
+
+Like a master of Apple-style copywriting. Following the principles of *Don’t Make Me Think* and *The Non-Designer’s Design Book*, rewrite all menu labels and feature copy in my admin dashboard. Make everything instantly understandable, use everyday language, and avoid jargon. Keep names to 2–4 Chinese characters and descriptions to no more than 20 Chinese characters. Don’t change any functionality. Ask me first if anything is unclear.
