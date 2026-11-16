@@ -1,0 +1,63 @@
+# Toad 原始 TUI 样式摘录；仅删除未使用组件的规则，声明值保持原样。
+# 来源与许可证见 TOAD-NOTICE.md。
+.block {
+    margin: 1 1 1 0;  
+}
+
+Markdown {
+    layout: stream;    
+}
+
+Throbber {
+    width: 100%;
+    height: 1;    
+    layer: base;    
+    visibility: hidden;
+    &.-busy {
+        visibility: visible;
+    }    
+}
+
+Footer {    
+    background: transparent;
+    .footer-key--key {
+        color: $text;
+        background: transparent;
+        # text-style: not bold;
+        padding: 0 1;        
+    }
+
+    .footer-key--description {
+        padding: 0 1 0 0;
+        color: $text-muted;
+        background: $footer-description-background;
+    }
+
+    &:hover {
+        color: transparent;
+        background: transparent;
+    }
+
+    &.-disabled {
+        text-style: dim;
+    }
+
+    &.-compact {
+        .footer-key--key {
+            padding: 0;
+        }
+        .footer-key--description {
+            padding: 0 0 0 1;
+        }
+    }
+    FooterLabel {
+        color: $text-muted;
+        background: $footer-description-background;
+    }
+
+    FooterKey.-disabled {
+        .footer-key--key {
+            text-opacity: 0.6;       
+        }
+    }
+}

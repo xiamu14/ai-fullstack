@@ -1,0 +1,10 @@
+{
+  "mode": "auto",
+  "sandbox": true,
+  "protected_paths": [".git", ".git/**", ".env*", "**/.env*", "*.pem", "*.key", "**/credentials*"],
+  "rules": [
+    {"tool": "shell", "pattern": "pwd", "action": "allow"},
+    {"tool": "docs_search", "action": "ask", "remember": true},
+    {"tool": "mcp.start.untrusted", "action": "deny"}
+  ]
+}

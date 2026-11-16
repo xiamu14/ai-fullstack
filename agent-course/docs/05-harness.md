@@ -1,0 +1,926 @@
+## 1. Harness 基础
+Agent 所有核心已经单独讲解完。在核心之上再补充工程化代码，以及权限、安全护栏，可观测性与评测就是一套 Harness。Pydantic AI 是 Agent Framework，再补充实际 Agent 场景（比如 coding，客户系统）工程系统，就是 Agent Harness（智能运行层），如 Claude Code，DeepSeek Harness(dsh)，OpenClaw 等。
+
+> Agent = Model + Harness
+
+本章会使用前面的知识和**系统知识**来实现完整的 Coding Agent，聚焦单 Agent 模式。
+
+### 1.1 多轮对话
+
+多轮对话需要把上一轮消息作为下一轮的上下文。复用同一个 Agent 实例不会自动记住上一轮；真正维持对话的是显式传入 `message_history`。
+
+#### 传递完整消息
+
+复用前文已配置模型和工具的 `agent`：
+
+```python
+first = agent.run_sync("分析当前项目，并给出修改计划。")
+second = agent.run_sync(
+    "按刚才的计划继续。",
+    conversation_id=first.conversation_id,
+    message_history=first.all_messages(),
+)
+```
+
+`all_messages()` 包含用户输入、模型回复、工具调用和工具结果。只保存最终的 `result.output` 会丢失执行依据，不能代替完整消息历史。
+
+每轮成功后，用新的 `result.all_messages()` 替换当前历史；不要把它追加到旧列表中，否则会重复传入已有消息。启用上下文压缩后，这份历史也包含框架保留的近期消息和摘要。
+
+#### 区分会话、运行
+
+以下术语和字段命名沿用 [Pydantic AI 官方文档](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。
+
+| 数据 | 作用 |
+| --- | --- |
+| `conversation_id` | 标识同一段对话，多轮之间沿用 |
+| `run_id` | 标识一轮 Agent 运行 |
+| `message_history` | 决定这一轮模型能看到哪些已有消息 |
+
+一次 `agent.run()` 可以包含多次模型请求和工具调用，运行标识从 `result.run_id` 获取。同一会话中的多次运行沿用 `conversation_id`，每次运行各有自己的 `run_id`。
+
+`UsageLimits(request_limit=10)` 限制一次运行中的模型请求次数。
+
+新对话不传 `conversation_id`，由框架生成，成功后从 `result.conversation_id` 获取。已有会话沿用它的 ID，但 ID 本身不会把磁盘中的历史加载到模型上下文。
+
+#### 保存与恢复
+
+`StepPersistence(capture_frontier=True)` 在模型请求前、模型回复后和工具完成等边界保存原生快照。失败、取消或未完成的运行也可能包含有效进度，不能只按 `run_completed` 筛选历史。
+
+数据库选择最近有快照的顶层运行，只读取一个 `run_id`，再加载一份最新快照；成功运行缺少快照时仍明确报错：
+
+```sql
+SELECT r.run_id FROM runs AS r
+WHERE r.conversation_id = ? AND r.parent_run_id IS NULL
+  AND (
+    EXISTS (SELECT 1 FROM snapshots AS s WHERE s.run_id = r.run_id)
+    OR EXISTS (
+      SELECT 1 FROM events AS e
+      WHERE e.run_id = r.run_id AND e.kind = 'run_completed'
+    )
+  )
+ORDER BY r.started_at DESC, r.rowid DESC
+LIMIT 1;
+```
+
+没有快照的启动失败不会遮住已有进度。会话 ID 使用参数绑定；查询放到工作线程执行。复用部分复合索引，按时间倒序寻找记录，避免临时排序：
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_runs_top_conversation_started
+ON runs(conversation_id, started_at)
+WHERE parent_run_id IS NULL;
+```
+
+`EXISTS` 使用框架已有的 `snapshots(run_id, seq)`、`events(run_id, seq)` 索引。可用 `EXPLAIN QUERY PLAN` 验证没有 `USE TEMP B-TREE FOR ORDER BY`。索引排序原理见 [SQLite Query Planner](https://www.sqlite.org/queryplanner.html#multi_column_indices)。
+
+```python
+from pydantic_ai.messages import repair_messages
+
+snapshot = await store.latest_snapshot(run_id=run_id, include_interrupted=True)
+if snapshot is None:
+    raise ValueError("运行缺少消息快照")
+history = repair_messages(snapshot.messages)
+
+result = await agent.run(
+    "继续完成上次的任务。",
+    conversation_id=saved_id,
+    message_history=history,
+)
+```
+
+`repair_messages()` 为未返回结果的工具调用补上 `outcome="interrupted"`，保留原有消息并阻止恢复时自动重放。interrupted 不代表操作没有执行：文件写入、发信等副作用需查验工具执行记录和实际结果，不能盲目重试。
+
+同一进程内失败后继续请求，也要先恢复最新快照，避免用旧的成功历史覆盖未完成进度。历史读取失败时明确报错，不静默使用空历史。恢复只包含已持久化的消息，进程终止前尚未写入的流式片段无法找回。[Pydantic AI Step Persistence](https://pydantic.dev/docs/ai/harness/step-persistence/)
+
+消息恢复与历史检索不同：前者恢复当前上下文，后者按需找回压缩前的原文；见[第四章](./04-memory.md)。
+
+### 1.2 workspace
+
+Workspace 决定文件工具的相对路径从哪里解析，以及 shell 命令从哪个目录开始执行。本节沿用 [Pydantic AI 的 Workspace 与 LocalWorkspace](https://pydantic.dev/docs/ai/core-concepts/workspace/)：
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import LocalWorkspace
+from pydantic_ai_harness.coder import Coder
+
+agent = Agent(model, capabilities=[LocalWorkspace(project_dir), Coder()])
+```
+
+会话历史和工作目录需要一起恢复。同样的 `read_file("src/main.py")`，在不同目录下会读取不同文件；只恢复消息历史而切换目录，可能把之前的工具结果用于另一个项目。
+
+绑定会话时，先把工作目录转换为绝对路径，再与运行记录一起持久化。例如，在前文的 `StepPersistence` 配置中附加 metadata：
+
+```python
+workspace = project_dir.expanduser().resolve()
+if not workspace.is_dir():
+    raise ValueError("工作目录不存在或不是目录")
+
+persistence = StepPersistence(
+    store=store,
+    metadata={"workspace": str(workspace)},
+)
+```
+
+恢复时，先读取该会话顶层运行记录中的目录，再构建 `LocalWorkspace` 并加载消息历史。目录已删除或无法访问时，应明确报错，不能静默换成另一个目录。
+
+会话存储的位置应独立于命令启动目录，否则换一个目录启动后可能找不到旧会话。笔记可以按工作目录组织，让同一项目的多个会话共享约定；消息历史仍按会话 ID 隔离。
+
+`LocalWorkspace` 提供执行目录，不提供进程或文件访问隔离。工作目录绑定也不会阻止工具访问目录之外的本机资源。
+
+### 1.3 Session Schema
+
+先看目前已经实现的数据结构。会话持久化沿用 **Pydantic AI Harness 0.64.0** 的 `StepPersistence` 与 `SqliteStepStore`，字段来源见 [Pydantic AI 的 Step Persistence 源码](https://github.com/pydantic/pydantic-ai/tree/main/src/pydantic_ai_harness/pydantic_ai_harness/step_persistence/)。下面按当前安装版本说明。
+
+#### 会话如何组织
+
+会话和运行需要分开保存：一个会话可以暂时没有运行，而每次 `agent.run()` 才产生一个 `run_id`。仅从 `runs` 聚合会话，会遗漏尚未发送消息的空会话。
+
+因此，应用层增加 `sessions` 登记表，保存会话身份、工作目录和创建时间。ID 使用 Pydantic AI 的公开 `Conversation` 类型生成，随后交给各次运行沿用：
+
+```python
+from pydantic_ai.conversation import Conversation
+
+conversation = Conversation()
+conversation_id = conversation.conversation_id
+# 将 conversation_id、工作目录和创建时间保存到会话登记表。
+# 后续运行使用 agent.run(..., conversation_id=conversation_id)。
+```
+
+保存空会话不需要调用模型，也不应插入一条虚假的运行记录。运行过程与快照仍由框架的 `StepPersistence` 保存。
+
+```text
+sessions.conversation_id：同一会话，可以有零到多次运行
+├── run_id：第一次运行
+│   ├── metadata：工作目录等附加信息
+│   ├── events：运行、模型请求、工具调用的过程事件
+│   ├── snapshots：执行过程中保存的消息历史
+│   └── tool_effects：工具执行状态
+└── run_id：下一次运行
+    └── ……
+```
+
+| 会话信息 | 当前存放或获取方式 |
+| --- | --- |
+| 会话 ID | `sessions.conversation_id`；运行通过 `runs.conversation_id` 关联，应用中的 `session_id` 对应该值 |
+| 标题 | 优先读取运行的 `metadata.title`，否则从首条用户消息提取；没有独立标题列 |
+| 工作目录 | 会话登记表的 `workspace`；运行的 `metadata.workspace` 同时记录执行目录 |
+| 消息历史 | 最近有快照的顶层运行，包含未完成进度 |
+| 运行结果状态 | 从 `events.kind` 判断，例如 `run_completed`、`run_failed`；没有独立 session 状态列 |
+
+会话列表合并会话登记与运行记录，按最近活动排序；还没有消息时使用默认标题，出现消息后再提取标题。旧的运行记录即使没有会话登记，也可以继续按 `conversation_id` 聚合。运行 metadata 中仍保留工作目录：
+
+```json
+{"workspace": "/absolute/path/to/project"}
+```
+
+#### SQLite 表结构
+
+下表列出当前存储使用的表与字段。`sessions` 是应用层登记表，其余表沿用框架的运行持久化结构。`TEXT` 用于标识、时间和序列化 JSON，`INTEGER` 用于序号与步骤编号。
+
+| 表 | 主键 | 其他字段 | 保存什么 |
+| --- | --- | --- | --- |
+| `sessions` | `conversation_id` | `workspace`、`created_at` | 独立于模型运行的会话身份与工作目录 |
+| `runs` | `run_id` | `conversation_id`、`parent_run_id`、`agent_name`、`metadata`、`started_at`、`registration_id` | 一次运行的身份、归属与附加信息 |
+| `events` | `seq`，自增 | `run_id`、`kind`、`step_index`、`timestamp`、`conversation_id`、`parent_run_id`、`agent_name`、`tool_call_id`、`tool_name`、`error`、`metadata`、`idempotency_key` | 按顺序追加的过程事件 |
+| `snapshots` | `seq`，自增 | `run_id`、`step_index`、`conversation_id`、`parent_run_id`、`agent_name`、`timestamp`、`state`、`messages`、`idempotency_key` | 可恢复的消息历史快照 |
+| `snapshot_messages` | `sha256` | `message` | 按内容哈希去重的原生消息 JSON |
+| `snapshot_message_refs` | (`snapshot_seq`, `position`) | `sha256` | 一个快照中的消息顺序与内容引用 |
+| `snapshot_idempotency_keys` | (`run_id`, `idempotency_key`) | 无 | 防止同一次快照写入被重复保存 |
+| `tool_effects` | (`run_id`, `tool_call_id`) | `tool_name`、`status`、`started_at`、`ended_at`、`idempotency_key`、`effect_summary` | 工具调用的执行状态与副作用记录 |
+
+这些表通过 `run_id`、`snapshot_seq` 和 `sha256` 关联；当前 SQLite schema 未声明外键约束。`parent_run_id` 表示运行之间的父子关系，与按 `conversation_id` 分组是两个不同维度。
+
+快照在逻辑上包含完整历史，但物理存储可以复用已有消息：`snapshot_message_refs.position` 保留顺序，`sha256` 指向 `snapshot_messages` 中的正文。此时 `snapshots.messages` 保存存储标记；读取时由框架还原为 `list[ModelMessage]`。
+
+最后区分两个状态：`snapshots.state="complete"` 表示消息中的工具调用已有对应结果，不等于整次运行成功。恢复历史不要求存在 `run_completed` 事件；挂起的工具调用先补为 interrupted，再交给模型继续。`tool_effects.status` 为 `started`、`completed` 或 `failed`；进程中断后仍停在 `started` 的调用，外部操作是否已生效需要另行确认。
+
+### 1.4 System Prompt
+System Prompt 分成两层：固定的角色与通用规则，以及会随项目变化的概览。分层思路参考[项目感知与上下文组织设计](https://fivwvysqdz.feishu.cn/wiki/D079wzybGiVdxnkbQ6kcwB12nIb)，组装使用 [Pydantic AI 的 instructions](https://pydantic.dev/docs/ai/api/pydantic-ai/agent/#pydantic_ai.agent.Agent.instructions)。
+
+#### 固定层：角色与通用规则
+
+固定层统一描述协作方式、任务范围、先调查再修改、工具使用和验证要求。完整文本保存在 [system.md](../coder-cli/prompts/system.md)，与 Python 代码分开维护；同一个 Agent 的后续运行复用这段文本。
+
+工具相关指令必须匹配实际注册的工具。框架提供文件读取、搜索和 shell 能力时，就使用这些工具；不能仅在 prompt 里写一个工具名称，便假定 Agent 拥有该工具。
+
+固定文本放在动态信息之前，避免把时间、Git 状态等变化值混入固定规则。这样可以保持前缀稳定；模型服务是否命中 prompt cache 仍取决于服务商，不等于应用已经缓存项目状态。
+
+#### 动态层：项目概览
+
+项目概览帮助 Agent 判断应该去哪里查，而不是预先读取所有代码。
+
+| 信息 | 允许的来源 | 提取范围 |
+| --- | --- | --- |
+| 项目名称、语言和框架 | 项目根目录及可见一级模块中的项目清单 | 如名称、简述、运行时、脚本名称和已声明的框架；不读取依赖安装目录 |
+| 模块分布 | 浅层目录项 | 最多两层、100 条可见目录项；不递归生成完整文件树 |
+| 架构与职责 | README、ARCHITECTURE 文档 | 简介和明确的架构、结构、模块说明，保留来源路径 |
+| 项目规则 | 所选工作目录中的 AGENTS.md | 以工作目录为边界，避免把宿主仓库的规则混入嵌套的独立练习项目 |
+| 当前工作状态 | Git 分支、HEAD 和已跟踪文件的状态 | 不读取 diff 正文，不递归枚举未跟踪文件或子模块内容 |
+
+没有文档依据时，只报告配置与目录事实，不把目录名推断成架构结论。函数实现、调用链、接口参数等细节在具体任务中通过文件工具加载。
+
+**持久化缓存与增量更新**
+
+缓存以规范化的工作目录为键，而不是按 session 存储。因此，同一项目的多个会话能够共享已经提取的概览。缓存保存来源指纹、内容摘要、提取片段和浅层目录项，不复制整个项目文件。
+
+```text
+启动或新一轮用户请求
+        ↓
+检查已知来源的文件指纹、浅层目录元数据
+        ↓
+未变化 → 复用缓存片段
+已变化 → 只读取变化来源，替换对应片段
+新增或删除 → 更新对应目录和来源
+        ↓
+刷新轻量 Git 状态，组装本轮项目概览
+```
+
+文件指纹使用修改时间、元数据变更时间、大小和 inode。指纹不变时不打开正文；指纹变化后才按读取预算计算内容摘要，正文未变则继续复用提取结果。目录使用自己的元数据判断是否需要重新列举，不因某个业务文件的正文变化而遍历整个项目。
+
+缓存通过临时文件和原子替换写入；无变化时不重写。缓存格式版本不符或内容损坏时，只重新采集允许范围内的信息，不升级为全项目扫描。Git 状态单独刷新，切换提交不会直接触发所有来源重读。
+
+#### 预算与排除规则
+
+每个来源最多读取 32 KiB，每轮更新总计最多读取 128 KiB；尚未处理的来源保留待更新标记，下一轮可以继续处理。动态层最多注入 8,000 个字符，超限的片段标记省略，任务需要时再读取原文件。
+
+遍历前排除依赖、环境、构建产物和缓存目录，例如 `node_modules`、`.venv`、`vendor`、`dist`、`target`；不跟随符号链接。Git 项目同时遵守 `.gitignore`，工作目录中的 AGENTS.md 仍作为项目规则读取。锁文件、数据库、二进制和密钥文件不作为自动正文来源。
+
+Git 命令设置超时和输出上限。采集失败时标记信息不可用，不把失败解释为工作区干净，也不通过全量读取来补偿。单个来源超过读取上限时只提供有界信息，不能把截断内容当作完整事实。
+
+#### 接入运行流程
+
+固定层注册为静态 instructions，项目概览注册为带名称的动态 instructions。Pydantic AI 会在模型请求时求值动态函数，因此应用还按 `run_id` 复用本轮结果：一轮中的多次模型请求和工具调用不重复检查项目，下一轮用户请求再做增量刷新。
+
+动态层使用框架的 `on_change="rewrite"` 更新当前指令，不把新概览反复追加为普通历史消息。具体任务读取到的代码和工具结果仍通过 `message_history` 保持多轮上下文。
+
+验证时应检查实际文件打开与目录遍历，而不只检查摘要文字：重复启动应复用正文缓存，修改一个清单只读取该来源，新增模块只更新对应结构，依赖目录始终不被进入；再验证同轮复用、跨轮刷新与不同工作目录隔离。
+
+### 1.5 Tools
+
+工具定义通过模型 API 的 `tools` 字段发送，包含 `name`、`description` 和参数 JSON Schema；它们不是 Python 实现，也不等同于 Agent 的 `instructions`。默认发送当前可用工具的完整定义，普通工具与本地连接的 MCP 工具均如此。
+
+#### 渐进披露
+
+工具多时，先发现相关工具，再加载其定义。工具路由从“在全部工具中选择”变为“搜索候选工具 → 选择工具与参数”。
+
+```mermaid
+flowchart LR
+    A[用户任务] --> B[search_tools]
+    B --> C[匹配 name 和 description]
+    C --> D[披露候选工具的完整 Schema]
+    D --> E[模型选择并调用工具]
+```
+
+Pydantic AI 2.64.0 中，普通工具设置 `defer_loading=True`；框架自动提供 ToolSearch，无需单独注册。以下沿用已配置的 `model` 和已有工具函数：
+
+```python
+from pydantic_ai import Agent, Tool
+
+agent = Agent(model, tools=[
+    Tool(get_weather, defer_loading=True),
+    Tool(send_email, defer_loading=True),
+])
+```
+
+MCP 工具集可逐个按需发现；这与加载整组 capability 是两个粒度：
+
+```python
+from pydantic_ai.mcp import MCPToolset
+
+mcp = MCPToolset("http://127.0.0.1:8000/mcp")
+agent = Agent(model, toolsets=[mcp.defer_loading()])
+```
+
+[可运行示例](../coder-cli/examples/tool_disclosure.py) 用模拟 HTTP 响应捕获 OpenAI Chat 请求，不调用在线模型。分别打印启用前、发现前、发现后的 `tools` 与 `messages`：
+
+```bash
+# 在 coder-cli 目录运行
+uv run python examples/tool_disclosure.py
+```
+
+请求变化如下（仅摘录名称；脚本打印完整描述与参数）：
+
+```text
+启用前       tools: get_weather, send_email
+启用后
+  发现前     tools: search_tools
+  模型调用   search_tools(queries=["weather"])
+  搜索结果   {"discovered_tools": [{"name": "get_weather"}]}
+  发现后     tools: get_weather, search_tools
+```
+
+| 影响 | 全量定义 | 渐进披露 |
+|---|---|---|
+| 工具定义的输入 token | 全部工具的描述与 Schema | 发现入口 + 已披露工具；另有搜索交互开销 |
+| 工具路由 | 每步面对全部工具 | 先缩小候选集，减少无关工具干扰；检索遗漏也会导致选不到工具 |
+
+工具越多、Schema 越长、单项任务需要的工具越少，节省空间越大。少量工具不一定节省 token；发现通常增加一次模型请求。名称与描述需明确用途和边界；减少候选不保证路由正确，应验证检索召回和调用成功率。
+
+上述请求形状对应 OpenAI Chat 的本地搜索路径。支持原生 tool search 的接口可能仍接收带延迟标记的完整定义，由服务端控制模型可见性；不能把 HTTP 请求大小直接当作模型上下文 token。Prompt cache 也不等同于渐进披露。
+
+来源：[Pydantic AI Tool Search](https://pydantic.dev/docs/ai/api/pydantic-ai/capabilities/#pydantic_ai.capabilities.ToolSearch)、[Toolset Deferred Loading](https://pydantic.dev/docs/ai/tools-toolsets/toolsets/#deferred-loading)。
+
+#### MCP：注册与调用
+
+MCP 将外部服务的工具定义与调用接入 Agent。注册是应用读取服务配置；工具发现通过 MCP 的 `tools/list` 完成，不需要额外的 `register` 协议。
+
+| 传输 | 配置入口 | 生命周期 |
+|---|---|---|
+| HTTP | `url`、`headers` | 客户端连接已启动的服务 |
+| stdio | `command`、`args`、`env`、`cwd` | 框架启动本地子进程，结束或取消时回收 |
+
+```json
+{"mcpServers":{"local-tools":{"command":"python","args":["server.py"],"cwd":"/path/to/project"}}}
+```
+
+两种传输共用工具发现、工具白名单和渐进披露；每个服务只选 `url` 或 `command`。stdio 发现工具时就可能执行启动命令，因此配置必须来自可信来源。
+
+```mermaid
+flowchart LR
+    A[服务配置] --> B[每次模型请求前检查配置]
+    B --> C[校验配置与传输策略]
+    C --> D[MCP tools/list]
+    D --> E[search_tools 发现候选]
+    E --> F[披露 Schema]
+    F --> G[MCP tools/call]
+```
+
+沿用框架动态 toolset 的默认行为：每次模型请求前检查配置，新增服务先变为可发现，无需等待下一轮用户消息。配置未变化时复用当前连接。`defer_loading` 控制完整工具定义何时对模型可见，不代表工具发现一定不连接 MCP 服务。
+
+[动态工厂](https://pydantic.dev/docs/ai/tools-toolsets/toolsets/#dynamically-building-a-toolset)按模型请求求值；返回当前配置对应的工具集：
+
+```python
+from pydantic_ai.toolsets import DynamicToolset
+
+# build_current_mcp(ctx) 读取配置，返回 MCPToolset 或 CombinedToolset。
+agent = Agent(model, toolsets=[DynamicToolset(build_current_mcp)])
+```
+
+MCP 连接使用受控客户端：
+
+```python
+from pydantic_ai.mcp import MCPToolset
+
+toolset = MCPToolset(
+    server_url, id="weather", http_client=policy_client,
+    init_timeout=5, read_timeout=30,
+    include_instructions=False,
+    max_retries=0, tool_error_behavior="failed",
+)
+agent = Agent(model, toolsets=[toolset.prefixed("weather").defer_loading()])
+```
+
+| 约束 | 作用 |
+|---|---|
+| 工具白名单 | 限定可发现、可调用的工具名 |
+| 网络白名单 | 限定 HTTP MCP 连接的 scheme、host、port |
+| SSRF 防护 | 校验全部 DNS 结果并固定连接地址；拒绝未授权内网、云元数据和重定向 |
+| Timeout | 分别限制连接、初始化、请求读取和工具调用总时长 |
+| Retry | 仅重试连接建立失败；请求已发送后的超时可能意味着执行结果未知，不自动重放 |
+
+Pydantic AI 提供配置加载、发现、工具列表缓存、渐进披露及超时接口；配置变化检查、网络白名单与 MCP 的 SSRF 防护由应用实现。工具纠错重试与 HTTP 连接重试是不同预算。外部服务的 instructions 不自动提升为 Agent 指令。
+
+```text
+coder-cli ──受控连接──> MCP 服务 ──服务自身的网络策略──> 外部 API
+```
+
+上述网络策略用于 HTTP MCP，只约束第一段链路。stdio 子进程的网络访问需由其自身或执行环境限制。MCP 服务内部请求需在服务端限制；它也不能替代 shell 等执行环境的网络隔离。[配置实验](../coder-cli/skills/mcp-config/SKILL.md)可验证：同次运行中添加配置后可发现、删除后不可调用、未授权地址连接失败。
+
+参考：[Pydantic AI MCP Client](https://pydantic.dev/docs/ai/mcp/client/)、[Timeouts](https://pydantic.dev/docs/ai/core-concepts/timeouts/)、[OWASP SSRF](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)。
+
+### 1.6 Skills
+
+Skill 把任务流程封装成说明与资源。工具定义“能做什么”，Skill 定义“何时用、怎样做、怎样判断完成”。
+
+#### Schema：元数据与执行说明
+
+沿用 [Agent Skills 规范](https://agentskills.io/specification)：一个技能目录至少包含 `SKILL.md`，文件由 YAML frontmatter 与 Markdown 正文组成。
+
+```text
+web-download/
+├── SKILL.md              # 触发条件、输入、执行入口、验收条件
+├── scripts/download.py   # 确定性步骤
+└── references/           # 可选：按需读取的细节
+```
+
+```markdown
+---
+name: web-download
+description: 下载网页中指定图片。用于已提供网页 URL 和 CSS 选择器的任务；不用于普通网页阅读或批量爬取。
+---
+
+# 网页图片下载
+
+输入：网页 URL、目标图片 CSS 选择器、工作目录内的输出目录。
+缺少选择器时先询问，不猜测目标图片。
+
+执行：使用本技能 scripts/download.py，按下方命令运行，不另写下载代码。
+验收：仅当返回 status=saved 且目标文件存在、大小与 bytes 一致时报告成功。
+失败：返回 status=failed 时报告 error 并停止，不更换工具重复下载。
+```
+
+| 字段 | 约定 |
+|---|---|
+| `name` | 必填，与目录名一致；1–64 字符，小写字母、数字和连字符；不以连字符开头或结尾，不连续使用连字符 |
+| `description` | 必填，1–1024 字符；写任务、触发条件与排除范围，不堆同义词 |
+| `license`、`compatibility`、`metadata` | 可选，分别描述许可证、环境要求和附加元数据；不代替依赖安装 |
+| Markdown 正文 | 写清输入、执行入口、输出、验收和失败处理；参数校验由脚本或工具负责 |
+
+当前 Harness 不执行 `allowed-tools`、`model`、`hooks` 等行为字段，会提示忽略。不能靠 frontmatter 授权工具、切换模型或自动注册 MCP；权限与运行时能力由应用配置。
+
+#### 少 token、短执行路径、可验证
+
+```mermaid
+flowchart LR
+    A[名称与简短描述] --> B[load_capability]
+    B --> C[正文与技能目录]
+    C --> D[直接调用已有脚本或工具]
+    D --> E[检查结构化结果与产物]
+```
+
+| 目标 | 写法 |
+|---|---|
+| 少 token | description 只用于选技能；正文保留必要步骤；长参考从正文直接链接，按需读取；脚本返回状态、路径、大小或错误，不回传整页 HTML、二进制或完整日志 |
+| 短执行路径 | 给一个明确入口和完整命令；固定步骤放脚本，避免“搜索脚本 → 阅读源码 → 临时重写”；路径以加载时给出的技能目录为基准，不猜安装位置；参考文件不层层跳转 |
+| 可验证 | 定义成功字段与产物检查；失败返回明确原因；MCP 工具可发现不等于调用成功，脚本退出成功不等于产物满足要求 |
+
+以用户全局技能库中的 `web-download` 为例，把 `<技能目录>` 替换为加载时提供的绝对路径，参数安全引用后直接执行：
+
+```bash
+uv run --script "<技能目录>/scripts/download.py" '<网页 URL>' '<CSS 选择器>' --workspace . --output-dir outputs
+```
+
+脚本通过内联依赖声明独立运行，不依赖宿主项目布局。先检查本机 Lightpanda 是否可用，再通过 CDP 执行网页 JavaScript；不可用立即退出，不回退到 Chromium 或其他下载流程。不要省掉输入校验与产物验收来减少调用，也不要自动重试结果未知的有副作用操作。
+
+渐进加载仍有加载交互的开销；所有可见技能的名称和描述也占上下文。比较同一任务的总输入、输出 token、模型请求数与验收结果，不能仅凭 `SKILL.md` 更短就声称成本更低。
+
+#### 常见的坑
+
+| 坑 | 怎样处理 |
+|---|---|
+| 指令模糊 | description 明确触发条件，正文给输入与验收。例如下载任务必须拿到 URL 和选择器；不能只写“帮助下载图片” |
+| 把声明当权限 | Skill 的 `allowed-tools` 被忽略，加载后仍可使用已注册的 Coder 工具。MCP 配置中的 `allowed_tools` 才由应用过滤；只读任务若需强制限制，必须在工具执行层控制，写“不要修改”不构成隔离 |
+| 把输出长度当预算 | Skill 中写 `caps` 或“最多 1000 token”不会设置框架预算。当前 `request_limit=50` 只限制模型请求次数，`timeout=30` 也不限制 token；输出上限与运行累计预算需分别配置 |
+| 静默降级 | 全局目录缺失可以跳过；格式无效的技能会被框架跳过并警告。任务依赖的技能或脚本不可用时，应报告原因，不改用默认流程假装完成，更不能用 `except Exception: pass` 隐藏错误 |
+
+#### 工程接入
+
+在 `agent/runtime.py` 中，沿用已配置的 `model` 和 `workspace`，将技能库加入 capabilities（其余能力省略）：
+
+```python
+from pathlib import Path
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import LocalWorkspace
+from pydantic_ai_harness import Skills
+from pydantic_ai_harness.coder import Coder
+
+agent = Agent(model, capabilities=[
+    LocalWorkspace(workspace), Coder(),
+    Skills(Path(__file__).resolve().parents[1] / "skills"),
+    Skills(
+        Path.home() / ".agents" / "skills",
+        missing_directories="skip", duplicate_names="keep_first",
+    ),
+])
+```
+
+框架合并两份技能库，内置优先，全局同名项跳过并提示。每次 Agent 运行开始时重新发现；模型先看到名称与描述，调用 `load_capability` 后才收到正文和技能目录。资源不自动读取或执行，实际执行仍通过 Coder。全局安装与更新见[项目 README](../coder-cli/README.md#skills)。
+
+MCP 配置路径由 MCP 能力统一提供，Skill 只引用 `mcp_config_path`；新增普通技能不增加专用 instructions。接入机制见 [Pydantic AI Skills](https://pydantic.dev/docs/ai/harness/skills/)。
+
+需要限制消耗时，在运行入口配置，而不是增加 Skill schema 字段。以下为预算示例，数值需按任务校准：
+
+```python
+from pydantic_ai import UsageLimits
+
+result = await agent.run(
+    prompt,
+    model_settings={"timeout": 30, "max_tokens": 1000},
+    usage_limits=UsageLimits(request_limit=10, total_tokens_limit=20_000),
+)
+```
+
+`max_tokens` 限制单次模型回复；`total_tokens_limit` 检查本次运行累计用量，回复返回后仍可能越过阈值，不能当作精确费用上限。见 [Pydantic AI UsageLimits](https://pydantic.dev/docs/ai/api/pydantic-ai/usage/#pydantic_ai.usage.UsageLimits)。
+
+
+--------
+## 2. 护栏
+
+**中断与运行中反馈** 是为了补充任务细节或停止错误任务的必要工程能力。
+| 意图 | 行为 | 运行标识 |
+|---|---|---|
+| 手动停止后重新提问 | 取消当前运行，等待清理完成；恢复最近快照，再提交新问题 | 沿用 `conversation_id`，产生新的 `run_id` |
+| 执行中补充反馈 | 将补充信息送入当前运行，在后续模型请求中处理；不立即取消当前工具或模型请求 | 保持当前 `run_id` |
+
+`conversation_id`、`run_id` 沿用 [Pydantic AI 运行标识](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。补充反馈不会自动替换原任务；等待 `AskUser` 回答时，新输入先作为该问题的答案处理。
+
+#### 取消与恢复
+
+执行方传播取消信号，并在 `finally` 中清理资源。以下摘自 `Interaction` capability：
+
+```python
+async def wrap_run(self, ctx, *, handler):
+    try:
+        return await handler()
+    finally:
+        self.close()  # 清理运行上下文、待注入反馈与提问回调。
+```
+
+调用方取消运行任务后，必须等待它退出，才能开始新运行。`Conversation.send()` 每次发送都在会话与工作目录的执行锁内，通过 `history_loader` 恢复最近持久化进度，再传给 `agent.run(message_history=...)`；取消或失败后的下一次发送也遵循这一流程。
+
+快照恢复与 `repair_messages()` 见 1.1：未返回结果的工具调用标记为 `interrupted`，不自动重放。取消不回滚已完成的写入，也不能证明远端操作未生效；结果未知时先核实。
+
+#### 补充信息
+
+`Interaction.before_run()` 保存原生运行上下文；普通反馈调用 `enqueue()`，无需重建 Agent 或直接修改历史：
+
+```python
+async def before_run(self, ctx):
+    self.context = ctx
+    for text in self.pending:
+        ctx.enqueue(text)
+    self.pending.clear()
+
+# feedback() 中：已排除等待用户回答的分支。
+if self.context is not None:
+    self.context.enqueue(text)
+else:
+    self.pending.append(text)  # 当前运行尚未进入 before_run。
+```
+
+原生 [`RunContext.enqueue()`](https://pydantic.dev/docs/ai/api/pydantic-ai/tools/#pydantic_ai.tools.RunContext.enqueue) 默认按 `asap` 在可用的后续模型请求中注入；若 Agent 原本即将结束，框架会安排处理反馈。当前运行已经关闭时，由调用方将输入留到下一次运行，不能向失效上下文入队。
+
+### 2.1 权限
+
+权限是为了在工程层面禁止 AI 执行危险操作、调用未许可的工具。核心问题是：**这个动作，该不该放行？**
+
+模型提出调用，执行层决定 `allow / ask / deny`。提示词与 Skill 可以说明规则，但不能授予权限；模型主动调用 `ask_user_question` 只是提问，不能替代执行前的审批。
+
+#### 判定与执行
+
+```mermaid
+flowchart LR
+    A[工具名 + 参数 + 工作目录] --> B{权限判定}
+    B -->|deny| C[返回拒绝结果]
+    B -->|allow| F[执行边界检查]
+    B -->|ask| D[挂起调用，等待批准]
+    D -->|拒绝 / 超时 / 取消| C
+    D -->|批准| E{调用、目标、策略仍一致？}
+    E -->|否| C
+    E -->|是| F
+    F -->|通过| G[执行工具并记录结果]
+    F -->|越界| C
+```
+
+以 coder-cli 的默认策略为例，按以下顺序判断：
+
+| 优先级 | 条件 | 结果 |
+|---|---|---|
+| 1 | 访问权限配置、运行存储、凭据目录；或命中 `deny` | 拒绝，普通批准不能覆盖 |
+| 2 | 受保护文件、工作目录外文件；或命中 `ask` | 逐次询问；已安装技能资源可只读放行 |
+| 3 | 模式限制与明确的 `allow` | 按规则处理 |
+| 4 | 项目普通文件、框架内部工具 | 放行；shell、外部及未分类工具默认询问 |
+
+`auto` 使用上述默认值；`read-only` 额外询问写入和所有命令；`full` 放行普通调用，仍保留硬拒绝、受保护资源与执行边界。模式名称来自原生 `Permissions`，具体规则由应用扩展，不能将本项目默认值当作框架默认值。
+
+**审批决定能否发起，沙箱限制实际影响。** 批准一条命令，不应使它获得任意文件访问权。文件工具检查解析符号链接后的实际路径；shell 与本地 MCP 还需进程隔离。本地 MCP 必须在启动前检查，因为启动程序本身就会执行代码，不能等到工具调用时才审批。
+
+#### 工程接入
+
+[Pydantic AI Permissions](https://pydantic.dev/docs/ai/harness/permissions/) 用 `ApprovalRequired` 挂起调用；[HandleDeferredToolCalls](https://pydantic.dev/docs/ai/capabilities/handle-deferred-tool-calls/) 在运行内处理批准结果。通用流程可用原生 `ask_permissions`；本项目扩展 `Permissions`，补充统一规则、完整调用指纹与审计，继续复用原生延迟工具协议。
+
+以下为 `create_agent()` 中与权限相关的接线，其余能力省略：
+
+```python
+from pydantic_ai import Agent
+from pydantic_ai.capabilities import HandleDeferredToolCalls
+from pydantic_ai_harness.coder import Coder
+
+from agent.permissions.policy import ExecutionPermissions
+from agent.permissions.workspace import RestrictedWorkspace
+
+permissions = ExecutionPermissions(workspace, interaction, database, mcp.path)
+mcp.authorize_stdio = permissions.authorize_stdio  # 连接前检查本地子进程。
+
+agent = Agent(model, capabilities=[
+    RestrictedWorkspace(workspace, permissions),
+    Coder(unrestricted_filesystem=True, repo_context=False, sub_agents=False),
+    permissions,
+    HandleDeferredToolCalls(handler=permissions.handle),
+])
+```
+
+这里 `unrestricted_filesystem=True` 让文件工具能请求指定的目录外文件，实际边界由 `RestrictedWorkspace` 检查；脱离受限后端使用会改变安全边界。审批处理器将明确批准转成 `ToolApproved()`，其余转成 `ToolDenied(...)`；拒绝结果返回模型，工具不执行。原生机制见[延迟工具](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)。
+
+审批必须绑定**完整调用**，而不是只记住“允许 shell”或“允许某工具”。本项目指纹结构如下（示意）：
+
+```text
+fingerprint = hash(
+    权限配置版本, MCP 配置版本, 工作目录,
+    工具名, 全部参数, 实际目标路径, 目标文件状态
+)
+approval_key = (run_id, tool_call_id)
+```
+
+执行前重算指纹；参数、目标或策略变化时，旧批准失效。只有可信规则显式允许记忆时，适合的外部调用才可按 `conversation_id + fingerprint` 在进程内复用；shell、写入与受保护资源不记忆。取消或恢复运行不复用未执行的批准，也不自动重放调用。
+
+策略只从可信用户配置读取，工具不能修改；审批展示参数时脱敏，审计只保存原生运行标识、原因与指纹，工具结果由运行记录追踪。最小验证：**拒绝后无副作用、批准后仅执行原调用、目标变化使批准失效、子进程越界被阻止**。
+
+配置与平台边界见[项目 README：工具权限](../coder-cli/README.md#工具权限)。
+
+### 2.2 上下文隔离
+
+上下文隔离要回答两个问题：**这次运行能看到谁的历史？能修改哪些共享资源？** 不同会话使用不同历史，同一项目仍可共享文件和长期记忆。
+
+#### 隔离与共享
+
+| 数据 | 边界 |
+|---|---|
+| 消息历史、历史检索 | 按 `conversation_id` 隔离，每次运行使用自己的消息副本 |
+| 运行上下文、反馈与待审批调用 | 绑定当前运行，不跨会话复用 |
+| 项目文件、项目笔记 | 同一工作目录共享，不随新建会话复制 |
+| 项目概览缓存 | 按规范化工作目录复用，只提供项目导航 |
+
+`conversation_id` 标识会话，`run_id` 标识一次运行，沿用 [Pydantic AI 术语](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。ID 用于关联数据；文件访问边界仍由 2.1 的权限与执行隔离约束。
+
+两个实例可能同时读到同一份旧历史，然后各自续写；仅给数据库写入加锁不能避免这种分叉。[Pydantic AI 建议串行化同一会话的更新](https://pydantic.dev/docs/ai/production/)，锁必须覆盖“读取 → 执行 → 持久化”。
+
+```mermaid
+flowchart LR
+    A[提交请求] --> B{会话与目录锁可用？}
+    B -->|否| C[拒绝本次运行]
+    B -->|是| D[重新读取最新历史]
+    D --> E[独立消息副本运行 Agent]
+    E --> F[持久化成功或未完成进度]
+    F --> G[等待工具清理完成]
+    G --> H[释放执行锁]
+```
+
+#### 工程接入
+
+coder-cli 使用两层锁：同一会话只运行一个请求；相同或互相包含的工作目录只运行一个任务。互不包含的目录可并行。首次注册会话后，工厂重新读取已保存的工作目录，避免并发创建把同一会话绑定到不同目录。
+
+以下将 `Conversation.send()` 的关键步骤合并为示意；`agent` 已配置 `StepPersistence`，工具资源的进入与清理省略：
+
+```python
+from copy import deepcopy
+from storage.execution_lock import execution_lock
+from storage.sessions import load_session_history
+
+async def send(agent, database, conversation_id, workspace, prompt):
+    with execution_lock(database, conversation_id, workspace):
+        history = await load_session_history(database, conversation_id)
+        result = await agent.run(
+            prompt,
+            conversation_id=conversation_id,
+            message_history=deepcopy(history),
+        )
+        return result
+```
+
+即使对象已经打开，也要在取得锁后重新读取历史，不能继续它启动时的旧快照。恢复失败就报错，不换成空历史；取消后恢复未完成进度，不自动重放工具。
+
+目录锁采用 POSIX 非阻塞文件锁，跨本机进程生效；祖先目录持共享锁，目标目录持排他锁，因此父子目录互斥、兄弟目录可并行。忙时直接拒绝，不排队。正常退出或进程终止会释放锁；取消运行时先等待文件写线程和子进程清理，避免后一个任务提前写入。
+
+项目记忆继续使用原生 `FileStore`；它要求[同目录单写者](https://pydantic.dev/docs/ai/harness/memory/)，目录锁同时保护共享笔记。需要并行修改代码时，各任务使用独立工作目录。该锁协调本机 coder-cli 实例，不约束其他程序或已批准访问的目录外资源。
+
+会话互斥保护历史顺序，目录锁保护共享写入；模型 API 的并发额度另行限制，可复用原生 [ConcurrencyLimitedModel](https://pydantic.dev/docs/ai/models/overview/)，不需要用任务池实现上下文隔离。
+
+最小验证：**同会话拒绝重入、重叠目录互斥、独立目录可并行、旧对象读取最新历史、项目笔记共享但聊天历史不串入、取消后安全释放锁**。使用边界见[项目 README](../coder-cli/README.md#并行与共享边界)。
+
+
+
+## 3. 决策模式
+
+**Planning 管任务，Reflection 管反馈，Thinking 管推理深度。** 三者可以组合，不是互斥模式。
+
+| 能力 | 作用 | Pydantic AI 原生支持 | 需要应用补充 |
+|---|---|---|---|
+| Planning | 维持多步骤任务的目标与进度 | Harness `Planning`、计划存储 | 触发条件、会话绑定；严格规划阶段的执行限制 |
+| Reflection | 根据失败与验收证据修正实现 | 工具结果、校验、`ModelRetry`、输出验证器 | 验收条件、结果记录、修复预算 |
+| Chain-of-Thought / Thinking | 给复杂问题更多推理投入 | Core `Thinking`、统一 `thinking` 设置 | 模型适配、投入选择与效果评测 |
+
+### 3.1 Planning：任务计划与执行阶段
+
+[Pydantic AI Planning](https://pydantic.dev/docs/ai/harness/planning/) 管理步骤，Harness 控制执行。计划复用 Pydantic AI 的 [`conversation_id`](https://pydantic.dev/docs/ai/api/pydantic-ai/run/)。
+
+```python
+from pydantic_ai_harness import Planning
+from pydantic_ai_harness.planning import SqlitePlanStore
+
+planning = Planning(
+    tools=["write_plan"],
+    store=SqlitePlanStore(str(database), session=conversation_id),
+)
+```
+
+#### 严格规划的执行门禁
+
+```mermaid
+flowchart TD
+    R["每次运行从只读研究开始<br/>可读文件、历史和记忆，可提问"]
+    R --> W["write_plan 保存有序步骤<br/>写明范围和验收条件"]
+    W --> A{"用户明确批准当前计划？"}
+    A -->|"拒绝、超时或取消"| R
+    A -->|批准| G{"有进行中的步骤<br/>且工具权限允许？"}
+    G -->|允许| E["执行与验证<br/>写入、shell、外部工具、本地 MCP"]
+    G -->|拒绝| B["阻止调用"]
+    E -->|"仅更新进度"| G
+    E -->|"计划实质变更或收到新反馈"| R
+    E -->|"全部步骤结束"| F["关闭执行门禁"]
+```
+
+```text
+进行中：completed* → in_progress → pending*
+已结束：无 in_progress
+```
+
+计划审批和工具权限在执行前分别检查。计划更新与工具执行串行处理。批准仅在当前运行有效，恢复会话时重新审批。
+
+#### 用 HTTP 示例验证
+
+实验任务：用 Python 标准库实现 API Router，支持 GET、POST、PATCH 和 JSON，在临时本地端口测试。
+
+| 操作 | 应观察到的结果 |
+| --- | --- |
+| 批准前尝试调用 shell | 调用被拦截 |
+| 批准后执行 | 示例生成，接口测试通过 |
+| 改变步骤内容或恢复会话 | 下一次执行前重新审批 |
+
+在会话数据库中查询示例的最终计划。删除会话时，相关计划行一并删除。
+
+```sql
+SELECT status, COUNT(*) AS steps
+FROM plan_items
+WHERE session = '01a1a22b-2e93-73ad-88f8-e91bcd0c5556'
+GROUP BY status;
+```
+
+```text
+status     steps
+completed  10
+```
+
+接口验收以测试输出为准。在 [mini_http 示例目录](../coder-cli/example/mini_http/README.md) 运行：
+
+```bash
+python3 -m unittest test_app -q
+```
+
+### 3.2 Reflection：优先形成验证闭环
+
+Pydantic AI 将工具参数和结构化输出的校验错误反馈给模型。工具或输出验证器也可抛出 `ModelRetry`，说明下一次该如何修正。[Pydantic AI 自我纠正](https://pydantic.dev/docs/ai/core-concepts/agent/#reflection-and-self-correction)
+
+#### 在 coder-cli 接入验证闭环
+
+由执行 Agent 和独立评审 Agent 分工的验证闭环属于多 Agent（multi-agent）能力。当前 coder-cli 仍是单 Agent（single-agent）Harness，由同一个 Agent 实施、读取测试结果并修复。
+
+复用现有 Agent、shell 和工具权限。测试失败沿用普通工具结果，模型根据退出码和断言修复。下面是拟接入的验收逻辑，示例预算为一次修复、两次验证。
+
+```mermaid
+flowchart LR
+    A["按批准的计划实施"] --> B["用 shell 运行指定测试"]
+    B -->|"退出码 0"| C["记录证据，核对验收项"]
+    B -->|"非零退出码，仍可修复"| D["读取失败断言，修复代码"]
+    D --> B
+    B -->|"预算耗尽或工具不可用"| E["报告失败或未验证"]
+```
+
+```text
+每次运行登记验收命令、验证次数上限和修复次数上限
+指定测试返回 → 保存退出码和失败摘要，状态为通过或失败
+测试通过后又修改相关文件 → 清除通过记录，状态为未验证
+输出验证器发现模型声称完成，但缺少有效通过记录
+    还有验证额度且可以执行 → ModelRetry("请运行指定测试并根据结果汇报")
+    无法继续 → 只接受如实报告失败或未验证的输出
+```
+
+预算由 Harness 检查。现有 `UsageLimits(request_limit=50)` 限制模型请求数，`ModelRetry` 使用框架的重试预算，测试失败则由验收逻辑计数。
+
+#### 按运行观察证据
+
+| 观察点 | 现有数据来源 |
+| --- | --- |
+| 框架要求模型纠正什么 | 在快照消息中查 `RetryPromptPart` |
+| 测试是否通过、修复顺序是否正确 | 按 `run_id` 查 SQLite 的 `events`，再从消息快照核对工具结果中的退出码与断言 |
+| 修复消耗 | 用 Logfire 查看模型和工具耗时，用 `result.usage` 查看请求数和 token |
+
+`tool_call_completed` 只说明工具调用结束。测试通过以指定命令的退出码 `0` 为准。[Pydantic AI 的 Logfire 观测](https://pydantic.dev/docs/ai/integrations/logfire/)
+
+3.1 的 HTTP 示例已包含验证环节：Planning 把测试列为最后一步，Reflection 根据测试结果决定结束，还是修复后重测。示例的测试直接通过，展示了验收环节。
+
+#### Multi-Agent 实现后验证 PATCH
+
+在 [mini_http](../coder-cli/example/mini_http/README.md) 的临时副本中，让 PATCH 返回新名称，但保留内存中的旧值。现有用例会用 GET 检查修改是否保存。在示例目录运行：
+
+```bash
+python3 -m unittest test_app.ItemsAPITest.test_patch_updates_name -v
+```
+
+```text
+验证 Agent：运行用例，记录 GET 读到旧值，退出码 1
+执行 Agent：根据失败证据修复 PATCH
+验证 Agent：独立重跑同一用例，核对退出码 0
+```
+
+待 Multi-Agent Harness 实现后，用不同 Agent 执行上述流程。记录各自的 `run_id`、测试退出码和失败断言，核对证据如何在 Agent 之间传递。
+
+### 3.3 Thinking：使用模型原生推理
+
+Thinking 对应 Codex 的「推理强度」这一概念：调节模型在回答或决定下一步行动前的推理投入。具体档位和行为由模型及供应商决定，Codex 的档位与 Pydantic AI 的设置值不一定一一对应。本节仅说明机制，coder-cli 暂不接入。
+
+CoT 是推理方法，Thinking 是模型侧推理能力。工程产物保留计划、结论和验证证据，不要求模型输出完整思维链，也不把思考文字当作正确性证明。
+
+```python
+from pydantic_ai.capabilities import Thinking
+
+thinking = Thinking("medium")  # 作为 capability 接入。
+# 或通过运行设置配置：
+model_settings = {"thinking": "medium"}
+```
+
+Pydantic AI 提供统一接口，实际深度、能否关闭及历史推理内容的处理取决于供应商和模型。[Pydantic AI Thinking](https://pydantic.dev/docs/ai/capabilities/thinking/)
+
+Claude 的 adaptive thinking 可在工具调用之间继续推理，effort 调节投入程度。复杂诊断、算法与长任务可能受益，简单修改则可能增加延迟与 token；应比较结果，而不是默认调到最高。[Claude thinking](https://platform.claude.com/docs/en/about-claude/models/extended-thinking-models)
+
+coder-cli 目前通过 `OpenAIChatModel` 访问模型；兼容接口不代表推理参数也相同。例如原生 `ZaiModel` 负责 GLM 的参数转换与推理内容回传，但当前 GLM 部署是否遵循该协议仍需验证。[Z.AI 适配](https://pydantic.dev/docs/ai/models/zai/)
+
+增强时优先使用原生模型适配和配置，不自定义 `<think>` 解析器；保留框架消息结构，不手工拼接或改写供应商要求回传的推理块。
+
+## 5. Hook
+
+Hook 在一次 Agent 运行的指定节点执行 Python 回调。单个回调用 `Hooks` 注册，权限和交互等跨节点逻辑用 `AbstractCapability` 组织。[Pydantic AI Hooks](https://pydantic.dev/docs/ai/core-concepts/hooks/)
+
+```mermaid
+flowchart LR
+    R["before_run"] --> M["模型请求前后"]
+    M --> V["工具参数校验"]
+    V --> B["before_tool_execute"]
+    B -->|"允许"| T["执行工具"]
+    B -->|"拒绝或待审批"| S["本次不执行"]
+    T --> A["after_tool_execute"]
+    A -->|"工具结果进入上下文"| M
+    M -->|"模型给出最终输出"| F["输出校验 → after_run"]
+```
+
+coder-cli 在 `before_tool_execute` 检查严格规划和权限，用 `wrap_run` 的 `finally` 清理运行状态。工具副作用已经发生后，`after_tool_execute` 仍可修改返回值。
+
+### 内置示例：压缩工具结果
+
+```python
+from pydantic_ai.capabilities import Hooks
+
+output_hooks = Hooks()
+
+@output_hooks.on.after_tool_execute(tools=["shell", "web_fetch"])
+async def compact_tool_output(ctx, *, call, tool_def, args, result):
+    # 示意：具体规则见下表
+    return compact(call.tool_name, result)
+
+# 将 output_hooks 加入 Agent(..., capabilities=[..., output_hooks])
+```
+
+| 工具 | 压缩规则 | 保留的信息 |
+| --- | --- | --- |
+| `shell` | 连续相同的日志行出现至少三次时，折叠为一行和次数 | 不同的日志行、错误、退出状态和原始日志路径 |
+| `web_fetch` | 去除 JSON 对象或数组在字符串外的排版空白 | 字段、值及字符串中的空白；HTML 和普通文本原样返回 |
+
+```text
+shell:     waiting × 5 + ERROR + exit code
+模型收到:  waiting + [上一行共出现 5 次] + ERROR + exit code
+
+HTTP JSON: { "message": "a b", "count": 5 }
+模型收到:  {"message":"a b","count":5}
+```
+
+Hook 仅在结果文本变短时替换。可用 `FunctionModel` 检查下一次模型请求收到的工具结果；实际 token 节省以模型返回的用量为准。
+
+### 外部 Hook 的权限边界
+
+外部 Hook 从启动环境变量 `CODER_HOOK_CONFIG` 指定的 JSON 文件加载。Harness 只接受指定工具、行首过滤规则和额外字符数。项目文件不会自动注册 Hook。配置包含脚本、文件操作或网络等不支持的字段时，启动阶段直接报错。
+
+```json
+{
+  "hooks": [
+    {"tool": "shell", "remove_prefix": "DEBUG: polling", "extra_chars": 1024}
+  ]
+}
+```
+
+```text
+工具结果 → 默认范围直接过滤 → 结果交回模型
+         └─ 申请额外范围
+            ├─ 已授权 → 直接过滤
+            └─ 未授权 → 本次允许 / 以后都允许 / 拒绝
+```
+
+| | Tool 权限 | 外部 Hook 权限 |
+| --- | --- | --- |
+| 检查时机 | 工具执行前 | 工具执行后，结果进入模型上下文前 |
+| 检查对象 | 工具名、参数、目标资源及可能的副作用 | 工具结果中允许过滤的字符范围 |
+| 权限来源 | 工具权限配置与执行边界。严格规划另行检查 | 独立 Hook 配置与 Harness 固定上限 |
+| 审批 | 按工具规则审批具体调用，部分授权可在会话内复用 | 可单次允许，也可为相同 Hook 保存长期授权 |
+| 拒绝后 | 工具不执行，拒绝结果交回模型 | 只过滤默认范围，范围外的文本原样保留 |
+
+上例允许 Hook 在前 4096 字符内按规则过滤完整行。结果超出该范围时，`extra_chars: 1024` 表示可申请再处理最多 1024 字符，申请上限为 4096。审批展示工具名、字符范围和过滤前缀，用户可选「本次允许」「以后都允许」或「拒绝」。长期授权保存在会话数据库的独立表中，绑定工作目录、配置路径、过滤规则和额外范围上限，跨会话与重启复用。JSON 和 HTML 响应跳过外部行过滤。
+
+**两套授权不互通。** Tool 的 `full` 模式不会扩大 Hook 的过滤范围。批准 Hook 处理更多文本也不会授权工具调用或文件访问。配置和启动方式见 [coder-cli README](../coder-cli/README.md#外部-hook)。

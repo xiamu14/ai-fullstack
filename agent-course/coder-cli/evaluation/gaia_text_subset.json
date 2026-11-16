@@ -1,0 +1,17 @@
+{
+  "version": "gaia-text-v1",
+  "level": 1,
+  "selection": "Reviewed questions requiring only text reasoning, arithmetic or textual web sources; no attachments, image layout, audio or video interpretation. IDs fixed before execution; answers were not used for selection.",
+  "tasks": [
+    {"task_id": "11af4e1a-5f45-467d-9aeb-46f4bb0bf034", "category": "web-arithmetic"},
+    {"task_id": "27d5d136-8563-469e-92bf-fd103c28b57c", "category": "text-reasoning"},
+    {"task_id": "2d83110e-a098-4ebb-9987-066c06fa42d0", "category": "text-reasoning"},
+    {"task_id": "305ac316-eef6-4446-960a-92d80d542f82", "category": "web-research"},
+    {"task_id": "3cef3a44-215e-4aed-8e3b-b1e3f08063b7", "category": "text-reasoning"},
+    {"task_id": "3f57289b-8c60-48be-bd80-01f8099ca449", "category": "web-research"},
+    {"task_id": "4fc2f1ae-8625-45b5-ab34-ad4433bc21f8", "category": "web-research"},
+    {"task_id": "6f37996b-2ac7-44b0-8e68-6d28256631b4", "category": "text-reasoning"},
+    {"task_id": "8e867cd7-cff9-4e6c-867a-ff5ddc2550be", "category": "web-research"},
+    {"task_id": "d0633230-7067-47a9-9dbf-ee11e0a2cdd6", "category": "web-research"}
+  ]
+}
