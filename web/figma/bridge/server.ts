@@ -33,17 +33,37 @@ export function startBridgeServer(port = DEFAULT_BRIDGE_PORT): BridgeHub {
   const pending = new Map<string, PendingRequest>();
   const connectionWaiters = new Set<() => void>();
 
-  function dispatch<A extends ReadAction>(
+  function waitForPlugin(timeoutMs = 15_000): Promise<void> {
+    if (activeSocket !== null) {
+      return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        connectionWaiters.delete(onConnect);
+        reject(
+          new Error(
+            `等待 Figma 本地插件连接超时 (${timeoutMs}ms)。请确认已在 Figma Desktop 运行插件 Local Figma Reader Bridge。`
+          )
+        );
+      }, timeoutMs);
+
+      function onConnect() {
+        clearTimeout(timer);
+        connectionWaiters.delete(onConnect);
+        resolve();
+      }
+
+      connectionWaiters.add(onConnect);
+    });
+  }
+
+  async function dispatch<A extends ReadAction>(
     action: A,
     payload: ReadRequestPayloadMap[A],
     timeoutMs = 15_000
   ): Promise<BridgeResponse> {
     if (!activeSocket) {
-      return Promise.reject(
-        new Error(
-          "Figma 本地插件尚未连接。请在 Figma Desktop 中打开 Plugins -> Development -> Local Figma Reader Bridge。"
-        )
-      );
+      await waitForPlugin(timeoutMs);
     }
 
     seq += 1;
@@ -63,6 +83,7 @@ export function startBridgeServer(port = DEFAULT_BRIDGE_PORT): BridgeHub {
 
   const server = Bun.serve({
     port,
+    idleTimeout: 255,
     async fetch(req, srv) {
       const url = new URL(req.url);
 
@@ -141,29 +162,7 @@ export function startBridgeServer(port = DEFAULT_BRIDGE_PORT): BridgeHub {
   return {
     port: server.port ?? port,
     isPluginConnected: () => activeSocket !== null,
-    waitForPlugin(timeoutMs = 15_000) {
-      if (activeSocket !== null) {
-        return Promise.resolve();
-      }
-      return new Promise<void>((resolve, reject) => {
-        const timer = setTimeout(() => {
-          connectionWaiters.delete(onConnect);
-          reject(
-            new Error(
-              `等待 Figma 本地插件连接超时 (${timeoutMs}ms)。请确认已在 Figma Desktop 运行插件 Local Figma Reader Bridge。`
-            )
-          );
-        }, timeoutMs);
-
-        function onConnect() {
-          clearTimeout(timer);
-          connectionWaiters.delete(onConnect);
-          resolve();
-        }
-
-        connectionWaiters.add(onConnect);
-      });
-    },
+    waitForPlugin,
     request: dispatch,
     stop() {
       for (const [, item] of pending) {

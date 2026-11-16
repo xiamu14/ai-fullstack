@@ -1,0 +1,20 @@
+import type { IconProps } from './types.ts';
+
+export function Monitor2Icon({
+  size = 24,
+  variant: _variant = 'fill',
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      aria-hidden={props['aria-label'] ? undefined : true}
+      fill="none"
+      height={size}
+      viewBox={'0 0 24 24'}
+      width={size}
+      {...props}
+    >
+      <path d="M13.871 19.8412H10.128L10.561 17.1732H13.437L13.871 19.8412ZM16.971 2.6582H7.028C4.531 2.6582 2.5 4.6902 2.5 7.1882V12.6442C2.5 15.1412 4.531 17.1732 7.028 17.1732H9.042L8.608 19.8412H7.055C6.641 19.8412 6.305 20.1772 6.305 20.5912C6.305 21.0052 6.641 21.3412 7.055 21.3412H16.943C17.357 21.3412 17.693 21.0052 17.693 20.5912C17.693 20.1772 17.357 19.8412 16.943 19.8412H15.391L14.956 17.1732H16.971C19.468 17.1732 21.5 15.1412 21.5 12.6442V7.1882C21.5 4.6902 19.468 2.6582 16.971 2.6582Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+    </svg>
+  );
+}

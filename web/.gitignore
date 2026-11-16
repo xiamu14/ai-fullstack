@@ -11,3 +11,4 @@ coverage/
 *.log
 .DS_Store
 src/routeTree.gen.ts
+figma/.cache/

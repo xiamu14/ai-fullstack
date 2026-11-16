@@ -2,6 +2,7 @@ import type {
   ExportedAssetItem,
   ReadRequestPayloadMap,
 } from "../../protocol/types.ts";
+import { searchFigmaNodes } from "./document-reader.ts";
 import { resolveTargetNodes } from "./style-reader.ts";
 
 const BASE64_ALPHABET =
@@ -27,7 +28,16 @@ function bytesToBase64(bytes: Uint8Array): string {
 export async function exportAssets(
   payload: ReadRequestPayloadMap["export"]
 ): Promise<ExportedAssetItem[]> {
-  const nodes = await resolveTargetNodes(payload.id);
+  let nodes = payload.query
+    ? (await searchFigmaNodes(payload.query, payload.page)).slice(0, 1)
+    : await resolveTargetNodes(payload.id);
+
+  if (nodes.length === 0) {
+    throw new Error(
+      `未找到可导出的节点: ${payload.query ?? payload.id ?? "selection"}`
+    );
+  }
+
   const format = payload.format ?? "SVG";
   const scale = payload.scale ?? 1;
 

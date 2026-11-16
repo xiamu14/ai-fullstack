@@ -1,0 +1,23 @@
+import type { IconProps } from './types.ts';
+
+export function Anguished1Icon({
+  size = 24,
+  variant: _variant = 'line',
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      aria-hidden={props['aria-label'] ? undefined : true}
+      fill="none"
+      height={size}
+      viewBox={'0 0 24 24'}
+      width={size}
+      {...props}
+    >
+      <path d="M12 21C16.9709 21 21 16.9699 21 12C21 7.02908 16.9709 3 12 3C7.02908 3 3 7.02908 3 12C3 16.9699 7.02908 21 12 21Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M8.76953 9.00533V8.95377M8.72401 8.80078C8.60001 8.80078 8.49901 8.90178 8.50001 9.02578C8.50001 9.14978 8.60101 9.25078 8.72501 9.25078C8.84901 9.25078 8.95001 9.14978 8.95001 9.02578C8.95001 8.90078 8.84901 8.80078 8.72401 8.80078Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M15.2307 9.00533V8.95377M15.224 8.80078C15.1 8.80078 14.999 8.90178 15 9.02578C15 9.14978 15.101 9.25078 15.225 9.25078C15.349 9.25078 15.45 9.14978 15.45 9.02578C15.45 8.90078 15.349 8.80078 15.224 8.80078Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M14.8675 15.9359C14.8675 14.2332 13.5832 12.8516 11.9992 12.8516C10.4152 12.8516 9.13086 14.2332 9.13086 15.9359H14.8675Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+    </svg>
+  );
+}

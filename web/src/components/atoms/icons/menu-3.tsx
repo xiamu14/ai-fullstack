@@ -1,0 +1,22 @@
+import type { IconProps } from './types.ts';
+
+export function Menu3Icon({
+  size = 24,
+  variant: _variant = 'line',
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      aria-hidden={props['aria-label'] ? undefined : true}
+      fill="none"
+      height={size}
+      viewBox={'0 0 24 24'}
+      width={size}
+      {...props}
+    >
+      <path d="M11.9503 18.0357H11.8863M11.9365 18.295C11.7925 18.295 11.6757 18.1782 11.6757 18.0341C11.6757 17.8901 11.7925 17.7734 11.9365 17.7734C12.0805 17.7734 12.1973 17.8901 12.1973 18.0341C12.1973 18.1782 12.0805 18.295 11.9365 18.295Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M11.9503 12.0123H11.8863M11.9365 12.2716C11.7925 12.2716 11.6757 12.1547 11.6757 12.0107C11.6757 11.8667 11.7925 11.75 11.9365 11.75C12.0805 11.75 12.1973 11.8667 12.1973 12.0107C12.1973 12.1547 12.0805 12.2716 11.9365 12.2716Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M11.9503 5.99276H11.8863M11.9365 6.25203C11.7925 6.25203 11.6757 6.13519 11.6757 5.99117C11.6757 5.84715 11.7925 5.73047 11.9365 5.73047C12.0805 5.73047 12.1973 5.84715 12.1973 5.99117C12.1973 6.13519 12.0805 6.25203 11.9365 6.25203Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+    </svg>
+  );
+}

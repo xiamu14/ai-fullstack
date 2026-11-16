@@ -1,0 +1,23 @@
+import type { IconProps } from './types.ts';
+
+export function GridInterface10Icon({
+  size = 24,
+  variant: _variant = 'fill',
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      aria-hidden={props['aria-label'] ? undefined : true}
+      fill="none"
+      height={size}
+      viewBox={'0 0 24 24'}
+      width={size}
+      {...props}
+    >
+      <path d="M7.802 2.5H5.198C3.71 2.5 2.5 3.71 2.5 5.198V7.802C2.5 9.29 3.71 10.5 5.198 10.5H7.802C9.29 10.5 10.5 9.29 10.5 7.802V5.198C10.5 3.71 9.29 2.5 7.802 2.5Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+      <path d="M18.802 13.5H16.198C14.71 13.5 13.5 14.71 13.5 16.198V18.802C13.5 20.29 14.71 21.5 16.198 21.5H18.802C20.29 21.5 21.5 20.29 21.5 18.802V16.198C21.5 14.71 20.29 13.5 18.802 13.5Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+      <path d="M7.802 13.5H5.198C3.71 13.5 2.5 14.71 2.5 16.198V18.802C2.5 20.29 3.71 21.5 5.198 21.5H7.802C9.29 21.5 10.5 20.29 10.5 18.802V16.198C10.5 14.71 9.29 13.5 7.802 13.5Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+      <path d="M18.802 2.5H16.198C14.71 2.5 13.5 3.71 13.5 5.198V7.802C13.5 9.29 14.71 10.5 16.198 10.5H18.802C20.29 10.5 21.5 9.29 21.5 7.802V5.198C21.5 3.71 20.29 2.5 18.802 2.5Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+    </svg>
+  );
+}

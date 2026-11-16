@@ -94,9 +94,17 @@ export async function serializeNode(
     cornerRadius: normalizeMixed<number>(node.cornerRadius),
     effects: sanitizeJsonValue(node.effects),
     text: extractText(node),
-    componentId: node.mainComponent?.id,
-    componentProperties: sanitizeJsonValue(node.componentProperties),
   };
+
+  if (node.type === "INSTANCE") {
+    try {
+      serialized.componentProperties = sanitizeJsonValue(
+        node.componentProperties
+      );
+    } catch {
+      // Ignore component property errors on broken/unloaded instances
+    }
+  }
 
   if (options.includeCss && typeof node.getCSSAsync === "function") {
     try {

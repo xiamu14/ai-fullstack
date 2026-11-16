@@ -32,6 +32,8 @@ export interface ReadRequestPayloadMap {
   styles: Record<string, never>;
   export: {
     id?: string;
+    query?: string;
+    page?: string;
     format?: ExportFormat;
     scale?: number;
   };

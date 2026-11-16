@@ -1,112 +1,5 @@
 (() => {
-  // ../web/figma/plugin/readers/style-reader.ts
-  async function resolveTargetNodes(id) {
-    if (id) {
-      const normalizedId = id.replace("-", ":");
-      const node = await figma.getNodeByIdAsync(id) ?? await figma.getNodeByIdAsync(normalizedId);
-      if (!node) {
-        throw new Error(`未找到节点: ${id}`);
-      }
-      return [node];
-    }
-    const selection = [...figma.currentPage.selection];
-    if (selection.length === 0) {
-      throw new Error("当前未在 Figma 中选中任何节点，且未指定 --id");
-    }
-    return selection;
-  }
-  async function readCss(payload) {
-    const nodes = await resolveTargetNodes(payload.id);
-    return Promise.all(nodes.map(async (node) => ({
-      id: node.id,
-      name: node.name,
-      type: node.type,
-      css: typeof node.getCSSAsync === "function" ? await node.getCSSAsync() : {}
-    })));
-  }
-  async function readLocalStyles() {
-    const [paintStyles, textStyles, effectStyles, collections, variables] = await Promise.all([
-      figma.getLocalPaintStylesAsync(),
-      figma.getLocalTextStylesAsync(),
-      figma.getLocalEffectStylesAsync(),
-      figma.variables ? figma.variables.getLocalVariableCollectionsAsync() : Promise.resolve([]),
-      figma.variables ? figma.variables.getLocalVariablesAsync() : Promise.resolve([])
-    ]);
-    return {
-      paintStyles: paintStyles.map((style) => ({
-        id: style.id,
-        name: style.name,
-        description: style.description,
-        paints: style.paints
-      })),
-      textStyles: textStyles.map((style) => ({
-        id: style.id,
-        name: style.name,
-        description: style.description,
-        fontSize: style.fontSize,
-        fontName: style.fontName,
-        lineHeight: style.lineHeight,
-        letterSpacing: style.letterSpacing,
-        textCase: style.textCase,
-        textDecoration: style.textDecoration
-      })),
-      effectStyles: effectStyles.map((style) => ({
-        id: style.id,
-        name: style.name,
-        description: style.description,
-        effects: style.effects
-      })),
-      variableCollections: collections.map((collection) => ({
-        id: collection.id,
-        name: collection.name,
-        modes: collection.modes,
-        variableIds: collection.variableIds
-      })),
-      variables: variables.map((variable) => ({
-        id: variable.id,
-        name: variable.name,
-        resolvedType: variable.resolvedType,
-        description: variable.description,
-        valuesByMode: variable.valuesByMode
-      }))
-    };
-  }
-
-  // ../web/figma/plugin/readers/asset-reader.ts
-  var BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  function bytesToBase64(bytes) {
-    let result = "";
-    const len = bytes.length;
-    for (let i = 0;i < len; i += 3) {
-      const b0 = bytes[i] ?? 0;
-      const b1 = i + 1 < len ? bytes[i + 1] ?? 0 : 0;
-      const b2 = i + 2 < len ? bytes[i + 2] ?? 0 : 0;
-      result += BASE64_ALPHABET[b0 >> 2];
-      result += BASE64_ALPHABET[(b0 & 3) << 4 | b1 >> 4];
-      result += i + 1 < len ? BASE64_ALPHABET[(b1 & 15) << 2 | b2 >> 6] : "=";
-      result += i + 2 < len ? BASE64_ALPHABET[b2 & 63] : "=";
-    }
-    return result;
-  }
-  async function exportAssets(payload) {
-    const nodes = await resolveTargetNodes(payload.id);
-    const format = payload.format ?? "SVG";
-    const scale = payload.scale ?? 1;
-    return Promise.all(nodes.map(async (node) => {
-      if (typeof node.exportAsync !== "function") {
-        throw new Error(`节点 ${node.id} (${node.type}) 不支持导出`);
-      }
-      const bytes = await node.exportAsync(format === "SVG" ? { format } : { format, constraint: { type: "SCALE", value: scale } });
-      return {
-        id: node.id,
-        name: node.name,
-        format,
-        base64: bytesToBase64(bytes)
-      };
-    }));
-  }
-
-  // ../web/figma/plugin/readers/node-serializer.ts
+  // figma/plugin/readers/node-serializer.ts
   function normalizeMixed(value) {
     if (value === undefined) {
       return;
@@ -183,10 +76,13 @@
       strokeWeight: normalizeMixed(node.strokeWeight),
       cornerRadius: normalizeMixed(node.cornerRadius),
       effects: sanitizeJsonValue(node.effects),
-      text: extractText(node),
-      componentId: node.mainComponent?.id,
-      componentProperties: sanitizeJsonValue(node.componentProperties)
+      text: extractText(node)
     };
+    if (node.type === "INSTANCE") {
+      try {
+        serialized.componentProperties = sanitizeJsonValue(node.componentProperties);
+      } catch {}
+    }
     if (options.includeCss && typeof node.getCSSAsync === "function") {
       try {
         serialized.css = await node.getCSSAsync();
@@ -213,7 +109,7 @@
     return serialized;
   }
 
-  // ../web/figma/plugin/readers/document-reader.ts
+  // figma/plugin/readers/document-reader.ts
   function readDocumentSummary() {
     const currentPage = figma.currentPage;
     return {
@@ -248,11 +144,23 @@
       includeCss: payload.includeCss ?? false
     });
   }
+  function normalizeSearchKey(text) {
+    return text.toLowerCase().replace(/[\s_-]+/g, " ").replace(/\b([a-z]{3,})s\b/g, "$1").trim();
+  }
   function collectMatchingNodes(root, segments, ancestors, matches) {
-    const nextAncestors = [...ancestors, root.name.toLowerCase()];
+    if (root.visible === false) {
+      return;
+    }
+    const normalizedName = normalizeSearchKey(root.name);
+    const nextAncestors = [...ancestors, normalizedName];
     const fullPath = nextAncestors.join("/");
-    const isLeafMatch = root.name.toLowerCase().includes(segments[segments.length - 1] ?? "") && segments.every((seg) => fullPath.includes(seg));
+    const leafTarget = segments[segments.length - 1] ?? "";
+    const isLeafMatch = normalizedName.includes(leafTarget) && segments.every((seg) => fullPath.includes(seg));
     if (isLeafMatch) {
+      if (root.type === "COMPONENT_SET" && Array.isArray(root.children) && root.children.length > 0 && root.children[0]) {
+        matches.push(root.children[0]);
+        return;
+      }
       matches.push(root);
       return;
     }
@@ -262,30 +170,157 @@
       }
     }
   }
-  async function findNodes(payload) {
-    const segments = payload.query.toLowerCase().split("/").map((s) => s.trim()).filter(Boolean);
+  async function searchFigmaNodes(query, pageFilter) {
+    const segments = query.split("/").map((s) => normalizeSearchKey(s)).filter(Boolean);
     if (segments.length === 0) {
       throw new Error("请提供非空的搜索关键词 --query");
     }
-    const pageFilter = payload.page?.toLowerCase().trim();
-    const targetPages = pageFilter ? figma.root.children.filter((p) => p.name.toLowerCase().includes(pageFilter)) : [figma.currentPage];
+    const normalizedPageFilter = pageFilter?.toLowerCase().trim();
+    const initialPages = normalizedPageFilter ? figma.root.children.filter((p) => p.name.toLowerCase().includes(normalizedPageFilter)) : [figma.currentPage];
     const matches = [];
-    for (const page of targetPages) {
-      if (typeof page.loadAsync === "function") {
-        await page.loadAsync();
-      }
-      if (Array.isArray(page.children)) {
-        for (const child of page.children) {
-          collectMatchingNodes(child, segments, [page.name.toLowerCase()], matches);
+    async function searchPages(pages) {
+      for (const page of pages) {
+        if (typeof page.loadAsync === "function") {
+          await page.loadAsync();
+        }
+        if (Array.isArray(page.children)) {
+          for (const child of page.children) {
+            collectMatchingNodes(child, segments, [normalizeSearchKey(page.name)], matches);
+          }
         }
       }
     }
+    await searchPages(initialPages);
+    if (matches.length === 0 && !normalizedPageFilter) {
+      const remainingPages = figma.root.children.filter((p) => p.id !== figma.currentPage.id);
+      await searchPages(remainingPages);
+    }
+    const leafTarget = segments[segments.length - 1] ?? "";
+    matches.sort((a, b) => {
+      const aExact = normalizeSearchKey(a.name) === leafTarget ? 0 : 1;
+      const bExact = normalizeSearchKey(b.name) === leafTarget ? 0 : 1;
+      return aExact - bExact;
+    });
+    return matches;
+  }
+  async function findNodes(payload) {
+    const matches = await searchFigmaNodes(payload.query, payload.page);
     const depth = payload.depth ?? 2;
     const includeCss = payload.includeCss ?? false;
     return Promise.all(matches.slice(0, 20).map((node) => serializeNode(node, { depth, includeCss })));
   }
 
-  // ../web/figma/plugin/code.ts
+  // figma/plugin/readers/style-reader.ts
+  async function resolveTargetNodes(id) {
+    if (id) {
+      const normalizedId = id.replace("-", ":");
+      const node = await figma.getNodeByIdAsync(id) ?? await figma.getNodeByIdAsync(normalizedId);
+      if (!node) {
+        throw new Error(`未找到节点: ${id}`);
+      }
+      return [node];
+    }
+    const selection = [...figma.currentPage.selection];
+    if (selection.length === 0) {
+      throw new Error("当前未在 Figma 中选中任何节点，且未指定 --id");
+    }
+    return selection;
+  }
+  async function readCss(payload) {
+    const nodes = await resolveTargetNodes(payload.id);
+    return Promise.all(nodes.map(async (node) => ({
+      id: node.id,
+      name: node.name,
+      type: node.type,
+      css: typeof node.getCSSAsync === "function" ? await node.getCSSAsync() : {}
+    })));
+  }
+  async function readLocalStyles() {
+    const [paintStyles, textStyles, effectStyles, collections, variables] = await Promise.all([
+      figma.getLocalPaintStylesAsync(),
+      figma.getLocalTextStylesAsync(),
+      figma.getLocalEffectStylesAsync(),
+      figma.variables ? figma.variables.getLocalVariableCollectionsAsync() : Promise.resolve([]),
+      figma.variables ? figma.variables.getLocalVariablesAsync() : Promise.resolve([])
+    ]);
+    return {
+      paintStyles: paintStyles.map((style) => ({
+        id: style.id,
+        name: style.name,
+        description: style.description,
+        paints: style.paints
+      })),
+      textStyles: textStyles.map((style) => ({
+        id: style.id,
+        name: style.name,
+        description: style.description,
+        fontSize: style.fontSize,
+        fontName: style.fontName,
+        lineHeight: style.lineHeight,
+        letterSpacing: style.letterSpacing,
+        textCase: style.textCase,
+        textDecoration: style.textDecoration
+      })),
+      effectStyles: effectStyles.map((style) => ({
+        id: style.id,
+        name: style.name,
+        description: style.description,
+        effects: style.effects
+      })),
+      variableCollections: collections.map((collection) => ({
+        id: collection.id,
+        name: collection.name,
+        modes: collection.modes,
+        variableIds: collection.variableIds
+      })),
+      variables: variables.map((variable) => ({
+        id: variable.id,
+        name: variable.name,
+        resolvedType: variable.resolvedType,
+        description: variable.description,
+        valuesByMode: variable.valuesByMode
+      }))
+    };
+  }
+
+  // figma/plugin/readers/asset-reader.ts
+  var BASE64_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  function bytesToBase64(bytes) {
+    let result = "";
+    const len = bytes.length;
+    for (let i = 0;i < len; i += 3) {
+      const b0 = bytes[i] ?? 0;
+      const b1 = i + 1 < len ? bytes[i + 1] ?? 0 : 0;
+      const b2 = i + 2 < len ? bytes[i + 2] ?? 0 : 0;
+      result += BASE64_ALPHABET[b0 >> 2];
+      result += BASE64_ALPHABET[(b0 & 3) << 4 | b1 >> 4];
+      result += i + 1 < len ? BASE64_ALPHABET[(b1 & 15) << 2 | b2 >> 6] : "=";
+      result += i + 2 < len ? BASE64_ALPHABET[b2 & 63] : "=";
+    }
+    return result;
+  }
+  async function exportAssets(payload) {
+    let nodes = payload.query ? (await searchFigmaNodes(payload.query, payload.page)).slice(0, 1) : await resolveTargetNodes(payload.id);
+    if (nodes.length === 0) {
+      throw new Error(`未找到可导出的节点: ${payload.query ?? payload.id ?? "selection"}`);
+    }
+    const format = payload.format ?? "SVG";
+    const scale = payload.scale ?? 1;
+    return Promise.all(nodes.map(async (node) => {
+      if (typeof node.exportAsync !== "function") {
+        throw new Error(`节点 ${node.id} (${node.type}) 不支持导出`);
+      }
+      const bytes = await node.exportAsync(format === "SVG" ? { format } : { format, constraint: { type: "SCALE", value: scale } });
+      return {
+        id: node.id,
+        name: node.name,
+        format,
+        base64: bytesToBase64(bytes)
+      };
+    }));
+  }
+
+  // figma/plugin/code.ts
   figma.showUI(__html__, {
     width: 280,
     height: 120,

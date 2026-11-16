@@ -1,15 +1,17 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { queryFigma } from "../bridge/client.ts";
 import { DEFAULT_BRIDGE_PORT, startBridgeServer } from "../bridge/server.ts";
-import { compactNode } from "../compact/node-compactor.ts";
-import { compactLocalStyles } from "../compact/styles-compactor.ts";
-import type {
-  ExportedAssetItem,
-  ExportFormat,
-  LocalStylesSummary,
-  SerializedNode,
-} from "../protocol/types.ts";
+import type { ExportFormat } from "../protocol/types.ts";
+import { fetchLocalStyles } from "../readers/color-style-reader.ts";
+import {
+  fetchMatchingNodes,
+  fetchNodeById,
+  fetchNodeCss,
+  fetchSelectionNodes,
+} from "../readers/component-node-reader.ts";
+import { fetchDocumentSummary } from "../readers/document-reader.ts";
+import { fetchAndExportIconAssets } from "../readers/icon-asset-reader.ts";
+import { fetchTypographyStyles } from "../readers/typography-reader.ts";
 import { buildFigmaPlugin } from "./build-plugin.ts";
 
 export interface CliFlags {
@@ -20,9 +22,11 @@ export interface CliFlags {
   depth?: number;
   css?: boolean;
   raw?: boolean;
+  refresh?: boolean;
   format?: ExportFormat;
   scale?: number;
   out?: string;
+  reactOut?: string;
   port?: number;
 }
 
@@ -38,32 +42,18 @@ async function emitJson(data: unknown, outPath?: string): Promise<void> {
   process.stdout.write(`${json}\n`);
 }
 
-function sanitizeFileName(name: string): string {
-  return (
-    name
-      .trim()
-      .replace(/[^\w\u4e00-\u9fa5.-]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "asset"
-  );
-}
-
 export async function runDocumentCommand(flags: CliFlags): Promise<void> {
-  const data = await queryFigma("document", {}, { port: flags.port });
+  const data = await fetchDocumentSummary({ port: flags.port });
   await emitJson(data, flags.out);
 }
 
 export async function runSelectionCommand(flags: CliFlags): Promise<void> {
-  const data = await queryFigma<SerializedNode[]>(
-    "selection",
-    {
-      depth: flags.depth ?? 2,
-      includeCss: flags.css ?? false,
-    },
-    { port: flags.port }
-  );
-  const output = flags.raw
-    ? data
-    : data.map((n) => compactNode(n)).filter((n) => n !== null);
+  const output = await fetchSelectionNodes({
+    depth: flags.depth,
+    includeCss: flags.css,
+    raw: flags.raw,
+    port: flags.port,
+  });
   await emitJson(output, flags.out);
 }
 
@@ -71,99 +61,84 @@ export async function runNodeCommand(flags: CliFlags): Promise<void> {
   if (!flags.id) {
     throw new Error("读取指定节点需要提供 --id <nodeId>");
   }
-  const data = await queryFigma<SerializedNode>(
-    "node",
-    {
-      id: flags.id,
-      depth: flags.depth ?? 2,
-      includeCss: flags.css ?? false,
-    },
-    { port: flags.port }
-  );
-  const output = flags.raw ? data : compactNode(data);
+  const output = await fetchNodeById({
+    id: flags.id,
+    depth: flags.depth,
+    includeCss: flags.css,
+    raw: flags.raw,
+    port: flags.port,
+  });
   await emitJson(output, flags.out);
 }
 
 export async function runFindCommand(flags: CliFlags): Promise<void> {
   const query = flags.query ?? flags.filter;
   if (!query) {
-    throw new Error("搜索节点需要提供 --query <关键词>（例如 --query colors/purple）");
+    throw new Error(
+      "搜索节点需要提供 --query <关键词>（例如 --query colors/purple）"
+    );
   }
-  const data = await queryFigma<SerializedNode[]>(
-    "find",
-    {
-      query,
-      page: flags.page,
-      depth: flags.depth ?? 2,
-      includeCss: flags.css ?? false,
-    },
-    { port: flags.port }
-  );
-  const output = flags.raw
-    ? data
-    : data.map((n) => compactNode(n)).filter((n) => n !== null);
+  const output = await fetchMatchingNodes({
+    query,
+    page: flags.page,
+    depth: flags.depth,
+    includeCss: flags.css,
+    raw: flags.raw,
+    port: flags.port,
+  });
   await emitJson(output, flags.out);
 }
 
 export async function runCssCommand(flags: CliFlags): Promise<void> {
-  const data = await queryFigma(
-    "css",
-    { id: flags.id },
-    {
-      port: flags.port,
-    }
-  );
+  const data = await fetchNodeCss({ id: flags.id, port: flags.port });
   await emitJson(data, flags.out);
 }
 
 export async function runStylesCommand(flags: CliFlags): Promise<void> {
-  const data = await queryFigma<LocalStylesSummary>(
-    "styles",
-    {},
-    {
-      port: flags.port,
-    }
-  );
-  const output = flags.raw ? data : compactLocalStyles(data, flags.filter);
+  const output = await fetchLocalStyles({
+    filter: flags.filter,
+    raw: flags.raw,
+    refresh: flags.refresh,
+    port: flags.port,
+  });
+  await emitJson(output, flags.out);
+}
+
+export async function runTypographyCommand(flags: CliFlags): Promise<void> {
+  const output = await fetchTypographyStyles({
+    filter: flags.filter,
+    raw: flags.raw,
+    refresh: flags.refresh,
+    port: flags.port,
+  });
   await emitJson(output, flags.out);
 }
 
 export async function runExportCommand(flags: CliFlags): Promise<void> {
-  const format: ExportFormat = flags.format ?? "SVG";
-  const items = await queryFigma<ExportedAssetItem[]>(
-    "export",
-    {
-      id: flags.id,
-      format,
-      scale: flags.scale ?? 1,
-    },
-    { port: flags.port }
-  );
+  const result = await fetchAndExportIconAssets({
+    id: flags.id,
+    query: flags.query ?? flags.filter,
+    page: flags.page,
+    format: flags.format,
+    scale: flags.scale,
+    raw: flags.raw,
+    out: flags.out,
+    reactOut: flags.reactOut,
+    port: flags.port,
+  });
 
-  if (!flags.out) {
-    await emitJson(items);
+  if (!flags.out && !flags.reactOut) {
+    await emitJson(result.items);
     return;
   }
 
-  const outTarget = resolve(process.cwd(), flags.out);
-  const ext = format.toLowerCase();
-
-  if (items.length === 1 && outTarget.endsWith(`.${ext}`)) {
-    const first = items[0];
-    if (first) {
-      await mkdir(dirname(outTarget), { recursive: true });
-      await writeFile(outTarget, Buffer.from(first.base64, "base64"));
-      process.stdout.write(`已导出资源: ${outTarget}\n`);
-      return;
-    }
-  }
-
-  await mkdir(outTarget, { recursive: true });
-  for (const item of items) {
-    const fileName = `${sanitizeFileName(item.name)}-${item.id.replace(":", "-")}.${ext}`;
-    const filePath = resolve(outTarget, fileName);
-    await writeFile(filePath, Buffer.from(item.base64, "base64"));
+  for (const filePath of result.savedFiles) {
     process.stdout.write(`已导出资源: ${filePath}\n`);
+  }
+  for (const comp of result.savedReactComponents) {
+    process.stdout.write(
+      `已导出 React 图标组件 (${comp.componentName}): ${comp.filePath}\n`
+    );
   }
 }
 

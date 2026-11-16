@@ -53,19 +53,43 @@ export async function readNodeById(
   });
 }
 
+function normalizeSearchKey(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[\s_-]+/g, " ")
+    .replace(/\b([a-z]{3,})s\b/g, "$1")
+    .trim();
+}
+
 function collectMatchingNodes(
   root: FigmaNode,
   segments: string[],
   ancestors: string[],
   matches: FigmaNode[]
 ): void {
-  const nextAncestors = [...ancestors, root.name.toLowerCase()];
+  if (root.visible === false) {
+    return;
+  }
+  const normalizedName = normalizeSearchKey(root.name);
+  const nextAncestors = [...ancestors, normalizedName];
   const fullPath = nextAncestors.join("/");
+  const leafTarget = segments[segments.length - 1] ?? "";
+
   const isLeafMatch =
-    root.name.toLowerCase().includes(segments[segments.length - 1] ?? "") &&
+    normalizedName.includes(leafTarget) &&
     segments.every((seg) => fullPath.includes(seg));
 
   if (isLeafMatch) {
+    // 如果命中了 COMPONENT_SET（变体集合），优先取其第一个默认子 COMPONENT
+    if (
+      root.type === "COMPONENT_SET" &&
+      Array.isArray(root.children) &&
+      root.children.length > 0 &&
+      root.children[0]
+    ) {
+      matches.push(root.children[0]);
+      return;
+    }
     matches.push(root);
     return;
   }
@@ -77,42 +101,70 @@ function collectMatchingNodes(
   }
 }
 
-export async function findNodes(
-  payload: ReadRequestPayloadMap["find"]
-): Promise<SerializedNode[]> {
-  const segments = payload.query
-    .toLowerCase()
+export async function searchFigmaNodes(
+  query: string,
+  pageFilter?: string
+): Promise<FigmaNode[]> {
+  const segments = query
     .split("/")
-    .map((s) => s.trim())
+    .map((s) => normalizeSearchKey(s))
     .filter(Boolean);
   if (segments.length === 0) {
     throw new Error("请提供非空的搜索关键词 --query");
   }
 
-  const pageFilter = payload.page?.toLowerCase().trim();
-  const targetPages: FigmaPageNode[] = pageFilter
+  const normalizedPageFilter = pageFilter?.toLowerCase().trim();
+  const initialPages: FigmaPageNode[] = normalizedPageFilter
     ? figma.root.children.filter((p) =>
-        p.name.toLowerCase().includes(pageFilter)
+        p.name.toLowerCase().includes(normalizedPageFilter)
       )
     : [figma.currentPage];
 
   const matches: FigmaNode[] = [];
-  for (const page of targetPages) {
-    if (typeof page.loadAsync === "function") {
-      await page.loadAsync();
-    }
-    if (Array.isArray(page.children)) {
-      for (const child of page.children) {
-        collectMatchingNodes(
-          child,
-          segments,
-          [page.name.toLowerCase()],
-          matches
-        );
+
+  async function searchPages(pages: readonly FigmaPageNode[]): Promise<void> {
+    for (const page of pages) {
+      if (typeof page.loadAsync === "function") {
+        await page.loadAsync();
+      }
+      if (Array.isArray(page.children)) {
+        for (const child of page.children) {
+          collectMatchingNodes(
+            child,
+            segments,
+            [normalizeSearchKey(page.name)],
+            matches
+          );
+        }
       }
     }
   }
 
+  await searchPages(initialPages);
+
+  // 当前页未找到且未限定页面时，自动遍历其余页面查找
+  if (matches.length === 0 && !normalizedPageFilter) {
+    const remainingPages = figma.root.children.filter(
+      (p) => p.id !== figma.currentPage.id
+    );
+    await searchPages(remainingPages);
+  }
+
+  // 精确名称匹配优先排序
+  const leafTarget = segments[segments.length - 1] ?? "";
+  matches.sort((a, b) => {
+    const aExact = normalizeSearchKey(a.name) === leafTarget ? 0 : 1;
+    const bExact = normalizeSearchKey(b.name) === leafTarget ? 0 : 1;
+    return aExact - bExact;
+  });
+
+  return matches;
+}
+
+export async function findNodes(
+  payload: ReadRequestPayloadMap["find"]
+): Promise<SerializedNode[]> {
+  const matches = await searchFigmaNodes(payload.query, payload.page);
   const depth = payload.depth ?? 2;
   const includeCss = payload.includeCss ?? false;
   return Promise.all(

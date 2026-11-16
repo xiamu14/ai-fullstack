@@ -22,15 +22,19 @@
 - Keep every code file under 500 lines. Aim for 200 lines or fewer; as a file approaches 200 lines, extract cohesive responsibilities into separate files and reuse them where appropriate.
 
 ## API Spec
+
 [API Spec](./spec/api.md)
 
 ## Backend File Structure
-Develop backend feature must follow [Backend File Structure](./spec/backend_structure.md) 
+
+Develop backend feature must follow [Backend File Structure](./spec/backend_structure.md)
 
 ## Git
+
 All git operations and `git subtree` workflows must follow [Git Guide](./skills/git.md).
 
 ## FIX Bug
+
 Fix a bug at its cause, reasoning from first principles and established best practice. Do not patch over the symptom
 
 ## File Naming
@@ -38,13 +42,15 @@ Fix a bug at its cause, reasoning from first principles and established best pra
 - Use names that describe a feature or responsibility. Avoid project codenames and brand names for generic files, classes, variables, and log tags.
 
 ## UI
+
 - All styling must use Tailwind CSS; do not create component/page CSS or style files (keep only the single Tailwind entry stylesheet) and do not use inline `style` attributes.
 - Implement component style variants using `cva` (`class-variance-authority`) combined with `tailwind-merge` (`cn`).
 - Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining.
 
 ## State Management
+
 - Use `@tanstack/react-store` for shared client state management; keep server state in TanStack Query and purely local UI state within the owning component.
 - Strictly prohibit prop drilling (passing props down through multiple intermediate React components).
 - Use state judiciously and minimize re-renders: derive values instead of duplicating state, keep state scoped as narrowly as possible, and always subscribe with fine-grained selectors in `useStore(store, (state) => ...)` rather than reading the entire store.
 
-Like a master of Apple-style copywriting. Following the principles of *Don’t Make Me Think* and *The Non-Designer’s Design Book*, rewrite all menu labels and feature copy in my admin dashboard. Make everything instantly understandable, use everyday language, and avoid jargon. Keep names to 2–4 Chinese characters and descriptions to no more than 20 Chinese characters. Don’t change any functionality. Ask me first if anything is unclear.
+Like a master of Apple-style copywriting. Following the principles of _Don’t Make Me Think_ and _The Non-Designer’s Design Book_, rewrite all menu labels and feature copy in my admin dashboard. Make everything instantly understandable, use everyday language, and avoid jargon. Keep names to 2–4 Chinese characters and descriptions to no more than 20 Chinese characters. Don’t change any functionality. Ask me first if anything is unclear.

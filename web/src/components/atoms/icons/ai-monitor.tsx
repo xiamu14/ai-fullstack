@@ -1,0 +1,26 @@
+import type { IconProps } from './types.ts';
+
+export function AiMonitorIcon({
+  size = 24,
+  variant: _variant = 'line',
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      aria-hidden={props['aria-label'] ? undefined : true}
+      fill="none"
+      height={size}
+      viewBox={'0 0 24 24'}
+      width={size}
+      {...props}
+    >
+      <path d="M16.9709 3.2832H7.02811C4.80389 3.2832 3 5.0871 3 7.31228V12.7687C3 14.9939 4.80389 16.7978 7.02811 16.7978H16.9709C19.1961 16.7978 21 14.9939 21 12.7687V7.31228C21 5.0871 19.1961 3.2832 16.9709 3.2832Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M7.05469 20.7168H16.943" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M9.88339 16.8008L9.24609 20.718" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M14.1152 16.8008L14.7525 20.718" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M7.52051 13.1149L10.2103 6.9668L12.9775 13.1149" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path d="M8.24121 11.5332H12.2567" strokeWidth="1.5" stroke="currentColor"/>
+      <path d="M15.9443 13.1133V7.19141" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+    </svg>
+  );
+}

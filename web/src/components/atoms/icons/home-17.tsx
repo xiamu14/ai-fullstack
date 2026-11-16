@@ -1,0 +1,20 @@
+import type { IconProps } from './types.ts';
+
+export function Home17Icon({
+  size = 24,
+  variant: _variant = 'line',
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      aria-hidden={props['aria-label'] ? undefined : true}
+      fill="none"
+      height={size}
+      viewBox={'0 0 24 24'}
+      width={size}
+      {...props}
+    >
+      <path d="M17.2159 21H6.78462C4.94959 21 3.46289 19.5123 3.46289 17.6783V10.5045C3.46289 9.6133 3.86376 8.76973 4.55457 8.20638L10.1287 3.66551C11.2185 2.77816 12.782 2.77816 13.8718 3.66551L19.4459 8.20638C20.1367 8.76973 20.5376 9.6133 20.5376 10.5045V17.6783C20.5376 19.5123 19.0509 21 17.2159 21Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+    </svg>
+  );
+}

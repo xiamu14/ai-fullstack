@@ -10,6 +10,8 @@ web/figma/
 │   └── types.ts                # 本地桥接通信协议与只读数据结构定义
 ├── compact/
 │   ├── color.ts                # 0-1 RGBA 浮点转 #HEX / rgba()、渐变与阴影 CSS 简写
+│   ├── typography.ts           # Typography 字阶合并、字重归一化与行高/字间距压缩
+│   ├── svg.ts                  # SVG 路径精度与公共属性提升压缩 + React Icon 组件生成
 │   ├── styles-compactor.ts     # 本地样式 (Paint/Text/Effect) 与 Variables 极简压缩与过滤
 │   └── node-compactor.ts       # 画布节点树极简压缩（剔除隐藏层、默认属性与冗余坐标）
 ├── plugin/
@@ -59,6 +61,11 @@ bun figma/cli.ts selection --depth 3
 # 5. 根据节点 ID 读取指定节点
 bun figma/cli.ts node --id 12:34 --depth 4 --out ./figma-node.json
 
-# 6. 将当前选中节点导出为 SVG 或 PNG 到本地目录
-bun figma/cli.ts export --format SVG --out ./src/assets/icons
+# 6. 按名称搜索图标并同时导出压缩 SVG 与支持 fontSize/color 的 React 组件
+bun figma/cli.ts export --page "Icons" --query "2 User" \
+  --out ./src/sources/images \
+  --react-out ./src/components/atom/icons
+
+# 7. 导出为 PNG 位图
+bun figma/cli.ts export --page "Icons" --query "2 User" --format PNG --scale 2 --out ./src/sources/images
 ```
