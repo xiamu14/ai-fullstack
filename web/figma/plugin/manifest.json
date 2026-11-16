@@ -9,9 +9,6 @@
   "capabilities": ["inspect"],
   "networkAccess": {
     "allowedDomains": ["none"],
-    "devAllowedDomains": [
-      "http://localhost:38450",
-      "ws://localhost:38450"
-    ]
+    "devAllowedDomains": ["http://127.0.0.1:38450", "ws://127.0.0.1:38450"]
   }
 }

@@ -1,6 +1,6 @@
-import type { SVGProps } from 'react';
+import type { SVGProps } from "react";
 
-export type IconVariant = 'line' | 'fill';
+export type IconVariant = "line" | "fill";
 
 export interface IconProps extends SVGProps<SVGSVGElement> {
   readonly size?: number | string;

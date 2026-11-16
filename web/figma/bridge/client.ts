@@ -5,7 +5,9 @@ import type {
   ReadAction,
   ReadRequestPayloadMap,
 } from "../protocol/types.ts";
+import { BRIDGE_PROTOCOL } from "../protocol/messages.ts";
 import { DEFAULT_BRIDGE_HOST, DEFAULT_BRIDGE_PORT } from "./server.ts";
+import { loadBridgeToken } from "./token.ts";
 
 export interface QueryOptions {
   port?: number;
@@ -14,14 +16,16 @@ export interface QueryOptions {
 
 async function isDaemonAlive(port: number): Promise<boolean> {
   const baseUrl = `http://${DEFAULT_BRIDGE_HOST}:${port}`;
-  try {
-    const res = await fetch(`${baseUrl}/status`, {
-      signal: AbortSignal.timeout(600),
-    });
-    return res.ok;
-  } catch {
-    return false;
+  const res = await fetch(`${baseUrl}/status`, {
+    headers: { authorization: `Bearer ${loadBridgeToken(port)}` },
+    signal: AbortSignal.timeout(600),
+  }).catch(() => null);
+  if (!res) return false;
+  const status = await res.json().catch(() => null);
+  if (!res.ok || status?.protocol !== BRIDGE_PROTOCOL) {
+    throw new Error("本地端口运行着旧版或未配对的桥接，请停止旧服务后重试。");
   }
+  return true;
 }
 
 async function ensureDaemonRunning(port: number): Promise<void> {
@@ -48,7 +52,10 @@ async function ensureDaemonRunning(port: number): Promise<void> {
   }
 }
 
-export async function queryFigma<T = unknown, A extends ReadAction = ReadAction>(
+export async function queryFigma<
+  T = unknown,
+  A extends ReadAction = ReadAction,
+>(
   action: A,
   payload: ReadRequestPayloadMap[A],
   options: QueryOptions = {}
@@ -62,7 +69,10 @@ export async function queryFigma<T = unknown, A extends ReadAction = ReadAction>
   const baseUrl = `http://${DEFAULT_BRIDGE_HOST}:${port}`;
   const queryRes = await fetch(`${baseUrl}/query`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${loadBridgeToken(port)}`,
+    },
     body: JSON.stringify({ action, payload, timeoutMs }),
     signal: AbortSignal.timeout(timeoutMs + 2000),
   });

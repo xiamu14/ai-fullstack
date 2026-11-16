@@ -25,6 +25,8 @@ export interface ReadRequestPayloadMap {
     page?: string;
     depth?: number;
     includeCss?: boolean;
+    keepSets?: boolean;
+    exact?: boolean;
   };
   css: {
     id?: string;
@@ -93,11 +95,25 @@ export interface SerializedTextProps {
   textAlignVertical?: string;
 }
 
+export interface SerializedComponentRef {
+  name: string;
+  variant?: string;
+}
+
+export interface SerializedStyleRefs {
+  fill?: string;
+  stroke?: string;
+  text?: string;
+  effect?: string;
+}
+
 export interface SerializedNode {
   id: string;
   name: string;
   type: string;
   visible: boolean;
+  component?: SerializedComponentRef;
+  styles?: SerializedStyleRefs;
   opacity?: number;
   bounds?: SerializedBoundingBox | null;
   layout?: SerializedLayout;

@@ -1,21 +1,33 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function ReceiptBill2Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M7.06405 19.9023L6.30417 20.2661C5.50537 20.6485 4.58106 20.0657 4.58203 19.1793L4.59176 6.92492C4.59176 4.50225 5.93931 3 8.35809 3H15.6572C18.0818 3 19.4002 4.50225 19.4002 6.92492L19.4177 19.1774C19.4187 20.0638 18.4944 20.6475 17.6946 20.2642L16.9406 19.9032C16.4872 19.6853 15.9627 19.6697 15.4967 19.8604L13.3503 20.7351C12.4854 21.0883 11.5153 21.0883 10.6504 20.7351L8.50792 19.8604C8.04188 19.6697 7.51745 19.6853 7.06405 19.9023Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M14.8287 14.1972H9.17188M14.8287 9.80273H9.17188" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M7.06405 19.9023L6.30417 20.2661C5.50537 20.6485 4.58106 20.0657 4.58203 19.1793L4.59176 6.92492C4.59176 4.50225 5.93931 3 8.35809 3H15.6572C18.0818 3 19.4002 4.50225 19.4002 6.92492L19.4177 19.1774C19.4187 20.0638 18.4944 20.6475 17.6946 20.2642L16.9406 19.9032C16.4872 19.6853 15.9627 19.6697 15.4967 19.8604L13.3503 20.7351C12.4854 21.0883 11.5153 21.0883 10.6504 20.7351L8.50792 19.8604C8.04188 19.6697 7.51745 19.6853 7.06405 19.9023Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M14.8287 14.1972H9.17188M14.8287 9.80273H9.17188"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

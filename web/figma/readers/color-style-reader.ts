@@ -7,10 +7,7 @@ import {
 } from "../compact/styles-compact.ts";
 import type { LocalStylesSummary } from "../protocol/types.ts";
 
-const STYLES_CACHE_PATH = resolve(
-  import.meta.dirname,
-  "../.cache/styles.json"
-);
+const STYLES_CACHE_PATH = resolve(import.meta.dirname, "../.cache/styles.json");
 
 export interface ReadStylesOptions {
   filter?: string;

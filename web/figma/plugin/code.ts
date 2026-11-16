@@ -1,3 +1,4 @@
+import { isBridgeRequest } from "../protocol/messages.ts";
 import type { BridgeRequest, BridgeResponse } from "../protocol/types.ts";
 import { exportAssets } from "./readers/asset-reader.ts";
 import {
@@ -9,8 +10,8 @@ import {
 import { readCss, readLocalStyles } from "./readers/style-reader.ts";
 
 figma.showUI(__html__, {
-  width: 280,
-  height: 120,
+  width: 320,
+  height: 200,
   themeColors: true,
 });
 
@@ -79,14 +80,7 @@ async function handleReadRequest(
 }
 
 figma.ui.onmessage = async (rawMessage: unknown) => {
-  if (
-    !rawMessage ||
-    typeof rawMessage !== "object" ||
-    !("requestId" in rawMessage) ||
-    !("action" in rawMessage)
-  ) {
-    return;
-  }
-  const response = await handleReadRequest(rawMessage as BridgeRequest);
+  if (!isBridgeRequest(rawMessage)) return;
+  const response = await handleReadRequest(rawMessage);
   figma.ui.postMessage(response);
 };

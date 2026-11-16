@@ -1,23 +1,47 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Delivery3Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M4.95358 5.05592L4.14091 7.08759C3.856 7.80031 3.70842 8.5616 3.70748 9.3285L3.69534 16.7172C3.68973 18.9946 4.72378 20.6059 7.00393 20.6115L17.6686 20.6265C19.9478 20.632 20.9575 19.0273 20.9631 16.75L20.9753 9.34812C20.9771 8.56814 20.8278 7.7947 20.5363 7.07171L19.7217 5.04937C19.3145 4.03681 18.3318 3.3736 17.2398 3.3736H7.43735C6.34351 3.3736 5.35898 4.03962 4.95358 5.05592Z" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M7.16626 16.6701H10.0424" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M3.82617 8.16656H20.8427" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M13.9748 3.3736L14.7949 8.16635V13.1798L12.3298 12.2532L9.875 13.1798V8.16635L10.6951 3.3736" strokeWidth="1.44" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M4.95358 5.05592L4.14091 7.08759C3.856 7.80031 3.70842 8.5616 3.70748 9.3285L3.69534 16.7172C3.68973 18.9946 4.72378 20.6059 7.00393 20.6115L17.6686 20.6265C19.9478 20.632 20.9575 19.0273 20.9631 16.75L20.9753 9.34812C20.9771 8.56814 20.8278 7.7947 20.5363 7.07171L19.7217 5.04937C19.3145 4.03681 18.3318 3.3736 17.2398 3.3736H7.43735C6.34351 3.3736 5.35898 4.03962 4.95358 5.05592Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.44"
+      />
+      <path
+        d="M7.16626 16.6701H10.0424"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.44"
+      />
+      <path
+        d="M3.82617 8.16656H20.8427"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.44"
+      />
+      <path
+        d="M13.9748 3.3736L14.7949 8.16635V13.1798L12.3298 12.2532L9.875 13.1798V8.16635L10.6951 3.3736"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.44"
+      />
     </svg>
   );
 }

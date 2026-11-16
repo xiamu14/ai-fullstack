@@ -1,20 +1,26 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function ArrowRight2Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M8.5 5L15.5 12L8.5 19" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M8.5 5L15.5 12L8.5 19"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

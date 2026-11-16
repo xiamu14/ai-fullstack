@@ -1,21 +1,33 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Bag2Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M15.7729 9.30504V6.27304C15.7729 4.18904 14.0839 2.50001 12.0009 2.50001C9.91694 2.49104 8.21994 4.17204 8.21094 6.25604V6.27304V9.30504" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M16.7422 21.0003H7.25778C4.90569 21.0003 3 19.0953 3 16.7453V11.2293C3 8.87933 4.90569 6.97433 7.25778 6.97433H16.7422C19.0943 6.97433 21 8.87933 21 11.2293V16.7453C21 19.0953 19.0943 21.0003 16.7422 21.0003Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M15.7729 9.30504V6.27304C15.7729 4.18904 14.0839 2.50001 12.0009 2.50001C9.91694 2.49104 8.21994 4.17204 8.21094 6.25604V6.27304V9.30504"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M16.7422 21.0003H7.25778C4.90569 21.0003 3 19.0953 3 16.7453V11.2293C3 8.87933 4.90569 6.97433 7.25778 6.97433H16.7422C19.0943 6.97433 21 8.87933 21 11.2293V16.7453C21 19.0953 19.0943 21.0003 16.7422 21.0003Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

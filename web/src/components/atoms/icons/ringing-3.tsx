@@ -1,24 +1,54 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Ringing3Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M5.90315 10.3836C5.90315 7.01622 8.63324 4.28613 11.9996 4.28613C15.367 4.28613 18.0971 7.01622 18.0971 10.3836L18.0981 11.6076C18.0981 12.3314 18.2576 13.0466 18.5661 13.7023L18.999 14.6218C19.6606 16.0277 18.6342 17.6437 17.0813 17.6437H6.9189C5.36511 17.6437 4.33962 16.0277 5.00122 14.6218L5.43419 13.7023C5.74261 13.0466 5.90217 12.3314 5.90217 11.6076L5.90315 10.3836Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M12 3V4.28624" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M4.43555 6.48137C4.88991 5.49188 5.61379 4.56466 6.55171 3.83301" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M19.5634 6.48137C19.1091 5.49188 18.3852 4.56466 17.4473 3.83301" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M9.12109 18.1221C9.12109 19.7109 10.4093 21 11.9991 21C13.5879 21 14.8761 19.7109 14.8761 18.1221" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M5.90315 10.3836C5.90315 7.01622 8.63324 4.28613 11.9996 4.28613C15.367 4.28613 18.0971 7.01622 18.0971 10.3836L18.0981 11.6076C18.0981 12.3314 18.2576 13.0466 18.5661 13.7023L18.999 14.6218C19.6606 16.0277 18.6342 17.6437 17.0813 17.6437H6.9189C5.36511 17.6437 4.33962 16.0277 5.00122 14.6218L5.43419 13.7023C5.74261 13.0466 5.90217 12.3314 5.90217 11.6076L5.90315 10.3836Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M12 3V4.28624"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M4.43555 6.48137C4.88991 5.49188 5.61379 4.56466 6.55171 3.83301"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M19.5634 6.48137C19.1091 5.49188 18.3852 4.56466 17.4473 3.83301"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9.12109 18.1221C9.12109 19.7109 10.4093 21 11.9991 21C13.5879 21 14.8761 19.7109 14.8761 18.1221"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

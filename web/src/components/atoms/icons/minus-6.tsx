@@ -1,20 +1,25 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Minus6Icon({
   size = 24,
-  variant: _variant = 'fill',
+  variant: _variant = "fill",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M2.5 12C2.5 6.75294 6.75294 2.5 12 2.5C17.2471 2.5 21.5 6.75294 21.5 12C21.5 17.2461 17.2471 21.5 12 21.5C6.7529 21.5 2.5 17.2461 2.5 12ZM8.70006 11.252C8.28585 11.252 7.95006 11.5877 7.95006 12.002C7.95006 12.4162 8.28585 12.752 8.70006 12.752H15.2997C15.714 12.752 16.0497 12.4162 16.0497 12.002C16.0497 11.5877 15.714 11.252 15.2997 11.252H8.70006Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+      <path
+        clipRule="evenodd"
+        d="M2.5 12C2.5 6.75294 6.75294 2.5 12 2.5C17.2471 2.5 21.5 6.75294 21.5 12C21.5 17.2461 17.2471 21.5 12 21.5C6.7529 21.5 2.5 17.2461 2.5 12ZM8.70006 11.252C8.28585 11.252 7.95006 11.5877 7.95006 12.002C7.95006 12.4162 8.28585 12.752 8.70006 12.752H15.2997C15.714 12.752 16.0497 12.4162 16.0497 12.002C16.0497 11.5877 15.714 11.252 15.2997 11.252H8.70006Z"
+        fill="currentColor"
+        fillRule="evenodd"
+      />
     </svg>
   );
 }

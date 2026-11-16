@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "packageManager": "bun@1.3.14",
   "scripts": {
-    "dev": "bun scripts/dev.ts",
+    "biome": "bun scripts/biome.ts",
     "deploy": "bun scripts/deploy.ts",
+    "dev": "bun scripts/dev.ts",
     "test": "bun scripts/test.ts"
   },
   "dependencies": {
@@ -41,5 +41,6 @@
     "vite": "^8.3.8",
     "vitest": "^5.1.0",
     "zx": "^8.8.5"
-  }
+  },
+  "packageManager": "bun@1.3.14"
 }

@@ -132,7 +132,9 @@ export async function fetchSelectionNodes(
 
   return options.raw
     ? data
-    : data.map((n) => compactNode(n)).filter((n): n is CompactNode => n !== null);
+    : data
+        .map((n) => compactNode(n))
+        .filter((n): n is CompactNode => n !== null);
 }
 
 export async function fetchNodeById(
@@ -185,7 +187,9 @@ export async function fetchMatchingNodes(
   );
   return options.raw
     ? data
-    : data.map((n) => compactNode(n)).filter((n): n is CompactNode => n !== null);
+    : data
+        .map((n) => compactNode(n))
+        .filter((n): n is CompactNode => n !== null);
 }
 
 export async function fetchNodeCss(options: {

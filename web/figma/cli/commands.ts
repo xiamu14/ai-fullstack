@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { DEFAULT_BRIDGE_PORT, startBridgeServer } from "../bridge/server.ts";
+import { DEFAULT_BRIDGE_HOST, DEFAULT_BRIDGE_PORT, startBridgeServer } from "../bridge/server.ts";
+import { loadBridgeToken } from "../bridge/token.ts";
 import type { ExportFormat } from "../protocol/types.ts";
 import { fetchLocalStyles } from "../readers/color-style-reader.ts";
 import {
@@ -142,11 +143,15 @@ export async function runExportCommand(flags: CliFlags): Promise<void> {
   }
 }
 
+export async function runPairCommand(flags: CliFlags): Promise<void> {
+  process.stdout.write(`${loadBridgeToken(flags.port ?? DEFAULT_BRIDGE_PORT)}\n`);
+}
+
 export async function runServeCommand(flags: CliFlags): Promise<void> {
   const port = flags.port ?? DEFAULT_BRIDGE_PORT;
   const hub = startBridgeServer(port);
   process.stdout.write(
-    `Figma 本地只读桥接服务已启动: ws://localhost:${hub.port}/ws (按 Ctrl+C 停止)\n`
+    `Figma 本地只读桥接服务已启动: ws://${DEFAULT_BRIDGE_HOST}:${hub.port}/ws (按 Ctrl+C 停止)\n运行 bun figma/cli.ts pair --port ${hub.port} 获取插件配对码。\n`
   );
   await new Promise<void>((resolvePromise) => {
     process.once("SIGINT", () => {

@@ -1,5 +1,66 @@
 (() => {
+  // figma/plugin/readers/node-refs.ts
+  var styleNameCache = new Map;
+  async function resolveStyleName(styleId) {
+    if (typeof styleId !== "string" || styleId.length === 0) {
+      return;
+    }
+    if (!styleNameCache.has(styleId)) {
+      try {
+        const style = await figma.getStyleByIdAsync(styleId);
+        styleNameCache.set(styleId, style?.name ?? null);
+      } catch {
+        styleNameCache.set(styleId, null);
+      }
+    }
+    return styleNameCache.get(styleId) ?? undefined;
+  }
+  async function readStyleRefs(node) {
+    const [fill, stroke, text, effect] = await Promise.all([
+      resolveStyleName(node.fillStyleId),
+      resolveStyleName(node.strokeStyleId),
+      resolveStyleName(node.textStyleId),
+      resolveStyleName(node.effectStyleId)
+    ]);
+    const refs = {};
+    if (fill)
+      refs.fill = fill;
+    if (stroke)
+      refs.stroke = stroke;
+    if (text)
+      refs.text = text;
+    if (effect)
+      refs.effect = effect;
+    return Object.keys(refs).length > 0 ? refs : undefined;
+  }
+  async function readComponentRef(node) {
+    if (node.type !== "INSTANCE" || !node.getMainComponentAsync) {
+      return;
+    }
+    try {
+      const main = await node.getMainComponentAsync();
+      if (!main) {
+        return;
+      }
+      const parent = main.parent;
+      if (parent && parent.type === "COMPONENT_SET") {
+        return { name: parent.name, variant: main.name };
+      }
+      return { name: main.name };
+    } catch {
+      return;
+    }
+  }
+
   // figma/plugin/readers/node-serializer.ts
+  var VECTOR_LEAF_TYPES = new Set([
+    "VECTOR",
+    "BOOLEAN_OPERATION",
+    "STAR",
+    "LINE",
+    "ELLIPSE",
+    "POLYGON"
+  ]);
   function normalizeMixed(value) {
     if (value === undefined) {
       return;
@@ -82,7 +143,9 @@
       try {
         serialized.componentProperties = sanitizeJsonValue(node.componentProperties);
       } catch {}
+      serialized.component = await readComponentRef(node);
     }
+    serialized.styles = await readStyleRefs(node);
     if (options.includeCss && typeof node.getCSSAsync === "function") {
       try {
         serialized.css = await node.getCSSAsync();
@@ -94,7 +157,9 @@
         await pageNode.loadAsync();
       }
     }
-    if (node.type !== "PAGE" || options.depth > 0) {
+    const isVectorLeaf = VECTOR_LEAF_TYPES.has(node.type);
+    const isHidden = node.visible === false;
+    if (!isVectorLeaf && !isHidden && (node.type !== "PAGE" || options.depth > 0)) {
       if (Array.isArray(node.children)) {
         serialized.childCount = node.children.length;
         if (options.depth > 0) {
@@ -147,7 +212,7 @@
   function normalizeSearchKey(text) {
     return text.toLowerCase().replace(/[\s_-]+/g, " ").replace(/\b([a-z]{3,})s\b/g, "$1").trim();
   }
-  function collectMatchingNodes(root, segments, ancestors, matches) {
+  function collectMatchingNodes(root, segments, ancestors, matches, options) {
     if (root.visible === false) {
       return;
     }
@@ -155,22 +220,23 @@
     const nextAncestors = [...ancestors, normalizedName];
     const fullPath = nextAncestors.join("/");
     const leafTarget = segments[segments.length - 1] ?? "";
-    const isLeafMatch = normalizedName.includes(leafTarget) && segments.every((seg) => fullPath.includes(seg));
+    const leafHit = options.exact ? normalizedName === leafTarget : normalizedName.includes(leafTarget);
+    const isLeafMatch = leafHit && segments.every((seg) => fullPath.includes(seg));
     if (isLeafMatch) {
-      if (root.type === "COMPONENT_SET" && Array.isArray(root.children) && root.children.length > 0 && root.children[0]) {
+      if (!options.keepSets && root.type === "COMPONENT_SET" && Array.isArray(root.children) && root.children[0]) {
         matches.push(root.children[0]);
         return;
       }
       matches.push(root);
       return;
     }
-    if (Array.isArray(root.children)) {
+    if (root.type !== "INSTANCE" && Array.isArray(root.children)) {
       for (const child of root.children) {
-        collectMatchingNodes(child, segments, nextAncestors, matches);
+        collectMatchingNodes(child, segments, nextAncestors, matches, options);
       }
     }
   }
-  async function searchFigmaNodes(query, pageFilter) {
+  async function searchFigmaNodes(query, pageFilter, options = {}) {
     const segments = query.split("/").map((s) => normalizeSearchKey(s)).filter(Boolean);
     if (segments.length === 0) {
       throw new Error("请提供非空的搜索关键词 --query");
@@ -185,7 +251,7 @@
         }
         if (Array.isArray(page.children)) {
           for (const child of page.children) {
-            collectMatchingNodes(child, segments, [normalizeSearchKey(page.name)], matches);
+            collectMatchingNodes(child, segments, [normalizeSearchKey(page.name)], matches, options);
           }
         }
       }
@@ -204,7 +270,10 @@
     return matches;
   }
   async function findNodes(payload) {
-    const matches = await searchFigmaNodes(payload.query, payload.page);
+    const matches = await searchFigmaNodes(payload.query, payload.page, {
+      keepSets: payload.keepSets,
+      exact: payload.exact
+    });
     const depth = payload.depth ?? 2;
     const includeCss = payload.includeCss ?? false;
     return Promise.all(matches.slice(0, 20).map((node) => serializeNode(node, { depth, includeCss })));

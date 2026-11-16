@@ -1,120 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
-    <meta charset="utf-8" />
-    <style>
-      body {
-        margin: 0;
-        padding: 12px 14px;
-        font: 12px/1.5 -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
-        color: var(--figma-color-text, #e6e6e6);
-        background: var(--figma-color-bg, #2c2c2c);
-      }
-      .row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-      }
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #f59e0b;
-      }
-      .dot.connected {
-        background: #10b981;
-      }
-      .meta {
-        margin-top: 6px;
-        color: var(--figma-color-text-secondary, #a3a3a3);
-        font-size: 11px;
-        word-break: break-all;
-      }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Figma 本地连接</title>
+    <link id="plugin-styles" rel="stylesheet" href="/src/styles.css">
   </head>
-  <body>
-    <div class="row">
-      <span id="dot" class="dot"></span>
-      <span id="status">等待本地脚本连接…</span>
-    </div>
-    <div id="meta" class="meta">ws://localhost:38450/ws（只读桥接）</div>
-
-    <script>
-      const WS_URL = "ws://localhost:38450/ws";
-      const dotEl = document.getElementById("dot");
-      const statusEl = document.getElementById("status");
-      const metaEl = document.getElementById("meta");
-      let socket = null;
-
-      function setStatus(connected, text, detail) {
-        dotEl.className = connected ? "dot connected" : "dot";
-        statusEl.textContent = text;
-        if (detail) metaEl.textContent = detail;
-      }
-
-      function connect() {
-        if (
-          socket &&
-          (socket.readyState === WebSocket.OPEN ||
-            socket.readyState === WebSocket.CONNECTING)
-        ) {
-          return;
-        }
-        try {
-          socket = new WebSocket(WS_URL);
-        } catch {
-          return;
-        }
-
-        socket.onopen = () => {
-          setStatus(true, "已连接本地脚本", WS_URL);
-        };
-
-        socket.onmessage = (event) => {
-          try {
-            const payload = JSON.parse(event.data);
-            setStatus(true, `读取中: ${payload.action}`, `请求 #${payload.requestId}`);
-            parent.postMessage({ pluginMessage: payload }, "*");
-          } catch (err) {
-            setStatus(true, "解析请求失败", String(err));
-          }
-        };
-
-        socket.onclose = () => {
-          socket = null;
-          setStatus(false, "等待本地脚本连接…", "自动重连 ws://localhost:38450/ws");
-        };
-
-        socket.onerror = () => {
-          try {
-            socket.close();
-          } catch {}
-        };
-      }
-
-      window.onmessage = (event) => {
-        const message = event.data && event.data.pluginMessage;
-        if (!message || !socket || socket.readyState !== WebSocket.OPEN) {
-          return;
-        }
-        socket.send(JSON.stringify(message));
-        setStatus(true, "已连接本地脚本", `已完成 #${message.requestId}`);
-      };
-
-      // 使用 Web Worker 驱动重连心跳，避免 Figma 窗口在后台时被 Electron 节流 setTimeout
-      try {
-        const workerBlob = new Blob(
-          ["setInterval(() => postMessage('tick'), 800);"],
-          { type: "application/javascript" }
-        );
-        const worker = new Worker(URL.createObjectURL(workerBlob));
-        worker.onmessage = () => connect();
-      } catch {
-        setInterval(connect, 800);
-      }
-
-      connect();
-    </script>
+  <body class="m-0 bg-[var(--figma-color-bg,#2c2c2c)] px-3.5 py-3 font-sans text-xs leading-normal text-[var(--figma-color-text,#e6e6e6)]">
+    <main class="flex flex-col gap-2">
+      <div class="flex items-center gap-2 font-semibold">
+        <span id="dot" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-warning-500"></span>
+        <span id="status">等待配对</span>
+      </div>
+      <form id="pairing" class="flex flex-col gap-1.5">
+        <label for="token">配对码</label>
+        <div class="flex gap-2">
+          <input id="token" name="token" type="password" autocomplete="off" spellcheck="false" required pattern="[a-f0-9]{64}" aria-describedby="pairing-help" class="min-w-0 flex-1 rounded border border-current/40 px-2 py-1 text-xs focus-visible:outline-2 focus-visible:outline-offset-2">
+          <button type="submit" class="min-h-6 rounded border border-current/40 px-2 py-1 focus-visible:outline-2 focus-visible:outline-offset-2">连接</button>
+        </div>
+        <p id="pairing-help" class="text-[0.6875rem]">运行 <code>bun figma/cli.ts pair</code> 获取</p>
+      </form>
+      <p id="meta" class="break-all text-[0.6875rem] text-[var(--figma-color-text-secondary,#a3a3a3)]">仅连接本机，只读访问</p>
+      <span id="announcements" role="status" aria-atomic="true" class="sr-only"></span>
+    </main>
+    <script type="module" src="./ui.ts"></script>
   </body>
 </html>

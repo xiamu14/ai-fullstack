@@ -1,9 +1,9 @@
-import tailwindcss from '@tailwindcss/vite';
-import { tanstackStart } from '@tanstack/react-start/plugin/vite';
-import viteReact from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import tailwindcss from "@tailwindcss/vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
-const backendUrl = process.env.VITE_BACKEND_URL ?? 'http://localhost:3020';
+const backendUrl = process.env.VITE_BACKEND_URL ?? "http://localhost:3020";
 
 export default defineConfig({
   resolve: {
@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/rpc': {
+      "/rpc": {
         target: backendUrl,
         changeOrigin: true,
       },

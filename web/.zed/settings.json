@@ -5,6 +5,10 @@
       "name": "biome"
     }
   },
+  "code_actions_on_format": {
+    "source.fixAll.biome": true,
+    "source.organizeImports.biome": true
+  },
   "lsp": {
     "biome": {
       "settings": {
@@ -14,21 +18,57 @@
   },
   "languages": {
     "TypeScript": {
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "biome"
+        }
+      },
       "language_servers": ["vtsls", "biome", "..."]
     },
     "TSX": {
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "biome"
+        }
+      },
       "language_servers": ["vtsls", "biome", "..."]
     },
     "JavaScript": {
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "biome"
+        }
+      },
       "language_servers": ["vtsls", "biome", "..."]
     },
     "JSON": {
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "biome"
+        }
+      },
       "language_servers": ["biome", "..."]
     },
     "JSONC": {
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "biome"
+        }
+      },
       "language_servers": ["biome", "..."]
     },
     "CSS": {
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "biome"
+        }
+      },
       "language_servers": ["biome", "..."]
     }
   }

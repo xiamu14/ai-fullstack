@@ -1,9 +1,9 @@
-import { QueryClientProvider } from '@tanstack/react-query';
-import { createRouter } from '@tanstack/react-router';
-import { MotionConfig } from 'motion/react';
-import type { ReactNode } from 'react';
-import { queryClient } from './lib/query-client.ts';
-import { routeTree } from './routeTree.gen.ts';
+import { QueryClientProvider } from "@tanstack/react-query";
+import { createRouter } from "@tanstack/react-router";
+import { MotionConfig } from "motion/react";
+import type { ReactNode } from "react";
+import { queryClient } from "./lib/query-client.ts";
+import { routeTree } from "./routeTree.gen.ts";
 
 function RouterWrap({ children }: { readonly children: ReactNode }) {
   return (
@@ -19,13 +19,13 @@ export function getRouter() {
     context: {
       queryClient,
     },
-    defaultPreload: 'intent',
+    defaultPreload: "intent",
     scrollRestoration: true,
     Wrap: RouterWrap,
   });
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     router: ReturnType<typeof getRouter>;
   }

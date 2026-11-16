@@ -4,10 +4,7 @@ import type {
   SerializedTextProps,
 } from "../protocol/types.ts";
 import { compactEffects, compactPaints, roundNumber } from "./color-compact.ts";
-import {
-  formatLetterSpacing,
-  formatLineHeight,
-} from "./typography-compact.ts";
+import { formatLetterSpacing, formatLineHeight } from "./typography-compact.ts";
 
 export interface CompactNode {
   id: string;

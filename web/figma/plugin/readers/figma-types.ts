@@ -37,6 +37,12 @@ export interface FigmaNode {
   mainComponent?: { id: string } | null;
   componentProperties?: unknown;
   children?: readonly FigmaNode[];
+  parent?: FigmaNode | null;
+  fillStyleId?: string | symbol;
+  strokeStyleId?: string | symbol;
+  textStyleId?: string | symbol;
+  effectStyleId?: string | symbol;
+  getMainComponentAsync?: () => Promise<FigmaNode | null>;
   getCSSAsync?: () => Promise<Record<string, string>>;
   exportAsync?: (settings: {
     format: "SVG" | "PNG" | "JPG";
@@ -67,6 +73,7 @@ export interface FigmaGlobal {
     onmessage?: (pluginMessage: unknown) => void;
   };
   getNodeByIdAsync: (id: string) => Promise<FigmaNode | null>;
+  getStyleByIdAsync: (id: string) => Promise<{ name: string } | null>;
   getLocalPaintStylesAsync: () => Promise<
     Array<{
       id: string;

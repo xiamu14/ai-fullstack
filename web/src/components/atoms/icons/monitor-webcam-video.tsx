@@ -1,25 +1,61 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function MonitorWebcamVideoIcon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M8.69563 3.28516H7.02897C4.80384 3.28516 3 5.089 3 7.31413V12.7704C3 14.9955 4.80384 16.7994 7.02897 16.7994H16.9705C19.1957 16.7994 20.9995 14.9955 20.9995 12.7704V11.4939" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M16.4263 3.28516H13.4491C12.2932 3.28516 11.5684 4.10438 11.5684 5.26218V7.49218C11.5684 8.65096 12.2893 9.46921 13.4491 9.46921H16.4263C17.586 9.46921 18.308 8.65096 18.308 7.49218V5.26218C18.308 4.10438 17.586 3.28516 16.4263 3.28516Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M18.3047 5.84122L19.9694 4.47909C20.2389 4.25823 20.6368 4.29715 20.8577 4.56666C20.9501 4.67952 21.0007 4.82157 21.0007 4.96751L20.9939 7.78517C20.9939 8.13348 20.7108 8.41564 20.3625 8.41466C20.2165 8.41466 20.0755 8.36407 19.9626 8.27164L18.3047 6.90951" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M7.05469 20.7148H16.9427" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M9.88337 16.7969L9.24609 20.714" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M14.1152 16.7969L14.7525 20.714" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M8.69563 3.28516H7.02897C4.80384 3.28516 3 5.089 3 7.31413V12.7704C3 14.9955 4.80384 16.7994 7.02897 16.7994H16.9705C19.1957 16.7994 20.9995 14.9955 20.9995 12.7704V11.4939"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M16.4263 3.28516H13.4491C12.2932 3.28516 11.5684 4.10438 11.5684 5.26218V7.49218C11.5684 8.65096 12.2893 9.46921 13.4491 9.46921H16.4263C17.586 9.46921 18.308 8.65096 18.308 7.49218V5.26218C18.308 4.10438 17.586 3.28516 16.4263 3.28516Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M18.3047 5.84122L19.9694 4.47909C20.2389 4.25823 20.6368 4.29715 20.8577 4.56666C20.9501 4.67952 21.0007 4.82157 21.0007 4.96751L20.9939 7.78517C20.9939 8.13348 20.7108 8.41564 20.3625 8.41466C20.2165 8.41466 20.0755 8.36407 19.9626 8.27164L18.3047 6.90951"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M7.05469 20.7148H16.9427"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9.88337 16.7969L9.24609 20.714"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M14.1152 16.7969L14.7525 20.714"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

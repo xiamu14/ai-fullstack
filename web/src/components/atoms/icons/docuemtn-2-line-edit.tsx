@@ -1,22 +1,40 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Docuemtn2LineEditIcon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M10.45 20.723H7.89796C5.65827 20.723 3.8418 18.9065 3.8418 16.6668V7.05617C3.8418 4.81647 5.65827 3 7.89796 3H14.8856C17.1253 3 18.9417 4.81647 18.9417 7.05617V10.369" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M15.7634 20.866L15.0385 20.9876C14.5093 21.0762 14.0403 20.6344 14.0987 20.0993L14.1794 19.3521C14.2183 18.9912 14.3692 18.6526 14.6114 18.3821L17.7676 14.936C18.1402 14.5332 18.7697 14.5088 19.1725 14.8815L19.839 15.4983C20.2418 15.8719 20.2661 16.5004 19.8935 16.9032L16.7713 20.3105C16.5086 20.6053 16.1525 20.8008 15.7634 20.866Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M13.8954 9.54297H8.89158M11.503 13.9117H8.89062" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M10.45 20.723H7.89796C5.65827 20.723 3.8418 18.9065 3.8418 16.6668V7.05617C3.8418 4.81647 5.65827 3 7.89796 3H14.8856C17.1253 3 18.9417 4.81647 18.9417 7.05617V10.369"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M15.7634 20.866L15.0385 20.9876C14.5093 21.0762 14.0403 20.6344 14.0987 20.0993L14.1794 19.3521C14.2183 18.9912 14.3692 18.6526 14.6114 18.3821L17.7676 14.936C18.1402 14.5332 18.7697 14.5088 19.1725 14.8815L19.839 15.4983C20.2418 15.8719 20.2661 16.5004 19.8935 16.9032L16.7713 20.3105C16.5086 20.6053 16.1525 20.8008 15.7634 20.866Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M13.8954 9.54297H8.89158M11.503 13.9117H8.89062"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

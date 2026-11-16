@@ -1,20 +1,25 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function SmartPhone2Icon({
   size = 24,
-  variant: _variant = 'fill',
+  variant: _variant = "fill",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M11.95 18.15C11.44 18.15 11 17.71 11 17.2C11 16.69 11.44 16.25 11.95 16.25C12.46 16.25 12.9 16.69 12.9 17.2C12.9 17.71 12.46 18.15 11.95 18.15ZM14.75 2.5H9.25002C6.99002 2.5 5.15002 4.34 5.15002 6.6V17.4C5.15002 19.66 6.99002 21.5 9.25002 21.5H14.75C17.01 21.5 18.85 19.66 18.85 17.4V6.6C18.85 4.34 17.01 2.5 14.75 2.5Z" fillRule="evenodd" clipRule="evenodd" fill="currentColor"/>
+      <path
+        clipRule="evenodd"
+        d="M11.95 18.15C11.44 18.15 11 17.71 11 17.2C11 16.69 11.44 16.25 11.95 16.25C12.46 16.25 12.9 16.69 12.9 17.2C12.9 17.71 12.46 18.15 11.95 18.15ZM14.75 2.5H9.25002C6.99002 2.5 5.15002 4.34 5.15002 6.6V17.4C5.15002 19.66 6.99002 21.5 9.25002 21.5H14.75C17.01 21.5 18.85 19.66 18.85 17.4V6.6C18.85 4.34 17.01 2.5 14.75 2.5Z"
+        fill="currentColor"
+        fillRule="evenodd"
+      />
     </svg>
   );
 }

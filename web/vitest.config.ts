@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -6,11 +6,11 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    root: './',
-    include: ['src/**/*.spec.ts', 'src/**/*.spec.tsx', 'scripts/**/*.spec.ts'],
+    root: "./",
+    include: ["src/**/*.spec.ts", "src/**/*.spec.tsx", "scripts/**/*.spec.ts"],
     coverage: {
-      include: ['src/**/*.ts', 'src/**/*.tsx', 'scripts/**/*.ts'],
-      exclude: ['src/routeTree.gen.ts', 'scripts/**/*.spec.ts'],
+      include: ["src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts"],
+      exclude: ["src/routeTree.gen.ts", "scripts/**/*.spec.ts"],
     },
   },
 });

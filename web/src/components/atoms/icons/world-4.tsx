@@ -1,23 +1,47 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function World4Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M12.3633 3C17.3342 3 21.3633 7.02908 21.3633 12C21.3633 16.9709 17.3342 21 12.3633 21C7.39236 21 3.36328 16.9709 3.36328 12C3.36328 7.02908 7.39236 3 12.3633 3Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M12.3626 3C14.2132 3 15.7126 7.02908 15.7126 12C15.7126 16.9709 14.2132 21 12.3626 21C10.512 21 9.0127 16.9709 9.0127 12C9.0127 7.02908 10.512 3 12.3626 3Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M4.37793 7.84375C5.89479 8.31175 7.54301 8.62991 9.23793 8.80797C11.2977 9.02397 13.4237 9.02397 15.4932 8.80797C17.1881 8.62991 18.8363 8.31175 20.3532 7.84375" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M20.3532 16.1536C18.8363 15.6856 17.1881 15.3674 15.4932 15.1893C13.4237 14.9733 11.2977 14.9733 9.23793 15.1893C7.54301 15.3674 5.89479 15.6856 4.37793 16.1536" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M12.3633 3C17.3342 3 21.3633 7.02908 21.3633 12C21.3633 16.9709 17.3342 21 12.3633 21C7.39236 21 3.36328 16.9709 3.36328 12C3.36328 7.02908 7.39236 3 12.3633 3Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M12.3626 3C14.2132 3 15.7126 7.02908 15.7126 12C15.7126 16.9709 14.2132 21 12.3626 21C10.512 21 9.0127 16.9709 9.0127 12C9.0127 7.02908 10.512 3 12.3626 3Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M4.37793 7.84375C5.89479 8.31175 7.54301 8.62991 9.23793 8.80797C11.2977 9.02397 13.4237 9.02397 15.4932 8.80797C17.1881 8.62991 18.8363 8.31175 20.3532 7.84375"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M20.3532 16.1536C18.8363 15.6856 17.1881 15.3674 15.4932 15.1893C13.4237 14.9733 11.2977 14.9733 9.23793 15.1893C7.54301 15.3674 5.89479 15.6856 4.37793 16.1536"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

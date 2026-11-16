@@ -4,6 +4,17 @@ import type {
   SerializedTextProps,
 } from "../../protocol/types.ts";
 import type { FigmaNode, FigmaPageNode } from "./figma-types.ts";
+import { readComponentRef, readStyleRefs } from "./node-refs.ts";
+
+// 矢量图形内部结构对 UI 封装无意义，不再向下展开
+const VECTOR_LEAF_TYPES = new Set([
+  "VECTOR",
+  "BOOLEAN_OPERATION",
+  "STAR",
+  "LINE",
+  "ELLIPSE",
+  "POLYGON",
+]);
 
 export interface SerializeOptions {
   depth: number;
@@ -104,7 +115,10 @@ export async function serializeNode(
     } catch {
       // Ignore component property errors on broken/unloaded instances
     }
+    serialized.component = await readComponentRef(node);
   }
+
+  serialized.styles = await readStyleRefs(node);
 
   if (options.includeCss && typeof node.getCSSAsync === "function") {
     try {
@@ -121,7 +135,13 @@ export async function serializeNode(
     }
   }
 
-  if (node.type !== "PAGE" || options.depth > 0) {
+  const isVectorLeaf = VECTOR_LEAF_TYPES.has(node.type);
+  const isHidden = node.visible === false;
+  if (
+    !isVectorLeaf &&
+    !isHidden &&
+    (node.type !== "PAGE" || options.depth > 0)
+  ) {
     if (Array.isArray(node.children)) {
       serialized.childCount = node.children.length;
       if (options.depth > 0) {

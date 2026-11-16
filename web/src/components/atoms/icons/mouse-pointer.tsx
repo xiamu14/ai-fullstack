@@ -1,27 +1,42 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function MousePointerIcon({
   size = 24,
-  variant = 'line',
+  variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      {variant === 'fill' ? (
+      {variant === "fill" ? (
         <>
-          <path d="M5.24033 3.94374C4.87202 3.79962 4.4514 3.88598 4.16883 4.16656L4.16758 4.16781C3.88622 4.44917 3.80007 4.87003 3.94284 5.23886L9.46399 19.2408L9.46456 19.2422C9.61604 19.6229 9.98372 19.8734 10.3941 19.8734H10.4137L10.4332 19.8718C10.7828 19.8444 11.1689 19.6446 11.3285 19.2317L11.3294 19.2293L13.0206 14.788L17.9905 19.7589L17.9918 19.7601C18.2361 20.0028 18.5563 20.1244 18.8751 20.1244C19.1936 20.1244 19.5147 20.0029 19.7587 19.7589C20.247 19.2707 20.247 18.4791 19.7587 17.9908L14.7887 13.0199L19.229 11.3297L19.2301 11.3292C19.6147 11.1818 19.8701 10.8146 19.8741 10.4022V10.3998C19.8761 9.9871 19.6234 9.61578 19.2405 9.46422L5.24155 3.94422L5.24033 3.94374Z" fill="currentColor"/>
+          <path
+            d="M5.24033 3.94374C4.87202 3.79962 4.4514 3.88598 4.16883 4.16656L4.16758 4.16781C3.88622 4.44917 3.80007 4.87003 3.94284 5.23886L9.46399 19.2408L9.46456 19.2422C9.61604 19.6229 9.98372 19.8734 10.3941 19.8734H10.4137L10.4332 19.8718C10.7828 19.8444 11.1689 19.6446 11.3285 19.2317L11.3294 19.2293L13.0206 14.788L17.9905 19.7589L17.9918 19.7601C18.2361 20.0028 18.5563 20.1244 18.8751 20.1244C19.1936 20.1244 19.5147 20.0029 19.7587 19.7589C20.247 19.2707 20.247 18.4791 19.7587 17.9908L14.7887 13.0199L19.229 11.3297L19.2301 11.3292C19.6147 11.1818 19.8701 10.8146 19.8741 10.4022V10.3998C19.8761 9.9871 19.6234 9.61578 19.2405 9.46422L5.24155 3.94422L5.24033 3.94374Z"
+            fill="currentColor"
+          />
         </>
       ) : (
         <>
-          <path d="M5 5L10.5195 18.9988L12.8583 12.8583L18.9988 10.5195L5 5Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-          <path d="M12.8594 12.8594L19.0002 19.0002" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+          <path
+            d="M5 5L10.5195 18.9988L12.8583 12.8583L18.9988 10.5195L5 5Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M12.8594 12.8594L19.0002 19.0002"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+          />
         </>
       )}
     </svg>

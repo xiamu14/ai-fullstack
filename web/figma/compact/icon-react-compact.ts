@@ -194,9 +194,9 @@ export function ${componentName}({
   fontSize = ${defaultSize},
   ...props
 }: ${componentName}Props) {
+  const named = Boolean(props["aria-label"] || props["aria-labelledby"]);
   return (
     <svg
-      aria-hidden="true"
       color={color}
       fill="none"
       height={fontSize}${extraAttrsBlock}
@@ -204,6 +204,8 @@ export function ${componentName}({
       width={fontSize}
       xmlns="http://www.w3.org/2000/svg"
       {...props}
+      aria-hidden={props["aria-hidden"] ?? (named ? undefined : true)}
+      role={props.role ?? (named ? "img" : undefined)}
     >
       ${formattedInner}
     </svg>

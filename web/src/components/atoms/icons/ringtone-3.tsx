@@ -1,22 +1,40 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Ringtone3Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M6.06646 11.1345C6.06646 7.85745 8.72274 5.20117 11.9998 5.20117C15.2768 5.20117 17.9331 7.85745 17.9331 11.1345L17.9341 12.3264C17.9341 13.0309 18.0888 13.7266 18.3894 14.3639L18.8107 15.259C19.4539 16.6271 18.4556 18.1994 16.9445 18.1994H7.05502C5.54299 18.1994 4.54567 16.6271 5.18882 15.259L5.61012 14.3639C5.90981 13.7266 6.06549 13.0309 6.06549 12.3264L6.06646 11.1345Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M9.19922 18.2002C9.19922 19.7463 10.4534 21.0005 11.9995 21.0005C13.5466 21.0005 14.7998 19.7463 14.7998 18.2002" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M13.6044 5.414V4.60447C13.6044 3.71807 12.8854 3 11.999 3C11.1126 3 10.3945 3.71807 10.3945 4.60447V5.414" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M6.06646 11.1345C6.06646 7.85745 8.72274 5.20117 11.9998 5.20117C15.2768 5.20117 17.9331 7.85745 17.9331 11.1345L17.9341 12.3264C17.9341 13.0309 18.0888 13.7266 18.3894 14.3639L18.8107 15.259C19.4539 16.6271 18.4556 18.1994 16.9445 18.1994H7.05502C5.54299 18.1994 4.54567 16.6271 5.18882 15.259L5.61012 14.3639C5.90981 13.7266 6.06549 13.0309 6.06549 12.3264L6.06646 11.1345Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9.19922 18.2002C9.19922 19.7463 10.4534 21.0005 11.9995 21.0005C13.5466 21.0005 14.7998 19.7463 14.7998 18.2002"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M13.6044 5.414V4.60447C13.6044 3.71807 12.8854 3 11.999 3C11.1126 3 10.3945 3.71807 10.3945 4.60447V5.414"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

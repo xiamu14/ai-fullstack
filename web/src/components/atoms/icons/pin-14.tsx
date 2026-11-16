@@ -1,22 +1,40 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function Pin14Icon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M6.31934 8.67704C6.31934 12.7157 11.0877 16.5762 11.9964 16.5762C12.9051 16.5762 17.6734 12.7157 17.6734 8.67704C17.6734 5.54129 15.1311 3 11.9964 3C8.8616 3 6.31934 5.54129 6.31934 8.67704Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M13.8902 8.63063C13.8902 7.5857 13.0427 6.73828 11.9978 6.73828C10.9529 6.73828 10.1055 7.5857 10.1055 8.63063C10.1055 9.67555 10.9529 10.523 11.9978 10.523C13.0427 10.523 13.8902 9.67555 13.8902 8.63063Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M18.4479 15.5742C19.4451 16.1337 20.0328 16.8332 20.0328 17.5979C20.0328 18.3626 19.4451 19.0612 18.4479 19.6206C18.1025 19.8259 17.7201 20.003 17.2823 20.1616C15.8745 20.684 14.0278 21.0012 12.0042 21.0012C9.98144 21.0012 8.13482 20.684 6.72699 20.1616C6.2882 20.003 5.89709 19.8172 5.5517 19.6206C4.55445 19.0612 3.9668 18.3626 3.9668 17.5979C3.9668 16.8332 4.55445 16.1337 5.5517 15.5742" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M6.31934 8.67704C6.31934 12.7157 11.0877 16.5762 11.9964 16.5762C12.9051 16.5762 17.6734 12.7157 17.6734 8.67704C17.6734 5.54129 15.1311 3 11.9964 3C8.8616 3 6.31934 5.54129 6.31934 8.67704Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M13.8902 8.63063C13.8902 7.5857 13.0427 6.73828 11.9978 6.73828C10.9529 6.73828 10.1055 7.5857 10.1055 8.63063C10.1055 9.67555 10.9529 10.523 11.9978 10.523C13.0427 10.523 13.8902 9.67555 13.8902 8.63063Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M18.4479 15.5742C19.4451 16.1337 20.0328 16.8332 20.0328 17.5979C20.0328 18.3626 19.4451 19.0612 18.4479 19.6206C18.1025 19.8259 17.7201 20.003 17.2823 20.1616C15.8745 20.684 14.0278 21.0012 12.0042 21.0012C9.98144 21.0012 8.13482 20.684 6.72699 20.1616C6.2882 20.003 5.89709 19.8172 5.5517 19.6206C4.55445 19.0612 3.9668 18.3626 3.9668 17.5979C3.9668 16.8332 4.55445 16.1337 5.5517 15.5742"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

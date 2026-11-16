@@ -8,9 +8,5 @@ export interface ReadDocumentOptions {
 export async function fetchDocumentSummary(
   options: ReadDocumentOptions = {}
 ): Promise<DocumentSummary> {
-  return queryFigma<DocumentSummary>(
-    "document",
-    {},
-    { port: options.port }
-  );
+  return queryFigma<DocumentSummary>("document", {}, { port: options.port });
 }

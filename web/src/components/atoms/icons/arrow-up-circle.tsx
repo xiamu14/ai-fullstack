@@ -1,27 +1,42 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function ArrowUpCircleIcon({
   size = 24,
-  variant = 'line',
+  variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      {variant === 'fill' ? (
+      {variant === "fill" ? (
         <>
-          <path d="M12 2C17.52 2 22 6.49 22 12L21.9962 12.2798C21.8478 17.6706 17.4264 22 12 22C6.49 22 2 17.52 2 12C2 6.49 6.49 2 12 2ZM12 9.21C11.8 9.21 11.61 9.29 11.47 9.43L8 12.92C7.85 13.06 7.78 13.25 7.78 13.44C7.78 13.64 7.85 13.83 8 13.98C8.3 14.27 8.77 14.27 9.06 13.97L12 11.02L14.94 13.97C15.23 14.27 15.71 14.27 16 13.98C16.3 13.68 16.3 13.21 16 12.92L12.53 9.43C12.39 9.29 12.2 9.21 12 9.21Z" fill="currentColor"/>
+          <path
+            d="M12 2C17.52 2 22 6.49 22 12L21.9962 12.2798C21.8478 17.6706 17.4264 22 12 22C6.49 22 2 17.52 2 12C2 6.49 6.49 2 12 2ZM12 9.21C11.8 9.21 11.61 9.29 11.47 9.43L8 12.92C7.85 13.06 7.78 13.25 7.78 13.44C7.78 13.64 7.85 13.83 8 13.98C8.3 14.27 8.77 14.27 9.06 13.97L12 11.02L14.94 13.97C15.23 14.27 15.71 14.27 16 13.98C16.3 13.68 16.3 13.21 16 12.92L12.53 9.43C12.39 9.29 12.2 9.21 12 9.21Z"
+            fill="currentColor"
+          />
         </>
       ) : (
         <>
-          <path d="M21.2498 12C21.2498 6.892 17.1088 2.75 11.9998 2.75C6.89176 2.75 2.74976 6.892 2.74976 12C2.74976 17.108 6.89176 21.25 11.9998 21.25C17.1088 21.25 21.2498 17.108 21.2498 12Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-          <path d="M15.4705 13.4423L11.9995 9.95631L8.52846 13.4423" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+          <path
+            d="M21.2498 12C21.2498 6.892 17.1088 2.75 11.9998 2.75C6.89176 2.75 2.74976 6.892 2.74976 12C2.74976 17.108 6.89176 21.25 11.9998 21.25C17.1088 21.25 21.2498 17.108 21.2498 12Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M15.4705 13.4423L11.9995 9.95631L8.52846 13.4423"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.5"
+          />
         </>
       )}
     </svg>

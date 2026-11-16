@@ -12,7 +12,10 @@ import {
 } from "./typography-compact.ts";
 
 export interface CompactStylesOutput {
-  colors?: Record<string, Record<string, string | string[]> | string | string[]>;
+  colors?: Record<
+    string,
+    Record<string, string | string[]> | string | string[]
+  >;
   typography?: CompactTypographySummary;
   effects?: Record<string, string | string[]>;
   variables?: Record<string, Record<string, unknown>>;

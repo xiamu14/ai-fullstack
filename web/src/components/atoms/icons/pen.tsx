@@ -1,23 +1,47 @@
-import type { IconProps } from './types.ts';
+import { getIconProps } from "./accessibility.ts";
+import type { IconProps } from "./types.ts";
 
 export function PenIcon({
   size = 24,
-  variant: _variant = 'line',
+  variant: _variant = "line",
   ...props
 }: IconProps) {
   return (
     <svg
-      aria-hidden={props['aria-label'] ? undefined : true}
       fill="none"
       height={size}
-      viewBox={'0 0 24 24'}
+      viewBox={"0 0 24 24"}
       width={size}
-      {...props}
+      {...getIconProps(props)}
     >
-      <path d="M7.78216 3H16.2169C19.165 3 21 5.08119 21 8.02638V15.9736C21 18.9188 19.165 21 16.2159 21H7.78216C4.83405 21 3 18.9188 3 15.9736V8.02638C3 5.08119 4.84281 3 7.78216 3Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M12.4607 8.171L12.8684 7.43446C13.1564 6.91392 13.8627 6.81371 14.2831 7.235L17.2565 10.2074C17.6768 10.6287 17.5776 11.3351 17.057 11.6231L16.3195 12.0298C15.9118 12.2565 15.4039 12.1845 15.0741 11.8547L12.6368 9.41738C12.307 9.08755 12.235 8.57965 12.4607 8.171Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M15.0074 11.7845L14.3098 16.0033C14.2612 16.2962 14.0053 16.5112 13.7046 16.5034C12.6382 16.4742 10.1105 16.4781 8.21998 17.0064C7.99717 17.0668 7.78214 16.9899 7.64008 16.8478C7.49803 16.7058 7.42117 16.4908 7.48635 16.2718C8.00884 14.3775 8.0176 11.8536 7.98452 10.7823C7.98063 10.4865 8.19565 10.2306 8.48754 10.182L12.7073 9.48438" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
-      <path d="M10.6023 13.8887L7.63867 16.8514" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+      <path
+        d="M7.78216 3H16.2169C19.165 3 21 5.08119 21 8.02638V15.9736C21 18.9188 19.165 21 16.2159 21H7.78216C4.83405 21 3 18.9188 3 15.9736V8.02638C3 5.08119 4.84281 3 7.78216 3Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M12.4607 8.171L12.8684 7.43446C13.1564 6.91392 13.8627 6.81371 14.2831 7.235L17.2565 10.2074C17.6768 10.6287 17.5776 11.3351 17.057 11.6231L16.3195 12.0298C15.9118 12.2565 15.4039 12.1845 15.0741 11.8547L12.6368 9.41738C12.307 9.08755 12.235 8.57965 12.4607 8.171Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M15.0074 11.7845L14.3098 16.0033C14.2612 16.2962 14.0053 16.5112 13.7046 16.5034C12.6382 16.4742 10.1105 16.4781 8.21998 17.0064C7.99717 17.0668 7.78214 16.9899 7.64008 16.8478C7.49803 16.7058 7.42117 16.4908 7.48635 16.2718C8.00884 14.3775 8.0176 11.8536 7.98452 10.7823C7.98063 10.4865 8.19565 10.2306 8.48754 10.182L12.7073 9.48438"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M10.6023 13.8887L7.63867 16.8514"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
     </svg>
   );
 }

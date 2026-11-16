@@ -8,6 +8,7 @@ import {
   runExportCommand,
   runFindCommand,
   runNodeCommand,
+  runPairCommand,
   runSelectionCommand,
   runServeCommand,
   runStylesCommand,
@@ -29,6 +30,7 @@ Figma 本地设计文件只读工具 (Bun + TypeScript · 默认 AI 极简压缩
   styles         读取文档内的本地样式 (Paint/Text/Effect) 与 Variables
   typography     读取文档内的排版样式 (Text Styles) 与字体变量 (Type Variables)
   export         导出选中节点、--id 或 --query 匹配节点为 SVG / PNG / JPG 及 React 组件
+  pair           显示本机配对码，填入 Figma 插件后连接
   serve          启动常驻本地 WebSocket 桥接服务 (首次运行任意命令也会自动后台启动)
   build-plugin   将 figma/plugin/code.ts 编译为 figma/plugin/code.js
 
@@ -133,6 +135,9 @@ async function main(): Promise<void> {
       break;
     case "export":
       await runExportCommand(flags);
+      break;
+    case "pair":
+      await runPairCommand(flags);
       break;
     case "serve":
       await runServeCommand(flags);

@@ -61,11 +61,17 @@ function normalizeSearchKey(text: string): string {
     .trim();
 }
 
+export interface SearchOptions {
+  keepSets?: boolean;
+  exact?: boolean;
+}
+
 function collectMatchingNodes(
   root: FigmaNode,
   segments: string[],
   ancestors: string[],
-  matches: FigmaNode[]
+  matches: FigmaNode[],
+  options: SearchOptions
 ): void {
   if (root.visible === false) {
     return;
@@ -75,16 +81,18 @@ function collectMatchingNodes(
   const fullPath = nextAncestors.join("/");
   const leafTarget = segments[segments.length - 1] ?? "";
 
+  const leafHit = options.exact
+    ? normalizedName === leafTarget
+    : normalizedName.includes(leafTarget);
   const isLeafMatch =
-    normalizedName.includes(leafTarget) &&
-    segments.every((seg) => fullPath.includes(seg));
+    leafHit && segments.every((seg) => fullPath.includes(seg));
 
   if (isLeafMatch) {
-    // 如果命中了 COMPONENT_SET（变体集合），优先取其第一个默认子 COMPONENT
+    // 默认命中 COMPONENT_SET（变体集合）时取其第一个子 COMPONENT；keepSets 时保留整个集合
     if (
+      !options.keepSets &&
       root.type === "COMPONENT_SET" &&
       Array.isArray(root.children) &&
-      root.children.length > 0 &&
       root.children[0]
     ) {
       matches.push(root.children[0]);
@@ -94,16 +102,18 @@ function collectMatchingNodes(
     return;
   }
 
-  if (Array.isArray(root.children)) {
+  // 不进入实例内部搜索，避免命中页面中大量重复的实例副本
+  if (root.type !== "INSTANCE" && Array.isArray(root.children)) {
     for (const child of root.children) {
-      collectMatchingNodes(child, segments, nextAncestors, matches);
+      collectMatchingNodes(child, segments, nextAncestors, matches, options);
     }
   }
 }
 
 export async function searchFigmaNodes(
   query: string,
-  pageFilter?: string
+  pageFilter?: string,
+  options: SearchOptions = {}
 ): Promise<FigmaNode[]> {
   const segments = query
     .split("/")
@@ -133,7 +143,8 @@ export async function searchFigmaNodes(
             child,
             segments,
             [normalizeSearchKey(page.name)],
-            matches
+            matches,
+            options
           );
         }
       }
@@ -164,7 +175,10 @@ export async function searchFigmaNodes(
 export async function findNodes(
   payload: ReadRequestPayloadMap["find"]
 ): Promise<SerializedNode[]> {
-  const matches = await searchFigmaNodes(payload.query, payload.page);
+  const matches = await searchFigmaNodes(payload.query, payload.page, {
+    keepSets: payload.keepSets,
+    exact: payload.exact,
+  });
   const depth = payload.depth ?? 2;
   const includeCss = payload.includeCss ?? false;
   return Promise.all(

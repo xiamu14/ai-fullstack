@@ -1,62 +1,69 @@
 @import "tailwindcss";
+@source "../figma/plugin/ui.html";
+@source "../figma/plugin/ui.ts";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not(.light), :root:not(.light) *) { @slot; }
+  }
+  &:where(.dark, .dark *) { @slot; }
+}
 
 @theme {
   /* Typography: Font Families */
-  --font-sans: 'Google Sans Flex', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
   --font-serif: Georgia, ui-serif, serif;
-  --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Typography: Scale (from Figma Style Guide & Type Variables) */
   --text-xs: 0.75rem;
-  --text-xs--line-height: 1rem;
+  --text-xs--line-height: 1.33333333333;
   --text-sm: 0.875rem;
-  --text-sm--line-height: 1.25rem;
+  --text-sm--line-height: 1.42857142857;
   --text-base: 1rem;
-  --text-base--line-height: 1.5rem;
+  --text-base--line-height: 1.5;
   --text-lg: 1.125rem;
-  --text-lg--line-height: 1.75rem;
+  --text-lg--line-height: 1.55555555556;
   --text-xl: 1.25rem;
-  --text-xl--line-height: 1.75rem;
+  --text-xl--line-height: 1.4;
   --text-2xl: 1.5rem;
-  --text-2xl--line-height: 2rem;
+  --text-2xl--line-height: 1.33333333333;
   --text-3xl: 1.875rem;
-  --text-3xl--line-height: 2.25rem;
+  --text-3xl--line-height: 1.2;
   --text-4xl: 2rem;
-  --text-4xl--line-height: 2.5rem;
+  --text-4xl--line-height: 1.25;
   --text-5xl: 2.25rem;
-  --text-5xl--line-height: 2.5rem;
+  --text-5xl--line-height: 1.11111111111;
   --text-6xl: 2.5rem;
-  --text-6xl--line-height: 3rem;
+  --text-6xl--line-height: 1.2;
   --text-7xl: 3rem;
-  --text-7xl--line-height: 3.75rem;
+  --text-7xl--line-height: 1.25;
   --text-8xl: 3.75rem;
-  --text-8xl--line-height: 4.5rem;
+  --text-8xl--line-height: 1.2;
   --text-9xl: 4.5rem;
-  --text-9xl--line-height: 6rem;
+  --text-9xl--line-height: 1.33333333333;
 
   /* Typography: Semantic Heading & Body Tokens */
   --text-h1: 3rem;
-  --text-h1--line-height: 3.75rem;
+  --text-h1--line-height: 1.25;
   --text-h2: 2.5rem;
-  --text-h2--line-height: 3rem;
+  --text-h2--line-height: 1.2;
   --text-h3: 2.25rem;
-  --text-h3--line-height: 2.5rem;
+  --text-h3--line-height: 1.11111111111;
   --text-h4: 1.875rem;
-  --text-h4--line-height: 2.25rem;
+  --text-h4--line-height: 1.2;
   --text-h5: 1.5rem;
-  --text-h5--line-height: 2rem;
+  --text-h5--line-height: 1.33333333333;
   --text-h6: 1.25rem;
-  --text-h6--line-height: 1.75rem;
+  --text-h6--line-height: 1.4;
   --text-body-lg: 1.125rem;
-  --text-body-lg--line-height: 1.75rem;
+  --text-body-lg--line-height: 1.55555555556;
   --text-body-md: 1rem;
-  --text-body-md--line-height: 1.5rem;
+  --text-body-md--line-height: 1.5;
   --text-body-sm: 0.875rem;
-  --text-body-sm--line-height: 1.25rem;
+  --text-body-sm--line-height: 1.42857142857;
   --text-body-xs: 0.75rem;
-  --text-body-xs--line-height: 1rem;
+  --text-body-xs--line-height: 1.33333333333;
 
   /* Typography: Letter Spacing */
   --tracking-tighter: -0.8px;
@@ -282,6 +289,7 @@
 }
 
 :root {
+  color-scheme: light dark;
   --gray-25: var(--color-gray-light-25);
   --gray-50: var(--color-gray-light-50);
   --gray-100: var(--color-gray-light-100);
@@ -304,7 +312,7 @@
   --text-muted: var(--color-gray-light-500);
 }
 
-.dark {
+@utility theme-dark {
   --gray-25: var(--color-gray-dark-25);
   --gray-50: var(--color-gray-dark-50);
   --gray-100: var(--color-gray-dark-100);
@@ -326,3 +334,14 @@
   --text: var(--color-gray-dark-25);
   --text-muted: var(--color-gray-dark-100);
 }
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) { @apply theme-dark; }
+}
+
+.dark {
+  color-scheme: dark;
+  @apply theme-dark;
+}
+
+:root.light { color-scheme: light; }

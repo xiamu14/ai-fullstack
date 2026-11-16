@@ -1,34 +1,34 @@
-import { finish, integer, parseCommand, runCli, start } from './shared/cli.js';
-import { tool } from './shared/process.js';
-import { booleanValue, textValue } from './shared/prompts.js';
+import { finish, integer, parseCommand, runCli, start } from "./shared/cli.js";
+import { tool } from "./shared/process.js";
+import { booleanValue, textValue } from "./shared/prompts.js";
 
-await runCli('dev', async () => {
+await runCli("dev", async () => {
   const args = parseCommand({
-    name: 'dev',
+    name: "dev",
     description:
-      '本地开发：启动 Vite + TanStack Start SPA 开发服务器，并将 /rpc 代理到后端服务。',
+      "本地开发：启动 Vite + TanStack Start SPA 开发服务器，并将 /rpc 代理到后端服务。",
     options: {
       port: {
-        type: 'string',
-        default: process.env.PORT ?? '5173',
-        description: 'HTTP 端口，范围 1–65535；也可使用 PORT',
+        type: "string",
+        default: process.env.PORT ?? "5173",
+        description: "HTTP 端口，范围 1–65535；也可使用 PORT",
       },
       host: {
-        type: 'boolean',
+        type: "boolean",
         default: false,
-        description: '监听所有网络接口（0.0.0.0）',
+        description: "监听所有网络接口（0.0.0.0）",
       },
       open: {
-        type: 'boolean',
+        type: "boolean",
         default: false,
-        description: '启动后自动打开浏览器',
+        description: "启动后自动打开浏览器",
       },
     },
     examples: [
-      'bun run dev',
-      'bun run dev --port 3000',
-      'bun run dev --host --open',
-      'bun run dev --interactive',
+      "bun run dev",
+      "bun run dev --port 3000",
+      "bun run dev --host --open",
+      "bun run dev --interactive",
     ],
   });
   if (!args) {
@@ -38,32 +38,32 @@ await runCli('dev', async () => {
   let host = args.values.host === true;
   let open = args.values.open === true;
   if (args.interactive) {
-    if (!args.provided.has('port')) {
-      port = await textValue('HTTP 端口', port);
+    if (!args.provided.has("port")) {
+      port = await textValue("HTTP 端口", port);
     }
-    if (!args.provided.has('host')) {
-      host = await booleanValue('监听所有网络接口？', host);
+    if (!args.provided.has("host")) {
+      host = await booleanValue("监听所有网络接口？", host);
     }
-    if (!args.provided.has('open')) {
-      open = await booleanValue('自动打开浏览器？', open);
+    if (!args.provided.has("open")) {
+      open = await booleanValue("自动打开浏览器？", open);
     }
   }
-  const validatedPort = integer(port, '--port', 65_535);
+  const validatedPort = integer(port, "--port", 65_535);
   start(`本地开发 · http://localhost:${validatedPort}`);
   await tool(
-    'vite',
+    "vite",
     [
-      'dev',
-      '--port',
+      "dev",
+      "--port",
       String(validatedPort),
-      '--strictPort',
-      ...(host ? ['--host'] : []),
-      ...(open ? ['--open'] : []),
+      "--strictPort",
+      ...(host ? ["--host"] : []),
+      ...(open ? ["--open"] : []),
     ],
     {
-      NODE_ENV: 'development',
+      NODE_ENV: "development",
       PORT: String(validatedPort),
-    },
+    }
   );
-  finish('开发服务已停止');
+  finish("开发服务已停止");
 });
