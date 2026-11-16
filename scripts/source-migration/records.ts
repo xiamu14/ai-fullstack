@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { z } from 'zod'
 
 export const libraryId = 'ai-agents'
-export const legacyDirectory = new URL('../../../agent-knowledge/sources/notes/', import.meta.url)
+export const legacyDirectory = new URL('../../sources/notes/', import.meta.url)
 export const reportDirectory = new URL(
   '../../reports/source-migration-2026-10-24/',
   import.meta.url,

@@ -7,3 +7,8 @@ dist/
 .tanstack/
 *.sql.gz
 backups/
+
+# Private collection links, media, and local OCR models
+sources/
+__pycache__/
+.DS_Store

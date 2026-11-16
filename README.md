@@ -44,8 +44,8 @@ bun run start
 - 题目放在 `content/questions/*.json`，填写目标 `libraryId`。只有 `reviewed` 题目导入。
 - `bun run import` 只新增题目，重复执行不覆盖数据库中的人工修订。修改已入库内容需明确审核并更新数据库内容及版本，不会自动覆盖。
 - `bun run export:md` 将实际数据库中的题目导出到 `content/markdown/`，保留 ID、library、版本、来源及评分细则，每文件不超过 300 行，不导出作答。
-- `bun run collect <target>` 和 `bun run read:notes <target>` 复用已有采集脚本。`target` 为已有 CDP Proxy 页面标识；采集前需自行连接浏览器及 Proxy。
-- `bun run read:images` 保留原脚本入口；本站 V1 题目整理只使用正文，不依赖图片或视频。
+- `bun run collect <target>` 和 `bun run read:notes <target>` 使用 `scripts/collection/` 内的采集脚本。`target` 为已有 CDP Proxy 页面标识；采集前需自行连接浏览器及 Proxy。
+- `bun run read:images` 使用 Python 3、Tesseract 和 `sources/tessdata/` 中的 `chi_sim.traineddata`、`eng.traineddata` 识别图片；本站 V1 题目整理只使用正文，不依赖图片或视频。
 
 首批 20 题来自 8 篇有独立文字证据的已有帖子。参考答案与细则由本次整理者补充，未冒充原作者答案。审核依据见 [正文审核](docs/正文审核.md)，用户尚未独立复核。
 
@@ -97,7 +97,7 @@ bun run restore < interview-backup.sql
 - `bun run sources:backup-check`：读取已有私有备份，恢复到独立临时库验证；不替换工作库。
 - `bun run sources:cleanup`：仅在备份恢复证明有效、数据库与旧文件哈希一致时清理已迁移 JSON；可重跑，不扩大删除范围。
 
-`read:notes` 现同时查询数据库已保存的 source ID 和本地未迁移 JSON，避免清理后重新抓取。该脚本使用 Bun 执行，须在 app 目录运行以加载 .env。迁移报告和脚本位于 app 仓库，旧采集脚本的去重修正位于仓库外的 `agent-knowledge/scripts/read-notes.mjs`。
+`read:notes` 现同时查询数据库已保存的 source ID 和本地未迁移 JSON，避免清理后重新抓取。该脚本使用 Bun 执行，须在 app 目录运行以加载 .env。采集脚本位于 `scripts/collection/`，原始索引、正文和媒体位于 `sources/`，来源迁移脚本也读取此目录。`sources/` 含个人收藏和访问参数，已忽略 Git 跟踪，迁移机器时需单独复制。
 
 私有备份包含旧记录，可能带历史采集访问参数，不提交 Git、不发送模型。恢复单篇旧文件可从 notes.tar.gz 提取到原 notes 目录；数据库回退使用 database.sql，会替换当前数据，执行前需保存后续新作答。
 
@@ -133,3 +133,18 @@ bun run export:md
 questions:verify:coverage 会核对数据库中每篇正文的哈希、题目关联、题内完整证据、逐批评分结果、题目文件与实际入库内容，以及应用目录是否展示全部题目。source-coverage.json 为 145 篇正文的逐篇清单，intent-source-topic-coverage.json 为原帖 32 道意图识别问题的逐项映射。详见 [全量整理验证报告](reports/question-completion-2026-10-24/report.md)。
 
 评分缓存指纹绑定题干、答案、细则、关键错误、样本标签及评分配置；仅更正来源或版本不会重发请求，改变评分内容仍会停止并保护原始记录。旧指纹已逐份验证后保留为 artifactFingerprint，迁移未发起新请求。所有代码、来源、题目、答题 fixture 与报告纳入版本管理；密钥和私有数据库备份不纳入。
+
+## 采集依赖与范围
+
+2026-11-05 已将旧采集脚本和资料迁入本项目，删除外部资料目录和旧 Markdown 笔记。
+从 `app` 运行采集命令；先启动数据库，并准备已登录的收藏页和监听 `localhost:3456` 的 CDP Proxy（提供 eval、navigate、scroll、screenshot 接口）。浏览器、Proxy、Python 3 与 Tesseract 是外部运行依赖。遇到验证码时停止，不绕过验证。
+
+图片识别的本地语言模型放在 `sources/tessdata/`；新环境可安装 Tesseract 后执行：
+
+```sh
+mkdir -p sources/tessdata
+curl -fL https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/chi_sim.traineddata -o sources/tessdata/chi_sim.traineddata
+curl -fL https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main/eng.traineddata -o sources/tessdata/eng.traineddata
+```
+
+本次只迁移现有能力：正文采集与来源审核仍限定 2026-01-01 至 2026-10-22，审核报告仍使用历史批次目录。整理者需将来源整理成 `content/questions/` 内含答案、评分细则的题目 JSON，再评测、审核和导入；没有自动出题流水线。视频不做转录。
