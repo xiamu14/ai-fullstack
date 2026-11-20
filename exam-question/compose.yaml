@@ -1,3 +1,5 @@
+name: ai-fullstack-exam-question
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -16,3 +18,5 @@ services:
       retries: 20
 volumes:
   interview-data:
+    external: true
+    name: app_interview-data

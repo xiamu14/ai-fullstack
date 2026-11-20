@@ -22,7 +22,7 @@ bun run import
 bun run dev
 ```
 
-访问 <http://127.0.0.1:3006>。PostgreSQL 仅绑定 `127.0.0.1:54339`，数据保存在 Compose 命名卷中。`db:down` 不删除数据卷。
+访问 <http://127.0.0.1:3006>。PostgreSQL 仅绑定 `127.0.0.1:54339`。Compose 项目 `ai-fullstack-exam-question` 复用外部卷 `app_interview-data`，`db:down` 会保留此卷。仅在全新环境中需要初始化空库时，先执行 `docker volume create app_interview-data`。
 
 生产运行：
 
